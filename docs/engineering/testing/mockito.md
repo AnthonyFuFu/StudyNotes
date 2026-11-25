@@ -1,5 +1,9 @@
 # Mockito 深入
 
+!!! abstract "本章重點"
+
+    單元測試要隔離外部依賴，Mockito 讓你用假物件取代資料庫、外部 API。本章說明 Mock、Stub、Spy 的差別，常用的 `when` / `verify` API，以及用 ArgumentCaptor 驗證傳入的參數。
+
 ## Mock / Stub / Spy 的區別
 
 **Mock（模擬）**
@@ -27,136 +31,151 @@
 
 ## Mockito 完整 API
 
-```java
-@ExtendWith(MockitoExtension.class)  // JUnit 5 整合 Mockito
-class OrderServiceTest {
+=== "類別與共用設定"
 
-    @Mock
-    private OrderRepository orderRepository;
+    ``` java
+    @ExtendWith(MockitoExtension.class)  // JUnit 5 整合 Mockito
+    class OrderServiceTest {
 
-    @Mock
-    private InventoryService inventoryService;
+        @Mock
+        private OrderRepository orderRepository;
 
-    @Mock
-    private NotificationService notificationService;
+        @Mock
+        private InventoryService inventoryService;
 
-    @InjectMocks  // 自動注入上面的 Mock 到被測對象
-    private OrderService orderService;
+        @Mock
+        private NotificationService notificationService;
 
-    // ─── Stubbing（設定返回值）───
+        @InjectMocks  // 自動注入上面的 Mock 到被測對象
+        private OrderService orderService;
 
-    @Test
-    void stubbingExamples() {
-        Order mockOrder = Order.builder()
-            .id(1L)
-            .status(OrderStatus.PENDING)
-            .amount(new BigDecimal("500"))
-            .build();
+    ```
 
-        // 基本 stubbing
-        when(orderRepository.findById(1L))
-            .thenReturn(Optional.of(mockOrder));
+=== "Stubbing"
 
-        // 連續返回不同值
-        when(orderRepository.findById(2L))
-            .thenReturn(Optional.empty())           // 第一次
-            .thenReturn(Optional.of(mockOrder));    // 第二次以後
+    ``` java
 
-        // 拋出例外
-        when(orderRepository.findById(-1L))
-            .thenThrow(new IllegalArgumentException("ID 不能為負數"));
+        @Test
+        void stubbingExamples() {
+            Order mockOrder = Order.builder()
+                .id(1L)
+                .status(OrderStatus.PENDING)
+                .amount(new BigDecimal("500"))
+                .build();
 
-        // 根據參數動態返回值
-        when(orderRepository.findById(anyLong()))
-            .thenAnswer(invocation -> {
-                Long id = invocation.getArgument(0);
-                if (id > 0) {
-                    return Optional.of(Order.builder().id(id).build());
-                }
-                return Optional.empty();
-            });
+            // 基本 stubbing
+            when(orderRepository.findById(1L))
+                .thenReturn(Optional.of(mockOrder));
 
-        // void 方法
-        doNothing().when(notificationService).send(any());          // 不做任何事
-        doThrow(new RuntimeException("發送失敗"))
-            .when(notificationService).send(any());                  // 拋出例外
-        doAnswer(invocation -> {
-            log.info("通知已發送（Mock）");
-            return null;
-        }).when(notificationService).send(any());                    // 自定義行為
+            // 連續返回不同值
+            when(orderRepository.findById(2L))
+                .thenReturn(Optional.empty())           // 第一次
+                .thenReturn(Optional.of(mockOrder));    // 第二次以後
+
+            // 拋出例外
+            when(orderRepository.findById(-1L))
+                .thenThrow(new IllegalArgumentException("ID 不能為負數"));
+
+            // 根據參數動態返回值
+            when(orderRepository.findById(anyLong()))
+                .thenAnswer(invocation -> {
+                    Long id = invocation.getArgument(0);
+                    if (id > 0) {
+                        return Optional.of(Order.builder().id(id).build());
+                    }
+                    return Optional.empty();
+                });
+
+            // void 方法
+            doNothing().when(notificationService).send(any());          // 不做任何事
+            doThrow(new RuntimeException("發送失敗"))
+                .when(notificationService).send(any());                  // 拋出例外
+            doAnswer(invocation -> {
+                log.info("通知已發送（Mock）");
+                return null;
+            }).when(notificationService).send(any());                    // 自定義行為
+        }
+
+    ```
+
+=== "參數匹配器"
+
+    ``` java
+
+        @Test
+        void argumentMatchersExamples() {
+            // any()：匹配任意值
+            when(orderRepository.findByUserId(anyLong()))
+                .thenReturn(List.of());
+
+            // 精確值匹配（不能混用 any() 和精確值！）
+            // ❌ 錯誤：when(repo.save(order, anyString()))
+            // ✅ 正確：用 eq() 包裝精確值
+            when(orderRepository.findByUserIdAndStatus(eq(1L), eq("PAID")))
+                .thenReturn(List.of());
+
+            // 自定義匹配器
+            when(orderRepository.save(argThat(order ->
+                order.getAmount().compareTo(BigDecimal.ZERO) > 0
+            ))).thenReturn(new Order());
+
+            // 常用匹配器
+            anyString()           // 任意非 null 字串
+            anyInt()              // 任意 int
+            anyLong()             // 任意 long
+            any(Order.class)      // 任意 Order 類型（包含 null）
+            notNull()             // 非 null
+            isNull()              // 為 null
+            startsWith("ORDER-")  // 以 ORDER- 開頭的字串
+        }
+
+    ```
+
+=== "驗證行為"
+
+    ``` java
+
+        @Test
+        @DisplayName("建立訂單後應該發送通知")
+        void createOrder_ShouldSendNotification() {
+            // Arrange
+            CreateOrderRequest request = CreateOrderRequest.builder()
+                .userId(1L)
+                .items(List.of(new OrderItem(1L, 2)))
+                .build();
+
+            when(inventoryService.checkAndReserve(anyLong(), anyInt()))
+                .thenReturn(true);
+            when(orderRepository.save(any()))
+                .thenReturn(Order.builder().id(1L).build());
+
+            // Act
+            orderService.create(request);
+
+            // Assert - 驗證方法被調用了
+            verify(orderRepository, times(1)).save(any(Order.class));
+            verify(notificationService, times(1)).send(any());
+            verify(inventoryService, times(1))
+                .checkAndReserve(eq(1L), eq(2));
+
+            // 驗證不應該被調用
+            verify(notificationService, never()).sendUrgent(any());
+
+            // 驗證調用順序
+            InOrder inOrder = inOrder(inventoryService, orderRepository, notificationService);
+            inOrder.verify(inventoryService).checkAndReserve(anyLong(), anyInt());
+            inOrder.verify(orderRepository).save(any());
+            inOrder.verify(notificationService).send(any());
+
+            // 驗證沒有其他未被驗證的互動
+            verifyNoMoreInteractions(notificationService);
+
+            // 驗證零互動
+            verifyNoInteractions(notificationService);
+        }
     }
+    ```
 
-    // ─── 參數匹配器（Argument Matchers）───
-
-    @Test
-    void argumentMatchersExamples() {
-        // any()：匹配任意值
-        when(orderRepository.findByUserId(anyLong()))
-            .thenReturn(List.of());
-
-        // 精確值匹配（不能混用 any() 和精確值！）
-        // ❌ 錯誤：when(repo.save(order, anyString()))
-        // ✅ 正確：用 eq() 包裝精確值
-        when(orderRepository.findByUserIdAndStatus(eq(1L), eq("PAID")))
-            .thenReturn(List.of());
-
-        // 自定義匹配器
-        when(orderRepository.save(argThat(order ->
-            order.getAmount().compareTo(BigDecimal.ZERO) > 0
-        ))).thenReturn(new Order());
-
-        // 常用匹配器
-        anyString()           // 任意非 null 字串
-        anyInt()              // 任意 int
-        anyLong()             // 任意 long
-        any(Order.class)      // 任意 Order 類型（包含 null）
-        notNull()             // 非 null
-        isNull()              // 為 null
-        startsWith("ORDER-")  // 以 ORDER- 開頭的字串
-    }
-
-    // ─── 驗證行為（Verify）───
-
-    @Test
-    @DisplayName("建立訂單後應該發送通知")
-    void createOrder_ShouldSendNotification() {
-        // Arrange
-        CreateOrderRequest request = CreateOrderRequest.builder()
-            .userId(1L)
-            .items(List.of(new OrderItem(1L, 2)))
-            .build();
-
-        when(inventoryService.checkAndReserve(anyLong(), anyInt()))
-            .thenReturn(true);
-        when(orderRepository.save(any()))
-            .thenReturn(Order.builder().id(1L).build());
-
-        // Act
-        orderService.create(request);
-
-        // Assert - 驗證方法被調用了
-        verify(orderRepository, times(1)).save(any(Order.class));
-        verify(notificationService, times(1)).send(any());
-        verify(inventoryService, times(1))
-            .checkAndReserve(eq(1L), eq(2));
-
-        // 驗證不應該被調用
-        verify(notificationService, never()).sendUrgent(any());
-
-        // 驗證調用順序
-        InOrder inOrder = inOrder(inventoryService, orderRepository, notificationService);
-        inOrder.verify(inventoryService).checkAndReserve(anyLong(), anyInt());
-        inOrder.verify(orderRepository).save(any());
-        inOrder.verify(notificationService).send(any());
-
-        // 驗證沒有其他未被驗證的互動
-        verifyNoMoreInteractions(notificationService);
-
-        // 驗證零互動
-        verifyNoInteractions(notificationService);
-    }
-}
-```
 
 ## ArgumentCaptor（捕獲參數）
 

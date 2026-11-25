@@ -1,5 +1,9 @@
 # RESTful API 設計最佳實踐
 
+!!! abstract "本章重點"
+
+    好的 API 讓前端、App、第三方都能直覺地使用。本章整理 REST 的設計原則、URI 命名、HTTP 方法與冪等性、狀態碼、統一回應格式與版本管理，最後附上一份可以直接拿來檢查的設計清單。
+
 ## REST 設計六大原則
 
 REST（Representational State Transfer）架構風格：
@@ -88,14 +92,14 @@ PATCH        部分更新       ❌      ❌
 DELETE       刪除           ❌      ✅
 ```
 
-| 項目 | 說明 |
+| 特性 | 意義 |
 |------|------|
 | 安全性（Safe） | 不修改服務器狀態 |
 | 冪等性（Idempotent） | 多次執行結果相同 |
 
 **重點**
 
-| 項目 | 說明 |
+| 請求 | 行為 |
 |------|------|
 | GET /orders/123 | 每次都返回相同訂單（安全 + 冪等） |
 | POST /orders | 每次呼叫可能建立新訂單（非冪等！） |
@@ -232,215 +236,234 @@ public class OrderController {
 
 ## 統一響應格式
 
-```java
-// 統一 API 響應格式
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class ApiResponse<T> {
+=== "統一 API 響應格式"
 
-    private boolean success;
-    private String  code;       // 業務狀態碼
-    private String  message;
-    private T       data;
-    private String  traceId;    // 請求追蹤 ID（方便排查）
-    private Long    timestamp;
+    ``` java
+    // 統一 API 響應格式
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public class ApiResponse<T> {
 
-    // 成功
-    public static <T> ApiResponse<T> success(T data) {
-        return ApiResponse.<T>builder()
-            .success(true)
-            .code("SUCCESS")
-            .message("操作成功")
-            .data(data)
-            .traceId(MDC.get("traceId"))
-            .timestamp(System.currentTimeMillis())
-            .build();
-    }
+        private boolean success;
+        private String  code;       // 業務狀態碼
+        private String  message;
+        private T       data;
+        private String  traceId;    // 請求追蹤 ID（方便排查）
+        private Long    timestamp;
 
-    // 失敗
-    public static <T> ApiResponse<T> fail(String code, String message) {
-        return ApiResponse.<T>builder()
-            .success(false)
-            .code(code)
-            .message(message)
-            .traceId(MDC.get("traceId"))
-            .timestamp(System.currentTimeMillis())
-            .build();
-    }
-}
-
-// 業務錯誤碼枚舉
-public enum ErrorCode {
-    // 通用錯誤
-    PARAM_INVALID        ("PARAM_001", "請求參數不合法"),
-    RESOURCE_NOT_FOUND   ("RESOURCE_001", "資源不存在"),
-    RESOURCE_CONFLICT    ("RESOURCE_002", "資源已存在"),
-    UNAUTHORIZED         ("AUTH_001", "請先登入"),
-    FORBIDDEN            ("AUTH_002", "無操作權限"),
-    RATE_LIMIT_EXCEEDED  ("RATE_001", "請求太頻繁，請稍後再試"),
-
-    // 訂單錯誤
-    ORDER_NOT_FOUND      ("ORDER_001", "訂單不存在"),
-    ORDER_ALREADY_PAID   ("ORDER_002", "訂單已支付"),
-    ORDER_CANCELLED      ("ORDER_003", "訂單已取消"),
-
-    // 庫存錯誤
-    INSUFFICIENT_STOCK   ("STOCK_001", "庫存不足"),
-
-    // 系統錯誤
-    SYSTEM_ERROR         ("SYS_001", "系統異常，請稍後再試");
-
-    private final String code;
-    private final String message;
-
-    ErrorCode(String code, String message) {
-        this.code    = code;
-        this.message = message;
-    }
-}
-
-// 全局異常處理器
-@RestControllerAdvice
-@Slf4j
-public class GlobalExceptionHandler {
-
-    // 業務異常
-    @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<ApiResponse<Void>> handleBusinessException(
-            BusinessException e, HttpServletRequest request) {
-        log.warn("業務異常：{}, path={}", e.getMessage(), request.getRequestURI());
-        return ResponseEntity
-            .status(e.getHttpStatus())
-            .body(ApiResponse.fail(e.getCode(), e.getMessage()));
-    }
-
-    // 參數驗證失敗（@Valid）
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiResponse<Map<String, String>>> handleValidException(
-            MethodArgumentNotValidException e) {
-
-        Map<String, String> errors = e.getBindingResult()
-            .getFieldErrors()
-            .stream()
-            .collect(Collectors.toMap(
-                FieldError::getField,
-                FieldError::getDefaultMessage,
-                (a, b) -> a
-            ));
-
-        return ResponseEntity
-            .badRequest()
-            .body(ApiResponse.<Map<String, String>>builder()
-                .success(false)
-                .code(ErrorCode.PARAM_INVALID.getCode())
-                .message("請求參數驗證失敗")
-                .data(errors)
+        // 成功
+        public static <T> ApiResponse<T> success(T data) {
+            return ApiResponse.<T>builder()
+                .success(true)
+                .code("SUCCESS")
+                .message("操作成功")
+                .data(data)
                 .traceId(MDC.get("traceId"))
                 .timestamp(System.currentTimeMillis())
-                .build());
-    }
+                .build();
+        }
 
-    // 資源不存在
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ApiResponse<Void>> handleNotFoundException(
-            ResourceNotFoundException e) {
-        return ResponseEntity
-            .status(HttpStatus.NOT_FOUND)
-            .body(ApiResponse.fail(
-                ErrorCode.RESOURCE_NOT_FOUND.getCode(),
-                e.getMessage()
-            ));
+        // 失敗
+        public static <T> ApiResponse<T> fail(String code, String message) {
+            return ApiResponse.<T>builder()
+                .success(false)
+                .code(code)
+                .message(message)
+                .traceId(MDC.get("traceId"))
+                .timestamp(System.currentTimeMillis())
+                .build();
+        }
     }
+    ```
 
-    // 限流異常
-    @ExceptionHandler(RateLimitException.class)
-    public ResponseEntity<ApiResponse<Void>> handleRateLimitException(
-            RateLimitException e) {
-        return ResponseEntity
-            .status(HttpStatus.TOO_MANY_REQUESTS)
-            .header("Retry-After", "60")
-            .body(ApiResponse.fail(
-                ErrorCode.RATE_LIMIT_EXCEEDED.getCode(),
-                ErrorCode.RATE_LIMIT_EXCEEDED.getMessage()
-            ));
-    }
+=== "業務錯誤碼枚舉"
 
-    // 其他系統異常
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse<Void>> handleException(
-            Exception e, HttpServletRequest request) {
-        log.error("系統異常：path={}", request.getRequestURI(), e);
-        return ResponseEntity
-            .status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body(ApiResponse.fail(
-                ErrorCode.SYSTEM_ERROR.getCode(),
-                ErrorCode.SYSTEM_ERROR.getMessage()
-                // ⚠️ 不要把 e.getMessage() 返回給客戶端！
-                // 可能洩漏系統內部資訊
-            ));
+    ``` java
+    // 業務錯誤碼枚舉
+    public enum ErrorCode {
+        // 通用錯誤
+        PARAM_INVALID        ("PARAM_001", "請求參數不合法"),
+        RESOURCE_NOT_FOUND   ("RESOURCE_001", "資源不存在"),
+        RESOURCE_CONFLICT    ("RESOURCE_002", "資源已存在"),
+        UNAUTHORIZED         ("AUTH_001", "請先登入"),
+        FORBIDDEN            ("AUTH_002", "無操作權限"),
+        RATE_LIMIT_EXCEEDED  ("RATE_001", "請求太頻繁，請稍後再試"),
+
+        // 訂單錯誤
+        ORDER_NOT_FOUND      ("ORDER_001", "訂單不存在"),
+        ORDER_ALREADY_PAID   ("ORDER_002", "訂單已支付"),
+        ORDER_CANCELLED      ("ORDER_003", "訂單已取消"),
+
+        // 庫存錯誤
+        INSUFFICIENT_STOCK   ("STOCK_001", "庫存不足"),
+
+        // 系統錯誤
+        SYSTEM_ERROR         ("SYS_001", "系統異常，請稍後再試");
+
+        private final String code;
+        private final String message;
+
+        ErrorCode(String code, String message) {
+            this.code    = code;
+            this.message = message;
+        }
     }
-}
-```
+    ```
+
+=== "全局異常處理器"
+
+    ``` java
+    // 全局異常處理器
+    @RestControllerAdvice
+    @Slf4j
+    public class GlobalExceptionHandler {
+
+        // 業務異常
+        @ExceptionHandler(BusinessException.class)
+        public ResponseEntity<ApiResponse<Void>> handleBusinessException(
+                BusinessException e, HttpServletRequest request) {
+            log.warn("業務異常：{}, path={}", e.getMessage(), request.getRequestURI());
+            return ResponseEntity
+                .status(e.getHttpStatus())
+                .body(ApiResponse.fail(e.getCode(), e.getMessage()));
+        }
+
+        // 參數驗證失敗（@Valid）
+        @ExceptionHandler(MethodArgumentNotValidException.class)
+        public ResponseEntity<ApiResponse<Map<String, String>>> handleValidException(
+                MethodArgumentNotValidException e) {
+
+            Map<String, String> errors = e.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .collect(Collectors.toMap(
+                    FieldError::getField,
+                    FieldError::getDefaultMessage,
+                    (a, b) -> a
+                ));
+
+            return ResponseEntity
+                .badRequest()
+                .body(ApiResponse.<Map<String, String>>builder()
+                    .success(false)
+                    .code(ErrorCode.PARAM_INVALID.getCode())
+                    .message("請求參數驗證失敗")
+                    .data(errors)
+                    .traceId(MDC.get("traceId"))
+                    .timestamp(System.currentTimeMillis())
+                    .build());
+        }
+
+        // 資源不存在
+        @ExceptionHandler(ResourceNotFoundException.class)
+        public ResponseEntity<ApiResponse<Void>> handleNotFoundException(
+                ResourceNotFoundException e) {
+            return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(ApiResponse.fail(
+                    ErrorCode.RESOURCE_NOT_FOUND.getCode(),
+                    e.getMessage()
+                ));
+        }
+
+        // 限流異常
+        @ExceptionHandler(RateLimitException.class)
+        public ResponseEntity<ApiResponse<Void>> handleRateLimitException(
+                RateLimitException e) {
+            return ResponseEntity
+                .status(HttpStatus.TOO_MANY_REQUESTS)
+                .header("Retry-After", "60")
+                .body(ApiResponse.fail(
+                    ErrorCode.RATE_LIMIT_EXCEEDED.getCode(),
+                    ErrorCode.RATE_LIMIT_EXCEEDED.getMessage()
+                ));
+        }
+
+        // 其他系統異常
+        @ExceptionHandler(Exception.class)
+        public ResponseEntity<ApiResponse<Void>> handleException(
+                Exception e, HttpServletRequest request) {
+            log.error("系統異常：path={}", request.getRequestURI(), e);
+            return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ApiResponse.fail(
+                    ErrorCode.SYSTEM_ERROR.getCode(),
+                    ErrorCode.SYSTEM_ERROR.getMessage()
+                    // ⚠️ 不要把 e.getMessage() 返回給客戶端！
+                    // 可能洩漏系統內部資訊
+                ));
+        }
+    }
+    ```
+
 
 ## API 版本管理
 
-```java
-// 版本管理三種方式：
+=== "UserControllerV2"
 
-// ① URI 版本（最常用、最清晰）
-@RestController
-@RequestMapping("/api/v1/users")
-public class UserControllerV1 { ... }
+    ``` java
+    // 版本管理三種方式：
 
-@RestController
-@RequestMapping("/api/v2/users")
-public class UserControllerV2 { ... }
 
-// ② Header 版本
-@GetMapping(value = "/users", headers = "X-API-Version=1")
-public ResponseEntity<?> getUsersV1() { ... }
+    // ① URI 版本（最常用、最清晰）
+    @RestController
+    @RequestMapping("/api/v1/users")
+    public class UserControllerV1 { ... }
 
-@GetMapping(value = "/users", headers = "X-API-Version=2")
-public ResponseEntity<?> getUsersV2() { ... }
+    @RestController
+    @RequestMapping("/api/v2/users")
+    public class UserControllerV2 { ... }
 
-// ③ Accept Header 版本
-@GetMapping(value = "/users",
-    produces = "application/vnd.myapp.v1+json")
-public ResponseEntity<?> getUsersV1() { ... }
+    // ② Header 版本
+    @GetMapping(value = "/users", headers = "X-API-Version=1")
+    public ResponseEntity<?> getUsersV1() { ... }
 
-@GetMapping(value = "/users",
-    produces = "application/vnd.myapp.v2+json")
-public ResponseEntity<?> getUsersV2() { ... }
+    @GetMapping(value = "/users", headers = "X-API-Version=2")
+    public ResponseEntity<?> getUsersV2() { ... }
 
-// 版本演進策略：
-// ① 新增欄位：向後兼容，不需要新版本
-// ② 修改欄位含義/刪除欄位：需要新版本
-// ③ 舊版本維護 6~12 個月後棄用
-// ④ 在響應頭加上棄用警告：
-//    Deprecation: true
-//    Sunset: Sat, 01 Jan 2025 00:00:00 GMT
+    // ③ Accept Header 版本
+    @GetMapping(value = "/users",
+        produces = "application/vnd.myapp.v1+json")
+    public ResponseEntity<?> getUsersV1() { ... }
 
-// API 棄用攔截器
-@Component
-public class DeprecationInterceptor implements HandlerInterceptor {
+    @GetMapping(value = "/users",
+        produces = "application/vnd.myapp.v2+json")
+    public ResponseEntity<?> getUsersV2() { ... }
 
-    @Override
-    public boolean preHandle(HttpServletRequest request,
-                             HttpServletResponse response,
-                             Object handler) {
-        String path = request.getRequestURI();
-        if (path.startsWith("/api/v1/")) {
-            response.setHeader("Deprecation", "true");
-            response.setHeader("Sunset", "Sat, 01 Jul 2025 00:00:00 GMT");
-            response.setHeader("Link",
-                "</api/v2/users>; rel=\"successor-version\"");
+    // 版本演進策略：
+    // ① 新增欄位：向後兼容，不需要新版本
+    // ② 修改欄位含義/刪除欄位：需要新版本
+    // ③ 舊版本維護 6~12 個月後棄用
+    // ④ 在響應頭加上棄用警告：
+    //    Deprecation: true
+    //    Sunset: Sat, 01 Jan 2025 00:00:00 GMT
+    ```
+
+=== "API 棄用攔截器"
+
+    ``` java
+    // API 棄用攔截器
+    @Component
+    public class DeprecationInterceptor implements HandlerInterceptor {
+
+        @Override
+        public boolean preHandle(HttpServletRequest request,
+                                 HttpServletResponse response,
+                                 Object handler) {
+            String path = request.getRequestURI();
+            if (path.startsWith("/api/v1/")) {
+                response.setHeader("Deprecation", "true");
+                response.setHeader("Sunset", "Sat, 01 Jul 2025 00:00:00 GMT");
+                response.setHeader("Link",
+                    "</api/v2/users>; rel=\"successor-version\"");
+            }
+            return true;
         }
-        return true;
     }
-}
-```
+    ```
+
 
 ## API 設計最佳實踐清單
 

@@ -1,5 +1,9 @@
 # 記憶體模型（Runtime Data Areas）
 
+!!! abstract "本章重點"
+
+    JVM 在執行時把記憶體劃分成不同區域，各自有不同的生命週期與 OOM 風險。本章逐一說明程序計數器、虛擬機棧、本地方法棧、堆與方法區（Metaspace）。
+
 ## 程序計數器（Program Counter Register）
 
 - ✅ 線程私有（每個線程一個）

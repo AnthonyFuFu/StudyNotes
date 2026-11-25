@@ -1,5 +1,9 @@
 # gRPC（高效能 RPC 框架）
 
+!!! abstract "本章重點"
+
+    gRPC 以 HTTP/2 + Protobuf 二進位傳輸，序列化更快、體積更小，並支援四種串流模式，是微服務內部通訊的常見選擇。本章從 `.proto` 定義到 Spring Boot 整合，並說明它為什麼不適合直接給瀏覽器使用。
+
 ## 核心原理
 
 gRPC 是 Google 開源的高效能 RPC 框架
@@ -186,239 +190,267 @@ grpc:
       negotiation-type: plaintext   # 生產用 TLS
 ```
 
-```java
-// ═══════════════ Server 端實作 ═══════════════
+=== "Server 端實作"
 
-@GrpcService
-@RequiredArgsConstructor
-@Slf4j
-public class OrderGrpcService extends OrderServiceGrpc.OrderServiceImplBase {
+    ``` java
+    @GrpcService
+    @RequiredArgsConstructor
+    @Slf4j
+    public class OrderGrpcService extends OrderServiceGrpc.OrderServiceImplBase {
 
-    private final OrderService orderService;
+        private final OrderService orderService;
 
-    // ① Unary RPC
-    @Override
-    public void createOrder(CreateOrderRequest request,
-                            StreamObserver<Order> responseObserver) {
-        try {
-            log.info("gRPC createOrder, userId={}", request.getUserId());
 
-            // 業務邏輯
-            com.example.model.Order order =
-                orderService.create(fromProto(request));
+        @Override
+        public void createOrder(CreateOrderRequest request,
+                                StreamObserver<Order> responseObserver) {
+            try {
+                log.info("gRPC createOrder, userId={}", request.getUserId());
 
-            // 返回響應
-            responseObserver.onNext(toProto(order));
-            responseObserver.onCompleted();
-
-        } catch (Exception e) {
-            log.error("gRPC createOrder 失敗", e);
-            responseObserver.onError(
-                Status.INTERNAL
-                    .withDescription(e.getMessage())
-                    .withCause(e)
-                    .asRuntimeException()
-            );
-        }
-    }
-
-    // ② Server Streaming RPC
-    @Override
-    public void watchOrderStatus(GetOrderRequest request,
-                                  StreamObserver<OrderStatusUpdate> responseObserver) {
-        Long orderId = request.getId();
-        log.info("開始監聽訂單狀態，orderId={}", orderId);
-
-        try {
-            // 模擬訂單狀態流
-            List<String> statuses = List.of("PAID", "PREPARING", "SHIPPED", "DELIVERED");
-            for (String status : statuses) {
-                Thread.sleep(2000); // 模擬狀態變化
-
-                OrderStatusUpdate update = OrderStatusUpdate.newBuilder()
-                    .setOrderId(orderId)
-                    .setStatus(status)
-                    .setMessage("訂單狀態更新為：" + status)
-                    .setUpdatedAt(Timestamps.fromMillis(System.currentTimeMillis()))
-                    .build();
-
-                responseObserver.onNext(update); // 推送狀態更新
-            }
-            responseObserver.onCompleted();
-
-        } catch (Exception e) {
-            responseObserver.onError(
-                Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException()
-            );
-        }
-    }
-
-    // ③ Client Streaming RPC
-    @Override
-    public StreamObserver<CreateOrderRequest> batchCreateOrders(
-            StreamObserver<ListOrdersResponse> responseObserver) {
-
-        List<com.example.model.Order> createdOrders = new ArrayList<>();
-
-        return new StreamObserver<CreateOrderRequest>() {
-            @Override
-            public void onNext(CreateOrderRequest request) {
-                // 接收客戶端發送的每個請求
+                // 業務邏輯
                 com.example.model.Order order =
                     orderService.create(fromProto(request));
-                createdOrders.add(order);
-                log.info("批量創建訂單：{}", order.getId());
-            }
 
-            @Override
-            public void onError(Throwable t) {
-                log.error("批量創建訂單出錯", t);
-            }
-
-            @Override
-            public void onCompleted() {
-                // 客戶端發送完畢，返回匯總結果
-                ListOrdersResponse response = ListOrdersResponse.newBuilder()
-                    .addAllOrders(createdOrders.stream()
-                        .map(OrderGrpcService.this::toProto)
-                        .collect(Collectors.toList()))
-                    .setTotal(createdOrders.size())
-                    .build();
-
-                responseObserver.onNext(response);
+                // 返回響應
+                responseObserver.onNext(toProto(order));
                 responseObserver.onCompleted();
+
+            } catch (Exception e) {
+                log.error("gRPC createOrder 失敗", e);
+                responseObserver.onError(
+                    Status.INTERNAL
+                        .withDescription(e.getMessage())
+                        .withCause(e)
+                        .asRuntimeException()
+                );
             }
-        };
-    }
-
-    // Proto 轉換工具方法
-    private Order toProto(com.example.model.Order order) {
-        return Order.newBuilder()
-            .setId(order.getId())
-            .setUserId(order.getUserId())
-            .setStatus(order.getStatus().name())
-            .setAmount(order.getAmount().doubleValue())
-            .build();
-    }
-
-    private com.example.model.OrderRequest fromProto(CreateOrderRequest proto) {
-        return com.example.model.OrderRequest.builder()
-            .userId(proto.getUserId())
-            .address(proto.getAddress())
-            .build();
-    }
-}
-
-// gRPC 攔截器（實作認證、日誌等）
-@Component
-public class AuthGrpcInterceptor implements ServerInterceptor {
-
-    private static final Metadata.Key<String> AUTH_KEY =
-        Metadata.Key.of("authorization", Metadata.ASCII_STRING_MARSHALLER);
-
-    @Override
-    public <Q, R> ServerCall.Listener<Q> interceptCall(
-            ServerCall<Q, R> call, Metadata headers,
-            ServerCallHandler<Q, R> next) {
-
-        String token = headers.get(AUTH_KEY);
-        if (token == null || !token.startsWith("Bearer ")) {
-            call.close(Status.UNAUTHENTICATED
-                .withDescription("缺少認證 Token"), new Metadata());
-            return new ServerCall.Listener<Q>() {};
         }
 
-        // 驗證 JWT Token
-        // ...
+    ```
 
-        return next.startCall(call, headers);
-    }
-}
-```
+=== "② Server Streaming RPC"
 
-```java
-// ═══════════════ Client 端使用 ═══════════════
+    ``` java
+        @Override
+        public void watchOrderStatus(GetOrderRequest request,
+                                      StreamObserver<OrderStatusUpdate> responseObserver) {
+            Long orderId = request.getId();
+            log.info("開始監聽訂單狀態，orderId={}", orderId);
 
-@Service
-@RequiredArgsConstructor
-@Slf4j
-public class OrderGrpcClient {
+            try {
+                // 模擬訂單狀態流
+                List<String> statuses = List.of("PAID", "PREPARING", "SHIPPED", "DELIVERED");
+                for (String status : statuses) {
+                    Thread.sleep(2000); // 模擬狀態變化
 
-    // 自動注入 gRPC Channel 並創建 Stub
-    @GrpcClient("order-service")
-    private OrderServiceGrpc.OrderServiceBlockingStub blockingStub;
+                    OrderStatusUpdate update = OrderStatusUpdate.newBuilder()
+                        .setOrderId(orderId)
+                        .setStatus(status)
+                        .setMessage("訂單狀態更新為：" + status)
+                        .setUpdatedAt(Timestamps.fromMillis(System.currentTimeMillis()))
+                        .build();
 
-    @GrpcClient("order-service")
-    private OrderServiceGrpc.OrderServiceStub asyncStub;
-
-    // ① Unary RPC - 同步調用
-    public Order createOrder(CreateOrderRequest request) {
-        try {
-            return blockingStub
-                .withDeadlineAfter(5, TimeUnit.SECONDS)  // 超時設定
-                .createOrder(request);
-        } catch (StatusRuntimeException e) {
-            log.error("gRPC createOrder 失敗: {}", e.getStatus());
-            throw new ServiceException("訂單服務不可用", e);
-        }
-    }
-
-    // ② Server Streaming - 異步監聽
-    public void watchOrderStatus(Long orderId,
-                                  Consumer<OrderStatusUpdate> onUpdate,
-                                  Runnable onComplete) {
-        GetOrderRequest request = GetOrderRequest.newBuilder()
-            .setId(orderId)
-            .build();
-
-        asyncStub.watchOrderStatus(request, new StreamObserver<OrderStatusUpdate>() {
-            @Override
-            public void onNext(OrderStatusUpdate update) {
-                log.info("收到訂單狀態更新：{}", update.getStatus());
-                onUpdate.accept(update);
-            }
-
-            @Override
-            public void onError(Throwable t) {
-                log.error("監聽訂單狀態出錯", t);
-            }
-
-            @Override
-            public void onCompleted() {
-                log.info("訂單狀態監聽完成");
-                onComplete.run();
-            }
-        });
-    }
-
-    // ③ Client Streaming - 批量發送
-    public ListOrdersResponse batchCreateOrders(
-            List<CreateOrderRequest> requests) throws InterruptedException {
-
-        CountDownLatch latch = new CountDownLatch(1);
-        AtomicReference<ListOrdersResponse> result = new AtomicReference<>();
-
-        StreamObserver<CreateOrderRequest> requestObserver =
-            asyncStub.batchCreateOrders(new StreamObserver<ListOrdersResponse>() {
-                @Override
-                public void onNext(ListOrdersResponse response) {
-                    result.set(response);
+                    responseObserver.onNext(update); // 推送狀態更新
                 }
-                @Override public void onError(Throwable t) { latch.countDown(); }
-                @Override public void onCompleted()        { latch.countDown(); }
-            });
+                responseObserver.onCompleted();
 
-        // 發送多個請求
-        for (CreateOrderRequest request : requests) {
-            requestObserver.onNext(request);
+            } catch (Exception e) {
+                responseObserver.onError(
+                    Status.INTERNAL.withDescription(e.getMessage()).asRuntimeException()
+                );
+            }
         }
-        requestObserver.onCompleted();
 
-        latch.await(30, TimeUnit.SECONDS);
-        return result.get();
+    ```
+
+=== "③ Client Streaming RPC"
+
+    ``` java
+        @Override
+        public StreamObserver<CreateOrderRequest> batchCreateOrders(
+                StreamObserver<ListOrdersResponse> responseObserver) {
+
+            List<com.example.model.Order> createdOrders = new ArrayList<>();
+
+            return new StreamObserver<CreateOrderRequest>() {
+                @Override
+                public void onNext(CreateOrderRequest request) {
+                    // 接收客戶端發送的每個請求
+                    com.example.model.Order order =
+                        orderService.create(fromProto(request));
+                    createdOrders.add(order);
+                    log.info("批量創建訂單：{}", order.getId());
+                }
+
+                @Override
+                public void onError(Throwable t) {
+                    log.error("批量創建訂單出錯", t);
+                }
+
+                @Override
+                public void onCompleted() {
+                    // 客戶端發送完畢，返回匯總結果
+                    ListOrdersResponse response = ListOrdersResponse.newBuilder()
+                        .addAllOrders(createdOrders.stream()
+                            .map(OrderGrpcService.this::toProto)
+                            .collect(Collectors.toList()))
+                        .setTotal(createdOrders.size())
+                        .build();
+
+                    responseObserver.onNext(response);
+                    responseObserver.onCompleted();
+                }
+            };
+        }
+
+        // Proto 轉換工具方法
+        private Order toProto(com.example.model.Order order) {
+            return Order.newBuilder()
+                .setId(order.getId())
+                .setUserId(order.getUserId())
+                .setStatus(order.getStatus().name())
+                .setAmount(order.getAmount().doubleValue())
+                .build();
+        }
+
+        private com.example.model.OrderRequest fromProto(CreateOrderRequest proto) {
+            return com.example.model.OrderRequest.builder()
+                .userId(proto.getUserId())
+                .address(proto.getAddress())
+                .build();
+        }
     }
-}
-```
+    ```
+
+=== "gRPC 攔截器"
+
+    ``` java
+    // gRPC 攔截器（實作認證、日誌等）
+    @Component
+    public class AuthGrpcInterceptor implements ServerInterceptor {
+
+        private static final Metadata.Key<String> AUTH_KEY =
+            Metadata.Key.of("authorization", Metadata.ASCII_STRING_MARSHALLER);
+
+        @Override
+        public <Q, R> ServerCall.Listener<Q> interceptCall(
+                ServerCall<Q, R> call, Metadata headers,
+                ServerCallHandler<Q, R> next) {
+
+            String token = headers.get(AUTH_KEY);
+            if (token == null || !token.startsWith("Bearer ")) {
+                call.close(Status.UNAUTHENTICATED
+                    .withDescription("缺少認證 Token"), new Metadata());
+                return new ServerCall.Listener<Q>() {};
+            }
+
+            // 驗證 JWT Token
+            // ...
+
+            return next.startCall(call, headers);
+        }
+    }
+    ```
+
+
+=== "類別與共用設定"
+
+    ``` java
+    // ═══════════════ Client 端使用 ═══════════════
+
+    @Service
+    @RequiredArgsConstructor
+    @Slf4j
+    public class OrderGrpcClient {
+
+        // 自動注入 gRPC Channel 並創建 Stub
+        @GrpcClient("order-service")
+        private OrderServiceGrpc.OrderServiceBlockingStub blockingStub;
+
+        @GrpcClient("order-service")
+        private OrderServiceGrpc.OrderServiceStub asyncStub;
+
+    ```
+
+=== "同步調用"
+
+    ``` java
+        public Order createOrder(CreateOrderRequest request) {
+            try {
+                return blockingStub
+                    .withDeadlineAfter(5, TimeUnit.SECONDS)  // 超時設定
+                    .createOrder(request);
+            } catch (StatusRuntimeException e) {
+                log.error("gRPC createOrder 失敗: {}", e.getStatus());
+                throw new ServiceException("訂單服務不可用", e);
+            }
+        }
+
+    ```
+
+=== "異步監聽"
+
+    ``` java
+        public void watchOrderStatus(Long orderId,
+                                      Consumer<OrderStatusUpdate> onUpdate,
+                                      Runnable onComplete) {
+            GetOrderRequest request = GetOrderRequest.newBuilder()
+                .setId(orderId)
+                .build();
+
+            asyncStub.watchOrderStatus(request, new StreamObserver<OrderStatusUpdate>() {
+                @Override
+                public void onNext(OrderStatusUpdate update) {
+                    log.info("收到訂單狀態更新：{}", update.getStatus());
+                    onUpdate.accept(update);
+                }
+
+                @Override
+                public void onError(Throwable t) {
+                    log.error("監聽訂單狀態出錯", t);
+                }
+
+                @Override
+                public void onCompleted() {
+                    log.info("訂單狀態監聽完成");
+                    onComplete.run();
+                }
+            });
+        }
+
+    ```
+
+=== "批量發送"
+
+    ``` java
+        public ListOrdersResponse batchCreateOrders(
+                List<CreateOrderRequest> requests) throws InterruptedException {
+
+            CountDownLatch latch = new CountDownLatch(1);
+            AtomicReference<ListOrdersResponse> result = new AtomicReference<>();
+
+            StreamObserver<CreateOrderRequest> requestObserver =
+                asyncStub.batchCreateOrders(new StreamObserver<ListOrdersResponse>() {
+                    @Override
+                    public void onNext(ListOrdersResponse response) {
+                        result.set(response);
+                    }
+                    @Override public void onError(Throwable t) { latch.countDown(); }
+                    @Override public void onCompleted()        { latch.countDown(); }
+                });
+
+            // 發送多個請求
+            for (CreateOrderRequest request : requests) {
+                requestObserver.onNext(request);
+            }
+            requestObserver.onCompleted();
+
+            latch.await(30, TimeUnit.SECONDS);
+            return result.get();
+        }
+    }
+    ```
+
 
 ## gRPC vs REST 對比
 

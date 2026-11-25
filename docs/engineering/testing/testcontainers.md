@@ -1,5 +1,9 @@
 # Testcontainers（真實環境整合測試）
 
+!!! abstract "本章重點"
+
+    用 H2 或 Mock 測試，常常跟正式環境的行為不一致。Testcontainers 在測試時用 Docker 啟動真正的 MySQL、Redis、Kafka；本章說明原理、整合方式，以及搭配 Flyway 管理測試資料。
+
 ## 核心原理
 
 **問題**
@@ -20,135 +24,146 @@
 
 ## 整合 MySQL + Redis
 
-```java
-// 方式一：每個測試類獨立容器（隔離性好，但慢）
-@SpringBootTest
-@Testcontainers
-class OrderRepositoryTest {
+=== "方式一：每個測試類獨立容器"
 
-    @Container
-    static MySQLContainer<?> mysql = new MySQLContainer<>("mysql:8.0")
-        .withDatabaseName("testdb")
-        .withUsername("test")
-        .withPassword("test")
-        .withInitScript("sql/init.sql");  // 初始化 SQL
+    ``` java
+    // 方式一：每個測試類獨立容器（隔離性好，但慢）
+    @SpringBootTest
+    @Testcontainers
+    class OrderRepositoryTest {
 
-    @Container
-    static GenericContainer<?> redis = new GenericContainer<>("redis:7-alpine")
-        .withExposedPorts(6379);
-
-    // 動態設定數據源（Container 啟動後才知道端口）
-    @DynamicPropertySource
-    static void configureProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url",      mysql::getJdbcUrl);
-        registry.add("spring.datasource.username", mysql::getUsername);
-        registry.add("spring.datasource.password", mysql::getPassword);
-        registry.add("spring.redis.host",          redis::getHost);
-        registry.add("spring.redis.port",
-            () -> redis.getMappedPort(6379));
-    }
-}
-
-// 方式二：共享容器（所有測試類共用，速度快）✅ 推薦
-
-// 1. 定義基礎類（所有整合測試繼承它）
-@SpringBootTest
-@ActiveProfiles("test")
-public abstract class BaseIntegrationTest {
-
-    // static + @Container → 所有測試共用同一個容器
-    @Container
-    protected static final MySQLContainer<?> MYSQL =
-        new MySQLContainer<>("mysql:8.0")
+        @Container
+        static MySQLContainer<?> mysql = new MySQLContainer<>("mysql:8.0")
             .withDatabaseName("testdb")
             .withUsername("test")
             .withPassword("test")
-            .withReuse(true);  // 開啟容器複用（更快！）
+            .withInitScript("sql/init.sql");  // 初始化 SQL
 
-    @Container
-    protected static final GenericContainer<?> REDIS =
-        new GenericContainer<>("redis:7-alpine")
-            .withExposedPorts(6379)
-            .withReuse(true);
+        @Container
+        static GenericContainer<?> redis = new GenericContainer<>("redis:7-alpine")
+            .withExposedPorts(6379);
 
-    @Container
-    protected static final KafkaContainer KAFKA =
-        new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.4.0"))
-            .withReuse(true);
-
-    static {
-        // Ryuk 容器管理（自動清理）
-        Startables.deepStart(MYSQL, REDIS, KAFKA).join();
+        // 動態設定數據源（Container 啟動後才知道端口）
+        @DynamicPropertySource
+        static void configureProperties(DynamicPropertyRegistry registry) {
+            registry.add("spring.datasource.url",      mysql::getJdbcUrl);
+            registry.add("spring.datasource.username", mysql::getUsername);
+            registry.add("spring.datasource.password", mysql::getPassword);
+            registry.add("spring.redis.host",          redis::getHost);
+            registry.add("spring.redis.port",
+                () -> redis.getMappedPort(6379));
+        }
     }
 
-    @DynamicPropertySource
-    static void configureProperties(DynamicPropertyRegistry registry) {
-        // MySQL
-        registry.add("spring.datasource.url",      MYSQL::getJdbcUrl);
-        registry.add("spring.datasource.username", MYSQL::getUsername);
-        registry.add("spring.datasource.password", MYSQL::getPassword);
+    // 方式二：共享容器（所有測試類共用，速度快）✅ 推薦
+    ```
 
-        // Redis
-        registry.add("spring.redis.host",
-            REDIS::getHost);
-        registry.add("spring.redis.port",
-            () -> REDIS.getMappedPort(6379));
+=== "1. 定義基礎類"
 
-        // Kafka
-        registry.add("spring.kafka.bootstrap-servers",
-            KAFKA::getBootstrapServers);
+    ``` java
+    // 1. 定義基礎類（所有整合測試繼承它）
+    @SpringBootTest
+    @ActiveProfiles("test")
+    public abstract class BaseIntegrationTest {
+
+        // static + @Container → 所有測試共用同一個容器
+        @Container
+        protected static final MySQLContainer<?> MYSQL =
+            new MySQLContainer<>("mysql:8.0")
+                .withDatabaseName("testdb")
+                .withUsername("test")
+                .withPassword("test")
+                .withReuse(true);  // 開啟容器複用（更快！）
+
+        @Container
+        protected static final GenericContainer<?> REDIS =
+            new GenericContainer<>("redis:7-alpine")
+                .withExposedPorts(6379)
+                .withReuse(true);
+
+        @Container
+        protected static final KafkaContainer KAFKA =
+            new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.4.0"))
+                .withReuse(true);
+
+        static {
+            // Ryuk 容器管理（自動清理）
+            Startables.deepStart(MYSQL, REDIS, KAFKA).join();
+        }
+
+        @DynamicPropertySource
+        static void configureProperties(DynamicPropertyRegistry registry) {
+            // MySQL
+            registry.add("spring.datasource.url",      MYSQL::getJdbcUrl);
+            registry.add("spring.datasource.username", MYSQL::getUsername);
+            registry.add("spring.datasource.password", MYSQL::getPassword);
+
+            // Redis
+            registry.add("spring.redis.host",
+                REDIS::getHost);
+            registry.add("spring.redis.port",
+                () -> REDIS.getMappedPort(6379));
+
+            // Kafka
+            registry.add("spring.kafka.bootstrap-servers",
+                KAFKA::getBootstrapServers);
+        }
     }
-}
+    ```
 
-// 2. 繼承基礎類
-@Testcontainers
-class OrderServiceIntegrationTest extends BaseIntegrationTest {
+=== "2. 繼承基礎類"
 
-    @Autowired
-    private OrderService    orderService;
+    ``` java
+    // 2. 繼承基礎類
+    @Testcontainers
+    class OrderServiceIntegrationTest extends BaseIntegrationTest {
 
-    @Autowired
-    private OrderRepository orderRepository;
+        @Autowired
+        private OrderService    orderService;
 
-    @BeforeEach
-    void setUp() {
-        orderRepository.deleteAll();
+        @Autowired
+        private OrderRepository orderRepository;
+
+        @BeforeEach
+        void setUp() {
+            orderRepository.deleteAll();
+        }
+
+        @Test
+        @DisplayName("完整訂單建立 + 查詢流程（真實 MySQL）")
+        void createAndQueryOrder_WithRealMySQL() {
+            // Act
+            CreateOrderRequest request = CreateOrderRequest.builder()
+                .userId(1L)
+                .address("台北市")
+                .items(List.of(new OrderItemRequest(1L, 3)))
+                .build();
+
+            Order created = orderService.create(request);
+
+            // 從真實 MySQL 查詢
+            Order fromDb = orderRepository.findById(created.getId()).orElseThrow();
+
+            assertThat(fromDb.getUserId()).isEqualTo(1L);
+            assertThat(fromDb.getStatus()).isEqualTo(OrderStatus.PENDING);
+        }
+
+        @Test
+        @DisplayName("Redis 緩存測試（真實 Redis）")
+        void getOrder_ShouldUseCache_WithRealRedis() {
+            // 第一次查詢（從 DB，並寫入 Redis）
+            Order order = orderService.findById(1L);
+
+            // 第二次查詢（應該從 Redis 取）
+            Order cached = orderService.findById(1L);
+
+            // 驗證 DB 只被查詢了一次
+            verify(orderRepository, times(1)).findById(1L);
+            assertThat(cached).isEqualTo(order);
+        }
     }
+    ```
 
-    @Test
-    @DisplayName("完整訂單建立 + 查詢流程（真實 MySQL）")
-    void createAndQueryOrder_WithRealMySQL() {
-        // Act
-        CreateOrderRequest request = CreateOrderRequest.builder()
-            .userId(1L)
-            .address("台北市")
-            .items(List.of(new OrderItemRequest(1L, 3)))
-            .build();
-
-        Order created = orderService.create(request);
-
-        // 從真實 MySQL 查詢
-        Order fromDb = orderRepository.findById(created.getId()).orElseThrow();
-
-        assertThat(fromDb.getUserId()).isEqualTo(1L);
-        assertThat(fromDb.getStatus()).isEqualTo(OrderStatus.PENDING);
-    }
-
-    @Test
-    @DisplayName("Redis 緩存測試（真實 Redis）")
-    void getOrder_ShouldUseCache_WithRealRedis() {
-        // 第一次查詢（從 DB，並寫入 Redis）
-        Order order = orderService.findById(1L);
-
-        // 第二次查詢（應該從 Redis 取）
-        Order cached = orderService.findById(1L);
-
-        // 驗證 DB 只被查詢了一次
-        verify(orderRepository, times(1)).findById(1L);
-        assertThat(cached).isEqualTo(order);
-    }
-}
-```
 
 ## Kafka 整合測試
 

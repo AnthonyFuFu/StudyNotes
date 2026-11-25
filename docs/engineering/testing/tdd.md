@@ -1,5 +1,9 @@
 # TDD（測試驅動開發）
 
+!!! abstract "本章重點"
+
+    TDD 先寫失敗的測試，再寫剛好讓它通過的程式，最後重構。本章示範 Red-Green-Refactor 的完整循環，並整理測試覆蓋率的意義與測試的最佳實踐。
+
 ## Red-Green-Refactor 循環
 
 **TDD 三步驟**
@@ -31,209 +35,208 @@
 - 商品數量不能為負數
 - 同一商品加入多次應該累加數量
 
-```java
-// ═══════════════════════════════════════
-// 第一輪：加入商品功能
-// ═══════════════════════════════════════
+=== "第一輪：加入商品功能"
 
-// Step 1 🔴 Red - 寫失敗的測試
-class ShoppingCartTest {
+    ``` java
+    // Step 1 🔴 Red - 寫失敗的測試
+    class ShoppingCartTest {
 
-    @Test
-    @DisplayName("加入商品後，購物車應有一個商品")
-    void addItem_ShouldHaveOneItem() {
-        ShoppingCart cart = new ShoppingCart();
-        cart.addItem("P001", "iPhone", new BigDecimal("30000"), 1);
+        @Test
+        @DisplayName("加入商品後，購物車應有一個商品")
+        void addItem_ShouldHaveOneItem() {
+            ShoppingCart cart = new ShoppingCart();
+            cart.addItem("P001", "iPhone", new BigDecimal("30000"), 1);
 
-        assertThat(cart.getItemCount()).isEqualTo(1);
+            assertThat(cart.getItemCount()).isEqualTo(1);
+        }
     }
-}
-// ❌ 此時 ShoppingCart 類不存在 → 編譯失敗（Red）
+    // ❌ 此時 ShoppingCart 類不存在 → 編譯失敗（Red）
 
-// Step 2 🟢 Green - 寫最少代碼
-public class ShoppingCart {
-    private List<CartItem> items = new ArrayList<>();
+    // Step 2 🟢 Green - 寫最少代碼
+    public class ShoppingCart {
+        private List<CartItem> items = new ArrayList<>();
 
-    public void addItem(String productId, String name,
-                        BigDecimal price, int quantity) {
-        items.add(new CartItem(productId, name, price, quantity));
+        public void addItem(String productId, String name,
+                            BigDecimal price, int quantity) {
+            items.add(new CartItem(productId, name, price, quantity));
+        }
+
+        public int getItemCount() {
+            return items.size();
+        }
     }
+    // ✅ 測試通過（Green）
 
-    public int getItemCount() {
-        return items.size();
-    }
-}
-// ✅ 測試通過（Green）
+    // Step 3 🔵 Refactor - 改善代碼
+    // 暫時沒有需要重構的地方
+    ```
 
-// Step 3 🔵 Refactor - 改善代碼
-// 暫時沒有需要重構的地方
+=== "第二輪：計算總金額"
 
-// ═══════════════════════════════════════
-// 第二輪：計算總金額
-// ═══════════════════════════════════════
-
-// Step 1 🔴 Red
-@Test
-@DisplayName("計算購物車總金額")
-void calculateTotal_ShouldReturnCorrectAmount() {
-    ShoppingCart cart = new ShoppingCart();
-    cart.addItem("P001", "iPhone",  new BigDecimal("30000"), 1);
-    cart.addItem("P002", "AirPods", new BigDecimal("6000"),  2);
-
-    assertThat(cart.getTotal())
-        .isEqualByComparingTo(new BigDecimal("42000")); // 30000 + 6000*2
-}
-// ❌ getTotal() 方法不存在（Red）
-
-// Step 2 🟢 Green
-public BigDecimal getTotal() {
-    return items.stream()
-        .map(item -> item.getPrice()
-            .multiply(new BigDecimal(item.getQuantity())))
-        .reduce(BigDecimal.ZERO, BigDecimal::add);
-}
-// ✅ 測試通過（Green）
-
-// ═══════════════════════════════════════
-// 第三輪：數量不能為負數
-// ═══════════════════════════════════════
-
-// Step 1 🔴 Red
-@Test
-@DisplayName("加入商品數量為負數時，應拋出例外")
-void addItem_ShouldThrowException_WhenQuantityNegative() {
-    ShoppingCart cart = new ShoppingCart();
-
-    assertThatThrownBy(() ->
-        cart.addItem("P001", "iPhone", new BigDecimal("30000"), -1))
-        .isInstanceOf(IllegalArgumentException.class)
-        .hasMessage("商品數量不能小於 1");
-}
-// ❌ 目前不會拋出例外（Red）
-
-// Step 2 🟢 Green
-public void addItem(String productId, String name,
-                    BigDecimal price, int quantity) {
-    if (quantity < 1) {
-        throw new IllegalArgumentException("商品數量不能小於 1");
-    }
-    items.add(new CartItem(productId, name, price, quantity));
-}
-// ✅ 測試通過（Green）
-
-// ═══════════════════════════════════════
-// 第四輪：同一商品累加數量
-// ═══════════════════════════════════════
-
-// Step 1 🔴 Red
-@Test
-@DisplayName("加入相同商品時，應累加數量而非新增")
-void addItem_ShouldAccumulateQuantity_WhenSameProduct() {
-    ShoppingCart cart = new ShoppingCart();
-    cart.addItem("P001", "iPhone", new BigDecimal("30000"), 1);
-    cart.addItem("P001", "iPhone", new BigDecimal("30000"), 2);
-
-    assertThat(cart.getItemCount()).isEqualTo(1);  // 仍然是 1 種商品
-    assertThat(cart.getTotal())
-        .isEqualByComparingTo(new BigDecimal("90000"));  // 30000 * 3
-}
-// ❌ 目前會加入兩個商品（Red）
-
-// Step 2 🟢 Green
-public void addItem(String productId, String name,
-                    BigDecimal price, int quantity) {
-    if (quantity < 1) {
-        throw new IllegalArgumentException("商品數量不能小於 1");
-    }
-
-    // 查找是否已有此商品
-    Optional<CartItem> existing = items.stream()
-        .filter(item -> item.getProductId().equals(productId))
-        .findFirst();
-
-    if (existing.isPresent()) {
-        existing.get().addQuantity(quantity); // 累加數量
-    } else {
-        items.add(new CartItem(productId, name, price, quantity));
-    }
-}
-// ✅ 測試通過（Green）
-
-// Step 3 🔵 Refactor
-// 可以將查找邏輯提取為私有方法
-private Optional<CartItem> findItem(String productId) {
-    return items.stream()
-        .filter(item -> item.getProductId().equals(productId))
-        .findFirst();
-}
-
-// ═══════════════════════════════════════
-// 最終完整的測試類
-// ═══════════════════════════════════════
-
-class ShoppingCartTest {
-
-    private ShoppingCart cart;
-
-    @BeforeEach
-    void setUp() {
-        cart = new ShoppingCart();
-    }
-
-    @Test
-    @DisplayName("加入商品後，購物車應有一個商品")
-    void addItem_ShouldHaveOneItem() {
-        cart.addItem("P001", "iPhone", new BigDecimal("30000"), 1);
-        assertThat(cart.getItemCount()).isEqualTo(1);
-    }
-
+    ``` java
+    // Step 1 🔴 Red
     @Test
     @DisplayName("計算購物車總金額")
     void calculateTotal_ShouldReturnCorrectAmount() {
+        ShoppingCart cart = new ShoppingCart();
         cart.addItem("P001", "iPhone",  new BigDecimal("30000"), 1);
         cart.addItem("P002", "AirPods", new BigDecimal("6000"),  2);
-        assertThat(cart.getTotal())
-            .isEqualByComparingTo(new BigDecimal("42000"));
-    }
 
+        assertThat(cart.getTotal())
+            .isEqualByComparingTo(new BigDecimal("42000")); // 30000 + 6000*2
+    }
+    // ❌ getTotal() 方法不存在（Red）
+
+    // Step 2 🟢 Green
+    public BigDecimal getTotal() {
+        return items.stream()
+            .map(item -> item.getPrice()
+                .multiply(new BigDecimal(item.getQuantity())))
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+    // ✅ 測試通過（Green）
+    ```
+
+=== "第三輪：數量不能為負數"
+
+    ``` java
+    // Step 1 🔴 Red
     @Test
     @DisplayName("加入商品數量為負數時，應拋出例外")
     void addItem_ShouldThrowException_WhenQuantityNegative() {
+        ShoppingCart cart = new ShoppingCart();
+
         assertThatThrownBy(() ->
             cart.addItem("P001", "iPhone", new BigDecimal("30000"), -1))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("商品數量不能小於 1");
     }
+    // ❌ 目前不會拋出例外（Red）
 
+    // Step 2 🟢 Green
+    public void addItem(String productId, String name,
+                        BigDecimal price, int quantity) {
+        if (quantity < 1) {
+            throw new IllegalArgumentException("商品數量不能小於 1");
+        }
+        items.add(new CartItem(productId, name, price, quantity));
+    }
+    // ✅ 測試通過（Green）
+    ```
+
+=== "第四輪：同一商品累加數量"
+
+    ``` java
+    // Step 1 🔴 Red
     @Test
     @DisplayName("加入相同商品時，應累加數量而非新增")
     void addItem_ShouldAccumulateQuantity_WhenSameProduct() {
+        ShoppingCart cart = new ShoppingCart();
         cart.addItem("P001", "iPhone", new BigDecimal("30000"), 1);
         cart.addItem("P001", "iPhone", new BigDecimal("30000"), 2);
-        assertThat(cart.getItemCount()).isEqualTo(1);
+
+        assertThat(cart.getItemCount()).isEqualTo(1);  // 仍然是 1 種商品
         assertThat(cart.getTotal())
-            .isEqualByComparingTo(new BigDecimal("90000"));
+            .isEqualByComparingTo(new BigDecimal("90000"));  // 30000 * 3
     }
+    // ❌ 目前會加入兩個商品（Red）
 
-    @Test
-    @DisplayName("移除商品後，購物車應為空")
-    void removeItem_ShouldEmptyCart() {
-        cart.addItem("P001", "iPhone", new BigDecimal("30000"), 1);
-        cart.removeItem("P001");
-        assertThat(cart.getItemCount()).isEqualTo(0);
-        assertThat(cart.getTotal()).isEqualByComparingTo(BigDecimal.ZERO);
-    }
+    // Step 2 🟢 Green
+    public void addItem(String productId, String name,
+                        BigDecimal price, int quantity) {
+        if (quantity < 1) {
+            throw new IllegalArgumentException("商品數量不能小於 1");
+        }
 
-    @Test
-    @DisplayName("清空購物車")
-    void clear_ShouldRemoveAllItems() {
-        cart.addItem("P001", "iPhone",  new BigDecimal("30000"), 1);
-        cart.addItem("P002", "AirPods", new BigDecimal("6000"),  1);
-        cart.clear();
-        assertThat(cart.getItemCount()).isEqualTo(0);
+        // 查找是否已有此商品
+        Optional<CartItem> existing = items.stream()
+            .filter(item -> item.getProductId().equals(productId))
+            .findFirst();
+
+        if (existing.isPresent()) {
+            existing.get().addQuantity(quantity); // 累加數量
+        } else {
+            items.add(new CartItem(productId, name, price, quantity));
+        }
     }
-}
-```
+    // ✅ 測試通過（Green）
+
+    // Step 3 🔵 Refactor
+    // 可以將查找邏輯提取為私有方法
+    private Optional<CartItem> findItem(String productId) {
+        return items.stream()
+            .filter(item -> item.getProductId().equals(productId))
+            .findFirst();
+    }
+    ```
+
+=== "最終完整的測試類"
+
+    ``` java
+    class ShoppingCartTest {
+
+        private ShoppingCart cart;
+
+        @BeforeEach
+        void setUp() {
+            cart = new ShoppingCart();
+        }
+
+        @Test
+        @DisplayName("加入商品後，購物車應有一個商品")
+        void addItem_ShouldHaveOneItem() {
+            cart.addItem("P001", "iPhone", new BigDecimal("30000"), 1);
+            assertThat(cart.getItemCount()).isEqualTo(1);
+        }
+
+        @Test
+        @DisplayName("計算購物車總金額")
+        void calculateTotal_ShouldReturnCorrectAmount() {
+            cart.addItem("P001", "iPhone",  new BigDecimal("30000"), 1);
+            cart.addItem("P002", "AirPods", new BigDecimal("6000"),  2);
+            assertThat(cart.getTotal())
+                .isEqualByComparingTo(new BigDecimal("42000"));
+        }
+
+        @Test
+        @DisplayName("加入商品數量為負數時，應拋出例外")
+        void addItem_ShouldThrowException_WhenQuantityNegative() {
+            assertThatThrownBy(() ->
+                cart.addItem("P001", "iPhone", new BigDecimal("30000"), -1))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("商品數量不能小於 1");
+        }
+
+        @Test
+        @DisplayName("加入相同商品時，應累加數量而非新增")
+        void addItem_ShouldAccumulateQuantity_WhenSameProduct() {
+            cart.addItem("P001", "iPhone", new BigDecimal("30000"), 1);
+            cart.addItem("P001", "iPhone", new BigDecimal("30000"), 2);
+            assertThat(cart.getItemCount()).isEqualTo(1);
+            assertThat(cart.getTotal())
+                .isEqualByComparingTo(new BigDecimal("90000"));
+        }
+
+        @Test
+        @DisplayName("移除商品後，購物車應為空")
+        void removeItem_ShouldEmptyCart() {
+            cart.addItem("P001", "iPhone", new BigDecimal("30000"), 1);
+            cart.removeItem("P001");
+            assertThat(cart.getItemCount()).isEqualTo(0);
+            assertThat(cart.getTotal()).isEqualByComparingTo(BigDecimal.ZERO);
+        }
+
+        @Test
+        @DisplayName("清空購物車")
+        void clear_ShouldRemoveAllItems() {
+            cart.addItem("P001", "iPhone",  new BigDecimal("30000"), 1);
+            cart.addItem("P002", "AirPods", new BigDecimal("6000"),  1);
+            cart.clear();
+            assertThat(cart.getItemCount()).isEqualTo(0);
+        }
+    }
+    ```
+
 
 ## 測試覆蓋率
 

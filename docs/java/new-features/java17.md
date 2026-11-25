@@ -1,5 +1,9 @@
 # Java 17 LTS 重點
 
+!!! abstract "本章重點"
+
+    Java 17 是繼 Java 11 之後的 LTS 版本。本章介紹 Record（一行定義不可變資料類別）、Sealed Class（限制繼承）與 instanceof 的模式匹配，三者搭配可以寫出更安全、更簡潔的程式。
+
 ## Record Classes - 記錄類
 
 **問題**：Java 的 POJO 類太冗長了！

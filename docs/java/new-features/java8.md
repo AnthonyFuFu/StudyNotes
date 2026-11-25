@@ -1,5 +1,9 @@
 # Java 8 核心回顧
 
+!!! abstract "本章重點"
+
+    Java 8 引入的 Lambda、Stream 與 Optional 至今仍是日常開發的基礎。本章回顧函數式介面、Stream 的進階用法（分組、收集、平行流），以及 Optional 的正確與錯誤用法。
+
 ## 函數式接口（Functional Interface）
 
 Java 8 內建四大函數式接口：

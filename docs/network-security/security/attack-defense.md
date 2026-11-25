@@ -1,5 +1,9 @@
 # 常見攻擊防禦
 
+!!! abstract "本章重點"
+
+    大部分的資安事件都來自少數幾種常見攻擊。本章說明 SQL 注入、XSS、CSRF 的攻擊方式與防禦措施，並整理暴力破解、重放攻擊等其他重要威脅的處理方法。
+
 ## SQL 注入（SQL Injection）
 
 ```java
@@ -121,102 +125,113 @@ http.csrf(csrf -> csrf
 
 ## 其他重要攻擊防禦
 
-```java
-// 1. 暴力破解（Brute Force）防禦
-@Service
-@RequiredArgsConstructor
-public class LoginAttemptService {
+=== "1. 暴力破解防禦"
 
-    private final StringRedisTemplate redisTemplate;
-    private static final int  MAX_ATTEMPTS   = 5;
-    private static final long LOCK_DURATION  = 30; // 分鐘
+    ``` java
+    // 1. 暴力破解（Brute Force）防禦
+    @Service
+    @RequiredArgsConstructor
+    public class LoginAttemptService {
 
-    public void loginFailed(String username, String ip) {
-        String key      = "login_attempt:" + ip + ":" + username;
-        Long   attempts = redisTemplate.opsForValue().increment(key);
+        private final StringRedisTemplate redisTemplate;
+        private static final int  MAX_ATTEMPTS   = 5;
+        private static final long LOCK_DURATION  = 30; // 分鐘
 
-        if (attempts == 1) {
-            redisTemplate.expire(key, LOCK_DURATION, TimeUnit.MINUTES);
+        public void loginFailed(String username, String ip) {
+            String key      = "login_attempt:" + ip + ":" + username;
+            Long   attempts = redisTemplate.opsForValue().increment(key);
+
+            if (attempts == 1) {
+                redisTemplate.expire(key, LOCK_DURATION, TimeUnit.MINUTES);
+            }
+
+            if (attempts >= MAX_ATTEMPTS) {
+                log.warn("帳號 {} (IP: {}) 已達登入失敗上限，鎖定 {} 分鐘",
+                    username, ip, LOCK_DURATION);
+            }
         }
 
-        if (attempts >= MAX_ATTEMPTS) {
-            log.warn("帳號 {} (IP: {}) 已達登入失敗上限，鎖定 {} 分鐘",
-                username, ip, LOCK_DURATION);
+        public boolean isBlocked(String username, String ip) {
+            String key      = "login_attempt:" + ip + ":" + username;
+            String attempts = redisTemplate.opsForValue().get(key);
+            return attempts != null && Integer.parseInt(attempts) >= MAX_ATTEMPTS;
+        }
+
+        public void loginSucceeded(String username, String ip) {
+            redisTemplate.delete("login_attempt:" + ip + ":" + username);
         }
     }
+    ```
 
-    public boolean isBlocked(String username, String ip) {
-        String key      = "login_attempt:" + ip + ":" + username;
-        String attempts = redisTemplate.opsForValue().get(key);
-        return attempts != null && Integer.parseInt(attempts) >= MAX_ATTEMPTS;
+=== "2. 敏感數據加密"
+
+    ``` java
+    // 2. 敏感數據加密（AES-256-GCM）
+    @Component
+    public class FieldEncryptor {
+
+        @Value("${app.encrypt.key}")
+        private String encryptKey;
+
+        public String encrypt(String plainText) throws Exception {
+            SecretKey key    = new SecretKeySpec(
+                Base64.getDecoder().decode(encryptKey), "AES");
+            Cipher    cipher = Cipher.getInstance("AES/GCM/NoPadding");
+
+            byte[] iv = new byte[12];
+            new SecureRandom().nextBytes(iv);
+            cipher.init(Cipher.ENCRYPT_MODE, key, new GCMParameterSpec(128, iv));
+
+            byte[] encrypted = cipher.doFinal(plainText.getBytes());
+            byte[] result    = new byte[iv.length + encrypted.length];
+            System.arraycopy(iv,        0, result, 0,          iv.length);
+            System.arraycopy(encrypted, 0, result, iv.length,  encrypted.length);
+
+            return Base64.getEncoder().encodeToString(result);
+        }
+
+        public String decrypt(String encryptedText) throws Exception {
+            byte[] data      = Base64.getDecoder().decode(encryptedText);
+            byte[] iv        = Arrays.copyOfRange(data, 0,  12);
+            byte[] encrypted = Arrays.copyOfRange(data, 12, data.length);
+
+            SecretKey key    = new SecretKeySpec(
+                Base64.getDecoder().decode(encryptKey), "AES");
+            Cipher    cipher = Cipher.getInstance("AES/GCM/NoPadding");
+            cipher.init(Cipher.DECRYPT_MODE, key, new GCMParameterSpec(128, iv));
+
+            return new String(cipher.doFinal(encrypted));
+        }
     }
+    ```
 
-    public void loginSucceeded(String username, String ip) {
-        redisTemplate.delete("login_attempt:" + ip + ":" + username);
-    }
-}
+=== "3. 接口冪等性防重放攻擊"
 
-// 2. 敏感數據加密（AES-256-GCM）
-@Component
-public class FieldEncryptor {
+    ``` java
+    // 3. 接口冪等性防重放攻擊
+    @RestController
+    public class PaymentController {
 
-    @Value("${app.encrypt.key}")
-    private String encryptKey;
+        @PostMapping("/pay")
+        public ResponseEntity<?> pay(
+                @RequestHeader("Idempotency-Key") String idempotencyKey,
+                @RequestBody PaymentRequest request) {
 
-    public String encrypt(String plainText) throws Exception {
-        SecretKey key    = new SecretKeySpec(
-            Base64.getDecoder().decode(encryptKey), "AES");
-        Cipher    cipher = Cipher.getInstance("AES/GCM/NoPadding");
+            String  redisKey = "idempotency:" + idempotencyKey;
+            Boolean isNew    = redisTemplate.opsForValue()
+                .setIfAbsent(redisKey, "processing", 24, TimeUnit.HOURS);
 
-        byte[] iv = new byte[12];
-        new SecureRandom().nextBytes(iv);
-        cipher.init(Cipher.ENCRYPT_MODE, key, new GCMParameterSpec(128, iv));
+            if (!Boolean.TRUE.equals(isNew)) {
+                String result = redisTemplate.opsForValue().get(redisKey);
+                return ResponseEntity.ok(result);
+            }
 
-        byte[] encrypted = cipher.doFinal(plainText.getBytes());
-        byte[] result    = new byte[iv.length + encrypted.length];
-        System.arraycopy(iv,        0, result, 0,          iv.length);
-        System.arraycopy(encrypted, 0, result, iv.length,  encrypted.length);
+            PaymentResult result = paymentService.pay(request);
+            redisTemplate.opsForValue().set(redisKey,
+                JSON.toJSONString(result), 24, TimeUnit.HOURS);
 
-        return Base64.getEncoder().encodeToString(result);
-    }
-
-    public String decrypt(String encryptedText) throws Exception {
-        byte[] data      = Base64.getDecoder().decode(encryptedText);
-        byte[] iv        = Arrays.copyOfRange(data, 0,  12);
-        byte[] encrypted = Arrays.copyOfRange(data, 12, data.length);
-
-        SecretKey key    = new SecretKeySpec(
-            Base64.getDecoder().decode(encryptKey), "AES");
-        Cipher    cipher = Cipher.getInstance("AES/GCM/NoPadding");
-        cipher.init(Cipher.DECRYPT_MODE, key, new GCMParameterSpec(128, iv));
-
-        return new String(cipher.doFinal(encrypted));
-    }
-}
-
-// 3. 接口冪等性防重放攻擊
-@RestController
-public class PaymentController {
-
-    @PostMapping("/pay")
-    public ResponseEntity<?> pay(
-            @RequestHeader("Idempotency-Key") String idempotencyKey,
-            @RequestBody PaymentRequest request) {
-
-        String  redisKey = "idempotency:" + idempotencyKey;
-        Boolean isNew    = redisTemplate.opsForValue()
-            .setIfAbsent(redisKey, "processing", 24, TimeUnit.HOURS);
-
-        if (!Boolean.TRUE.equals(isNew)) {
-            String result = redisTemplate.opsForValue().get(redisKey);
             return ResponseEntity.ok(result);
         }
-
-        PaymentResult result = paymentService.pay(request);
-        redisTemplate.opsForValue().set(redisKey,
-            JSON.toJSONString(result), 24, TimeUnit.HOURS);
-
-        return ResponseEntity.ok(result);
     }
-}
-```
+    ```
+

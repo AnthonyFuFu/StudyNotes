@@ -1,5 +1,9 @@
 # Docker 深入
 
+!!! abstract "本章重點"
+
+    容器讓「在我電腦上可以跑」的環境可以完整搬到任何地方。本章說明容器與虛擬機的差異、Namespace / Cgroups / UnionFS 三項底層技術，並示範多階段建置的 Dockerfile 與 Docker Compose。
+
 ## Docker 核心原理
 
 **Docker 不是虛擬機！**

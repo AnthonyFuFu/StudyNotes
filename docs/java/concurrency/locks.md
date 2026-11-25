@@ -1,5 +1,9 @@
 # 鎖進階
 
+!!! abstract "本章重點"
+
+    synchronized 之外，JUC 還提供更有彈性的鎖。本章比較 ReentrantLock（可中斷、可逾時、公平鎖）、ReadWriteLock（讀多寫少）與 StampedLock（樂觀讀）的特性與使用時機。
+
 ## ReentrantLock
 
 ```java

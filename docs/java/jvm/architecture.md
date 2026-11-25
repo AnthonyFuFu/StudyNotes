@@ -1,5 +1,9 @@
 # JVM 整體架構
 
+!!! abstract "本章重點"
+
+    本章用一張圖說明 JVM 的整體架構：類加載子系統把 `.class` 載入記憶體，執行引擎負責執行與垃圾回收，後續章節會逐一深入每個部分。
+
 ``` mermaid
 flowchart TB
     CLS[/".class 文件"/] --> CL["類加載子系統 ClassLoader<br>載入 → 驗證 → 準備 → 解析 → 初始化"]

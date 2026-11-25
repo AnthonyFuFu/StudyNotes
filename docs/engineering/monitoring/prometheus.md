@@ -1,5 +1,9 @@
 # Prometheus 深入
 
+!!! abstract "本章重點"
+
+    Prometheus 以拉取模式收集指標，是雲原生監控的事實標準。本章說明它的架構與四種指標類型、PromQL 查詢、Spring Boot Actuator 的整合，以及 AlertManager 告警規則的撰寫。
+
 ## 架構原理
 
 ``` mermaid
@@ -173,91 +177,98 @@ management:
         http.server.requests: 100ms, 200ms, 500ms, 1s
 ```
 
-```java
-// 自定義業務指標
-@Component
-@RequiredArgsConstructor
-public class OrderMetrics {
+=== "自定義業務指標"
 
-    private final MeterRegistry registry;
+    ``` java
+    // 自定義業務指標
+    @Component
+    @RequiredArgsConstructor
+    public class OrderMetrics {
 
-    private Counter             orderCreatedCounter;
-    private Counter             orderFailedCounter;
-    private AtomicInteger       pendingOrders = new AtomicInteger(0);
-    private Timer               orderProcessingTimer;
-    private DistributionSummary orderAmountSummary;
+        private final MeterRegistry registry;
 
-    @PostConstruct
-    public void init() {
-        // ① Counter
-        orderCreatedCounter = Counter.builder("order.created.total")
-            .description("已建立的訂單總數")
-            .tag("service", "order-service")
-            .register(registry);
+        private Counter             orderCreatedCounter;
+        private Counter             orderFailedCounter;
+        private AtomicInteger       pendingOrders = new AtomicInteger(0);
+        private Timer               orderProcessingTimer;
+        private DistributionSummary orderAmountSummary;
 
-        orderFailedCounter = Counter.builder("order.failed.total")
-            .description("建立失敗的訂單總數")
-            .register(registry);
+        @PostConstruct
+        public void init() {
+            // ① Counter
+            orderCreatedCounter = Counter.builder("order.created.total")
+                .description("已建立的訂單總數")
+                .tag("service", "order-service")
+                .register(registry);
 
-        // ② Gauge（監控動態值）
-        Gauge.builder("order.pending.count", pendingOrders, AtomicInteger::get)
-            .description("當前待處理訂單數")
-            .register(registry);
+            orderFailedCounter = Counter.builder("order.failed.total")
+                .description("建立失敗的訂單總數")
+                .register(registry);
 
-        // ③ Timer
-        orderProcessingTimer = Timer.builder("order.processing.duration")
-            .description("訂單處理耗時")
-            .publishPercentileHistogram()
-            .slo(
-                Duration.ofMillis(100),
-                Duration.ofMillis(500),
-                Duration.ofSeconds(1)
-            )
-            .register(registry);
+            // ② Gauge（監控動態值）
+            Gauge.builder("order.pending.count", pendingOrders, AtomicInteger::get)
+                .description("當前待處理訂單數")
+                .register(registry);
 
-        // ④ DistributionSummary
-        orderAmountSummary = DistributionSummary.builder("order.amount")
-            .description("訂單金額分布（元）")
-            .baseUnit("yuan")
-            .publishPercentileHistogram()
-            .register(registry);
+            // ③ Timer
+            orderProcessingTimer = Timer.builder("order.processing.duration")
+                .description("訂單處理耗時")
+                .publishPercentileHistogram()
+                .slo(
+                    Duration.ofMillis(100),
+                    Duration.ofMillis(500),
+                    Duration.ofSeconds(1)
+                )
+                .register(registry);
+
+            // ④ DistributionSummary
+            orderAmountSummary = DistributionSummary.builder("order.amount")
+                .description("訂單金額分布（元）")
+                .baseUnit("yuan")
+                .publishPercentileHistogram()
+                .register(registry);
+        }
+
+        public void recordOrderCreated(BigDecimal amount) {
+            orderCreatedCounter.increment();
+            orderAmountSummary.record(amount.doubleValue());
+            pendingOrders.incrementAndGet();
+        }
+
+        public void recordOrderFailed(String reason) {
+            orderFailedCounter.increment(Tags.of("reason", reason));
+        }
+
+        public void recordOrderCompleted() {
+            pendingOrders.decrementAndGet();
+        }
+
+        // 用 Timer 包裝業務邏輯（自動計時）
+        public Order createOrderWithMetrics(OrderRequest request) {
+            return orderProcessingTimer.record(() -> createOrder(request));
+        }
     }
+    ```
 
-    public void recordOrderCreated(BigDecimal amount) {
-        orderCreatedCounter.increment();
-        orderAmountSummary.record(amount.doubleValue());
-        pendingOrders.incrementAndGet();
+=== "使用 @Timed 注解"
+
+    ``` java
+    // 使用 @Timed 注解（更簡潔）
+    @Service
+    public class OrderService {
+
+        @Timed(
+            value       = "order.create.duration",
+            description = "訂單建立耗時",
+            percentiles = {0.5, 0.99},
+            histogram   = true
+        )
+        public Order createOrder(OrderRequest request) {
+            // 業務邏輯
+        }
     }
+    ```
 
-    public void recordOrderFailed(String reason) {
-        orderFailedCounter.increment(Tags.of("reason", reason));
-    }
-
-    public void recordOrderCompleted() {
-        pendingOrders.decrementAndGet();
-    }
-
-    // 用 Timer 包裝業務邏輯（自動計時）
-    public Order createOrderWithMetrics(OrderRequest request) {
-        return orderProcessingTimer.record(() -> createOrder(request));
-    }
-}
-
-// 使用 @Timed 注解（更簡潔）
-@Service
-public class OrderService {
-
-    @Timed(
-        value       = "order.create.duration",
-        description = "訂單建立耗時",
-        percentiles = {0.5, 0.99},
-        histogram   = true
-    )
-    public Order createOrder(OrderRequest request) {
-        // 業務邏輯
-    }
-}
-```
 
 ```yaml
 # prometheus.yml（Prometheus 配置）

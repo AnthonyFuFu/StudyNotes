@@ -1,5 +1,9 @@
 # Spring Security 核心原理
 
+!!! abstract "本章重點"
+
+    Spring Security 的核心是一條過濾器鏈。本章說明過濾器鏈的架構、認證流程的每個元件（AuthenticationManager、Provider、UserDetailsService）、SecurityContext，以及方法級別的授權。
+
 ## 過濾器鏈架構（最重要！）
 
 ``` mermaid
@@ -201,56 +205,63 @@ public UserProfile getProfile(@CurrentUser UserPrincipal user) {
 
 ## 授權流程（方法級別）
 
-```java
-@RestController
-@RequestMapping("/orders")
-public class OrderController {
+=== "OrderController"
 
-    // 需要 ADMIN 角色
-    @GetMapping("/all")
-    @PreAuthorize("hasRole('ADMIN')")
-    public List<Order> getAllOrders() { ... }
+    ``` java
+    @RestController
+    @RequestMapping("/orders")
+    public class OrderController {
 
-    // 需要 ADMIN 或 MANAGER 角色
-    @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
-    public void deleteOrder(@PathVariable Long id) { ... }
+        // 需要 ADMIN 角色
+        @GetMapping("/all")
+        @PreAuthorize("hasRole('ADMIN')")
+        public List<Order> getAllOrders() { ... }
 
-    // SpEL 表達式：只能訪問自己的訂單（或 ADMIN）
-    @GetMapping("/{id}")
-    @PreAuthorize("@orderSecurity.canAccess(authentication, #id)")
-    public Order getOrder(@PathVariable Long id) { ... }
+        // 需要 ADMIN 或 MANAGER 角色
+        @DeleteMapping("/{id}")
+        @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+        public void deleteOrder(@PathVariable Long id) { ... }
 
-    // 需要特定權限（不是角色）
-    @PostMapping
-    @PreAuthorize("hasAuthority('order:create')")
-    public Order createOrder(@RequestBody OrderRequest req) { ... }
-}
+        // SpEL 表達式：只能訪問自己的訂單（或 ADMIN）
+        @GetMapping("/{id}")
+        @PreAuthorize("@orderSecurity.canAccess(authentication, #id)")
+        public Order getOrder(@PathVariable Long id) { ... }
 
-// @PostAuthorize - 方法執行後檢查（用於返回值過濾）
-@GetMapping("/{id}")
-@PostAuthorize("returnObject.userId == authentication.principal.id")
-public Order getOrder(@PathVariable Long id) {
-    return orderService.findById(id);
-}
-
-// 自定義安全規則
-@Component("orderSecurity")
-public class OrderSecurityService {
-
-    private final OrderRepository orderRepository;
-
-    public boolean canAccess(Authentication auth, Long orderId) {
-        UserPrincipal user = (UserPrincipal) auth.getPrincipal();
-        // ADMIN 可以訪問所有
-        if (user.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
-            return true;
-        }
-        // 普通用戶只能訪問自己的
-        return orderRepository.findById(orderId)
-            .map(order -> order.getUserId().equals(user.getId()))
-            .orElse(false);
+        // 需要特定權限（不是角色）
+        @PostMapping
+        @PreAuthorize("hasAuthority('order:create')")
+        public Order createOrder(@RequestBody OrderRequest req) { ... }
     }
-}
-```
+
+    // @PostAuthorize - 方法執行後檢查（用於返回值過濾）
+    @GetMapping("/{id}")
+    @PostAuthorize("returnObject.userId == authentication.principal.id")
+    public Order getOrder(@PathVariable Long id) {
+        return orderService.findById(id);
+    }
+    ```
+
+=== "自定義安全規則"
+
+    ``` java
+    // 自定義安全規則
+    @Component("orderSecurity")
+    public class OrderSecurityService {
+
+        private final OrderRepository orderRepository;
+
+        public boolean canAccess(Authentication auth, Long orderId) {
+            UserPrincipal user = (UserPrincipal) auth.getPrincipal();
+            // ADMIN 可以訪問所有
+            if (user.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
+                return true;
+            }
+            // 普通用戶只能訪問自己的
+            return orderRepository.findById(orderId)
+                .map(order -> order.getUserId().equals(user.getId()))
+                .orElse(false);
+        }
+    }
+    ```
+

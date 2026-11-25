@@ -1,5 +1,9 @@
 # 主從複製與讀寫分離
 
+!!! abstract "本章重點"
+
+    單一資料庫的讀取能力有限，主從複製讓寫入集中在主庫、讀取分散到從庫。本章說明 Binlog 複製的流程與格式、主從延遲的成因與解法，並示範在 Spring Boot 中實作讀寫分離。
+
 ## Binlog 複製原理
 
 ``` mermaid
@@ -64,75 +68,90 @@ spring:
       driver-class-name: com.mysql.cj.jdbc.Driver
 ```
 
-```java
-// 自定義讀寫分離路由
-public enum DataSourceType {
-    MASTER, SLAVE
-}
+=== "自定義讀寫分離路由"
 
-// ThreadLocal 存放當前數據源類型
-public class DataSourceContextHolder {
-    private static final ThreadLocal<DataSourceType> CONTEXT_HOLDER =
-        new ThreadLocal<>();
-
-    public static void setDataSourceType(DataSourceType type) {
-        CONTEXT_HOLDER.set(type);
+    ``` java
+    // 自定義讀寫分離路由
+    public enum DataSourceType {
+        MASTER, SLAVE
     }
 
-    public static DataSourceType getDataSourceType() {
-        return CONTEXT_HOLDER.get();
-    }
+    // ThreadLocal 存放當前數據源類型
+    public class DataSourceContextHolder {
+        private static final ThreadLocal<DataSourceType> CONTEXT_HOLDER =
+            new ThreadLocal<>();
 
-    public static void clearDataSourceType() {
-        CONTEXT_HOLDER.remove();
-    }
-}
+        public static void setDataSourceType(DataSourceType type) {
+            CONTEXT_HOLDER.set(type);
+        }
 
-// 動態數據源路由
-@Component
-public class DynamicDataSource extends AbstractRoutingDataSource {
+        public static DataSourceType getDataSourceType() {
+            return CONTEXT_HOLDER.get();
+        }
 
-    @Override
-    protected Object determineCurrentLookupKey() {
-        DataSourceType type = DataSourceContextHolder.getDataSourceType();
-        return type == null ? DataSourceType.MASTER : type;
-    }
-}
-
-// AOP 自動切換數據源
-@Aspect
-@Component
-@Order(1)  // 優先於事務切面
-public class DataSourceAspect {
-
-    // @Transactional(readOnly=true) → Slave
-    // @Transactional → Master
-    @Around("@annotation(transactional)")
-    public Object around(ProceedingJoinPoint point,
-                         Transactional transactional) throws Throwable {
-        try {
-            if (transactional.readOnly()) {
-                DataSourceContextHolder.setDataSourceType(DataSourceType.SLAVE);
-            } else {
-                DataSourceContextHolder.setDataSourceType(DataSourceType.MASTER);
-            }
-            return point.proceed();
-        } finally {
-            DataSourceContextHolder.clearDataSourceType();
+        public static void clearDataSourceType() {
+            CONTEXT_HOLDER.remove();
         }
     }
-}
+    ```
 
-// 使用
-@Service
-public class OrderService {
+=== "動態數據源路由"
 
-    @Transactional  // → Master（寫操作）
-    public Order createOrder(OrderRequest request) { ... }
+    ``` java
+    // 動態數據源路由
+    @Component
+    public class DynamicDataSource extends AbstractRoutingDataSource {
 
-    @Transactional(readOnly = true)  // → Slave（讀操作）
-    public Order getOrder(Long id) { ... }
-}
+        @Override
+        protected Object determineCurrentLookupKey() {
+            DataSourceType type = DataSourceContextHolder.getDataSourceType();
+            return type == null ? DataSourceType.MASTER : type;
+        }
+    }
+    ```
 
-// 生產環境推薦：使用 ShardingSphere 或 MyBatis-Plus 的讀寫分離功能
-```
+=== "AOP 自動切換數據源"
+
+    ``` java
+    // AOP 自動切換數據源
+    @Aspect
+    @Component
+    @Order(1)  // 優先於事務切面
+    public class DataSourceAspect {
+
+        // @Transactional(readOnly=true) → Slave
+        // @Transactional → Master
+        @Around("@annotation(transactional)")
+        public Object around(ProceedingJoinPoint point,
+                             Transactional transactional) throws Throwable {
+            try {
+                if (transactional.readOnly()) {
+                    DataSourceContextHolder.setDataSourceType(DataSourceType.SLAVE);
+                } else {
+                    DataSourceContextHolder.setDataSourceType(DataSourceType.MASTER);
+                }
+                return point.proceed();
+            } finally {
+                DataSourceContextHolder.clearDataSourceType();
+            }
+        }
+    }
+    ```
+
+=== "使用"
+
+    ``` java
+    // 使用
+    @Service
+    public class OrderService {
+
+        @Transactional  // → Master（寫操作）
+        public Order createOrder(OrderRequest request) { ... }
+
+        @Transactional(readOnly = true)  // → Slave（讀操作）
+        public Order getOrder(Long id) { ... }
+    }
+
+    // 生產環境推薦：使用 ShardingSphere 或 MyBatis-Plus 的讀寫分離功能
+    ```
+

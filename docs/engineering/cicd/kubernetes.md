@@ -1,5 +1,9 @@
 # Kubernetes 深入
 
+!!! abstract "本章重點"
+
+    Kubernetes 負責在多台機器上排程容器、自動恢復與擴縮容。本章說明控制平面與工作節點的組件、Pod / Deployment / Service / Ingress 等核心資源，以及滾動更新、回滾與 StatefulSet。
+
 ## K8s 整體架構
 
 ``` mermaid
@@ -449,17 +453,17 @@ kubectl annotate deployment/myapp-deployment \
   -n production
 ```
 
-滾動更新流程（maxSurge=1, maxUnavailable=0, replicas=3）：
+**滾動更新流程**（`maxSurge=1`、`maxUnavailable=0`、`replicas=3`）
 
-| 項目 | 說明 |
-|------|------|
-| 初始狀態 | [v1] [v1] [v1] |
-| 步驟 1 | [v1] [v1] [v1] [v2]     ← 新增 v2（surge） |
-| 步驟 2 | [v1] [v1]      [v2]     ← 移除一個 v1 |
-| 步驟 3 | [v1] [v1] [v2] [v2]     ← 新增 v2 |
-| 步驟 4 | [v1]      [v2] [v2]     ← 移除一個 v1 |
-| 步驟 5 | [v1] [v2] [v2] [v2]     ← 新增 v2 |
-| 步驟 6 | [v2] [v2] [v2]     ← 移除最後一個 v1 |
+| 步驟 | Pod 狀態 | 動作 |
+|------|---------|------|
+| 初始 | v1 v1 v1 | — |
+| 1 | v1 v1 v1 **v2** | 新增 1 個 v2（surge） |
+| 2 | v1 v1 **v2** | v2 Ready 後移除 1 個 v1 |
+| 3 | v1 v1 **v2 v2** | 新增 v2 |
+| 4 | v1 **v2 v2** | 移除 v1 |
+| 5 | v1 **v2 v2 v2** | 新增 v2 |
+| 6 | **v2 v2 v2** | 移除最後一個 v1 |
 
 - ✅ 全程保持 3 個可用 Pod（0 停機！）
 

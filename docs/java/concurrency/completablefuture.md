@@ -1,71 +1,81 @@
 # CompletableFuture 異步編排
 
+!!! abstract "本章重點"
+
+    CompletableFuture 讓多個非同步任務可以串接、並行與合併，不必再寫巢狀的回呼。本章整理建立、轉換、組合、例外處理的核心 API，以及指定執行緒池的重要性。
+
 ## 核心 API
 
-```java
-// CompletableFuture 是 Future 的增強版
-// 支援異步編排、鏈式調用、組合多個異步任務
+=== "建立異步任務"
 
-// ─── 建立異步任務 ───
+    ``` java
+    // CompletableFuture 是 Future 的增強版
+    // 支援異步編排、鏈式調用、組合多個異步任務
 
-// 有返回值
-CompletableFuture<User> userFuture = CompletableFuture.supplyAsync(
-    () -> userService.findById(1L),
-    executor  // 指定線程池（不指定用 ForkJoinPool.commonPool）
-);
 
-// 無返回值
-CompletableFuture<Void> voidFuture = CompletableFuture.runAsync(
-    () -> notificationService.send("通知"),
-    executor
-);
+    // 有返回值
+    CompletableFuture<User> userFuture = CompletableFuture.supplyAsync(
+        () -> userService.findById(1L),
+        executor  // 指定線程池（不指定用 ForkJoinPool.commonPool）
+    );
 
-// ─── 鏈式調用 ───
+    // 無返回值
+    CompletableFuture<Void> voidFuture = CompletableFuture.runAsync(
+        () -> notificationService.send("通知"),
+        executor
+    );
+    ```
 
-CompletableFuture<OrderDTO> result = CompletableFuture
-    // 1. 查詢用戶
-    .supplyAsync(() -> userService.findById(userId), executor)
+=== "鏈式調用"
 
-    // 2. 用用戶資訊查詢訂單（上一步的結果作為輸入）
-    .thenApply(user -> orderService.findByUser(user))
+    ``` java
+    CompletableFuture<OrderDTO> result = CompletableFuture
+        // 1. 查詢用戶
+        .supplyAsync(() -> userService.findById(userId), executor)
 
-    // 3. 轉換為 DTO
-    .thenApply(order -> OrderDTO.from(order))
+        // 2. 用用戶資訊查詢訂單（上一步的結果作為輸入）
+        .thenApply(user -> orderService.findByUser(user))
 
-    // 4. 異常處理
-    .exceptionally(ex -> {
-        log.error("查詢失敗", ex);
-        return OrderDTO.empty();
-    });
+        // 3. 轉換為 DTO
+        .thenApply(order -> OrderDTO.from(order))
 
-// ─── 組合多個異步任務 ───
+        // 4. 異常處理
+        .exceptionally(ex -> {
+            log.error("查詢失敗", ex);
+            return OrderDTO.empty();
+        });
+    ```
 
-// 兩個任務都完成才繼續（AND 關係）
-CompletableFuture<User>    userFuture2  = userService.asyncFindById(userId);
-CompletableFuture<List<Order>> orderFuture = orderService.asyncFindByUser(userId);
+=== "組合多個異步任務"
 
-CompletableFuture<UserOrderVO> combined = userFuture2
-    .thenCombine(orderFuture, (user, orders) -> {
-        return new UserOrderVO(user, orders);
-    });
+    ``` java
+    // 兩個任務都完成才繼續（AND 關係）
+    CompletableFuture<User>    userFuture2  = userService.asyncFindById(userId);
+    CompletableFuture<List<Order>> orderFuture = orderService.asyncFindByUser(userId);
 
-// 任意一個完成就繼續（OR 關係）
-CompletableFuture<String> result2 = primaryFuture.applyToEither(
-    fallbackFuture,
-    response -> response
-);
+    CompletableFuture<UserOrderVO> combined = userFuture2
+        .thenCombine(orderFuture, (user, orders) -> {
+            return new UserOrderVO(user, orders);
+        });
 
-// 等待所有任務完成
-CompletableFuture<Void> allDone = CompletableFuture.allOf(
-    future1, future2, future3
-);
-allDone.join(); // 阻塞等待所有完成
+    // 任意一個完成就繼續（OR 關係）
+    CompletableFuture<String> result2 = primaryFuture.applyToEither(
+        fallbackFuture,
+        response -> response
+    );
 
-// 等待任意一個完成
-CompletableFuture<Object> anyDone = CompletableFuture.anyOf(
-    future1, future2, future3
-);
-```
+    // 等待所有任務完成
+    CompletableFuture<Void> allDone = CompletableFuture.allOf(
+        future1, future2, future3
+    );
+    allDone.join(); // 阻塞等待所有完成
+
+    // 等待任意一個完成
+    CompletableFuture<Object> anyDone = CompletableFuture.anyOf(
+        future1, future2, future3
+    );
+    ```
+
 
 ```java
 // 實戰：並行查詢多個服務（串行 vs 並行）

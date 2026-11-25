@@ -1,5 +1,9 @@
 # JWT 深入原理與實作
 
+!!! abstract "本章重點"
+
+    JWT 讓伺服器不需要保存 Session 也能驗證使用者。本章拆解 JWT 的三段結構，示範 Spring Security + JWT 的完整實作（含 Refresh Token），並整理 JWT 常見的安全問題與防禦方式。
+
 ## JWT 結構詳解
 
 JWT = Header.Payload.Signature
@@ -100,93 +104,104 @@ app:
     refresh-token-expiration: 604800  # 7 天（秒）
 ```
 
-```java
-// JWT 工具類
-@Component
-public class JwtTokenProvider {
+=== "類別與共用設定"
 
-    @Value("${app.jwt.secret}")
-    private String jwtSecret;
+    ``` java
+    // JWT 工具類
+    @Component
+    public class JwtTokenProvider {
 
-    @Value("${app.jwt.access-token-expiration}")
-    private long accessTokenExpiration;
+        @Value("${app.jwt.secret}")
+        private String jwtSecret;
 
-    @Value("${app.jwt.refresh-token-expiration}")
-    private long refreshTokenExpiration;
+        @Value("${app.jwt.access-token-expiration}")
+        private long accessTokenExpiration;
 
-    private SecretKey getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);
-        return Keys.hmacShaKeyFor(keyBytes);
-    }
+        @Value("${app.jwt.refresh-token-expiration}")
+        private long refreshTokenExpiration;
 
-    // ========== 生成 Token ==========
-
-    public String generateAccessToken(UserPrincipal user) {
-        return Jwts.builder()
-            .subject(user.getId().toString())
-            .claim("username", user.getUsername())
-            .claim("roles", user.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList()))
-            .issuedAt(new Date())
-            .expiration(new Date(System.currentTimeMillis()
-                + accessTokenExpiration * 1000))
-            .signWith(getSigningKey())
-            .compact();
-    }
-
-    public String generateRefreshToken(UserPrincipal user) {
-        return Jwts.builder()
-            .subject(user.getId().toString())
-            .claim("type", "refresh")
-            .issuedAt(new Date())
-            .expiration(new Date(System.currentTimeMillis()
-                + refreshTokenExpiration * 1000))
-            .signWith(getSigningKey())
-            .compact();
-    }
-
-    // ========== 解析 Token ==========
-
-    private Claims parseToken(String token) {
-        return Jwts.parser()
-            .verifyWith(getSigningKey())
-            .build()
-            .parseSignedClaims(token)
-            .getPayload();
-    }
-
-    public Long   getUserId(String token)   { return Long.parseLong(parseToken(token).getSubject()); }
-    public String getUsername(String token) { return parseToken(token).get("username", String.class); }
-
-    @SuppressWarnings("unchecked")
-    public List<String> getRoles(String token) {
-        return parseToken(token).get("roles", List.class);
-    }
-
-    public boolean validateToken(String token) {
-        try {
-            parseToken(token);
-            return true;
-        } catch (ExpiredJwtException e) {
-            log.warn("Token 已過期: {}", e.getMessage());
-        } catch (MalformedJwtException e) {
-            log.warn("Token 格式錯誤: {}", e.getMessage());
-        } catch (UnsupportedJwtException e) {
-            log.warn("不支援的 Token: {}", e.getMessage());
-        } catch (SecurityException e) {
-            log.warn("Token 簽名錯誤: {}", e.getMessage());
-        } catch (IllegalArgumentException e) {
-            log.warn("Token 為空: {}", e.getMessage());
+        private SecretKey getSigningKey() {
+            byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);
+            return Keys.hmacShaKeyFor(keyBytes);
         }
-        return false;
-    }
 
-    public boolean isRefreshToken(String token) {
-        return "refresh".equals(parseToken(token).get("type", String.class));
+    ```
+
+=== "生成 Token"
+
+    ``` java
+
+        public String generateAccessToken(UserPrincipal user) {
+            return Jwts.builder()
+                .subject(user.getId().toString())
+                .claim("username", user.getUsername())
+                .claim("roles", user.getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .collect(Collectors.toList()))
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis()
+                    + accessTokenExpiration * 1000))
+                .signWith(getSigningKey())
+                .compact();
+        }
+
+        public String generateRefreshToken(UserPrincipal user) {
+            return Jwts.builder()
+                .subject(user.getId().toString())
+                .claim("type", "refresh")
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis()
+                    + refreshTokenExpiration * 1000))
+                .signWith(getSigningKey())
+                .compact();
+        }
+
+    ```
+
+=== "解析 Token"
+
+    ``` java
+
+        private Claims parseToken(String token) {
+            return Jwts.parser()
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+        }
+
+        public Long   getUserId(String token)   { return Long.parseLong(parseToken(token).getSubject()); }
+        public String getUsername(String token) { return parseToken(token).get("username", String.class); }
+
+        @SuppressWarnings("unchecked")
+        public List<String> getRoles(String token) {
+            return parseToken(token).get("roles", List.class);
+        }
+
+        public boolean validateToken(String token) {
+            try {
+                parseToken(token);
+                return true;
+            } catch (ExpiredJwtException e) {
+                log.warn("Token 已過期: {}", e.getMessage());
+            } catch (MalformedJwtException e) {
+                log.warn("Token 格式錯誤: {}", e.getMessage());
+            } catch (UnsupportedJwtException e) {
+                log.warn("不支援的 Token: {}", e.getMessage());
+            } catch (SecurityException e) {
+                log.warn("Token 簽名錯誤: {}", e.getMessage());
+            } catch (IllegalArgumentException e) {
+                log.warn("Token 為空: {}", e.getMessage());
+            }
+            return false;
+        }
+
+        public boolean isRefreshToken(String token) {
+            return "refresh".equals(parseToken(token).get("type", String.class));
+        }
     }
-}
-```
+    ```
+
 
 ```java
 // JWT 認證過濾器
@@ -241,107 +256,114 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 }
 ```
 
-```java
-// Auth Controller（登入/刷新/登出）
-@RestController
-@RequestMapping("/auth")
-@RequiredArgsConstructor
-public class AuthController {
+=== "Auth Controller"
 
-    private final AuthenticationManager authenticationManager;
-    private final JwtTokenProvider      jwtTokenProvider;
-    private final RefreshTokenService   refreshTokenService;
+    ``` java
+    // Auth Controller（登入/刷新/登出）
+    @RestController
+    @RequestMapping("/auth")
+    @RequiredArgsConstructor
+    public class AuthController {
 
-    // 登入
-    @PostMapping("/login")
-    public ResponseEntity<TokenResponse> login(
-            @Valid @RequestBody LoginRequest request) {
+        private final AuthenticationManager authenticationManager;
+        private final JwtTokenProvider      jwtTokenProvider;
+        private final RefreshTokenService   refreshTokenService;
 
-        Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(
-                request.getUsername(),
-                request.getPassword()
-            )
-        );
+        // 登入
+        @PostMapping("/login")
+        public ResponseEntity<TokenResponse> login(
+                @Valid @RequestBody LoginRequest request) {
 
-        UserPrincipal user = (UserPrincipal) authentication.getPrincipal();
+            Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                    request.getUsername(),
+                    request.getPassword()
+                )
+            );
 
-        String accessToken  = jwtTokenProvider.generateAccessToken(user);
-        String refreshToken = jwtTokenProvider.generateRefreshToken(user);
+            UserPrincipal user = (UserPrincipal) authentication.getPrincipal();
 
-        refreshTokenService.save(user.getId(), refreshToken);
+            String accessToken  = jwtTokenProvider.generateAccessToken(user);
+            String refreshToken = jwtTokenProvider.generateRefreshToken(user);
 
-        return ResponseEntity.ok(TokenResponse.builder()
-            .accessToken(accessToken)
-            .refreshToken(refreshToken)
-            .tokenType("Bearer")
-            .expiresIn(900L)
-            .build());
-    }
+            refreshTokenService.save(user.getId(), refreshToken);
 
-    // 刷新 Token
-    @PostMapping("/refresh")
-    public ResponseEntity<TokenResponse> refresh(
-            @RequestBody RefreshRequest request) {
-
-        String refreshToken = request.getRefreshToken();
-
-        if (!jwtTokenProvider.validateToken(refreshToken)
-                || !jwtTokenProvider.isRefreshToken(refreshToken)) {
-            throw new InvalidTokenException("無效的 Refresh Token");
+            return ResponseEntity.ok(TokenResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .tokenType("Bearer")
+                .expiresIn(900L)
+                .build());
         }
 
-        Long userId = jwtTokenProvider.getUserId(refreshToken);
-        if (!refreshTokenService.isValid(userId, refreshToken)) {
-            throw new InvalidTokenException("Refresh Token 已失效");
+        // 刷新 Token
+        @PostMapping("/refresh")
+        public ResponseEntity<TokenResponse> refresh(
+                @RequestBody RefreshRequest request) {
+
+            String refreshToken = request.getRefreshToken();
+
+            if (!jwtTokenProvider.validateToken(refreshToken)
+                    || !jwtTokenProvider.isRefreshToken(refreshToken)) {
+                throw new InvalidTokenException("無效的 Refresh Token");
+            }
+
+            Long userId = jwtTokenProvider.getUserId(refreshToken);
+            if (!refreshTokenService.isValid(userId, refreshToken)) {
+                throw new InvalidTokenException("Refresh Token 已失效");
+            }
+
+            UserDetails   userDetails = userDetailsService.loadUserById(userId);
+            UserPrincipal user        = (UserPrincipal) userDetails;
+            String newAccessToken = jwtTokenProvider.generateAccessToken(user);
+
+            return ResponseEntity.ok(TokenResponse.builder()
+                .accessToken(newAccessToken)
+                .refreshToken(refreshToken)
+                .tokenType("Bearer")
+                .expiresIn(900L)
+                .build());
         }
 
-        UserDetails   userDetails = userDetailsService.loadUserById(userId);
-        UserPrincipal user        = (UserPrincipal) userDetails;
-        String newAccessToken = jwtTokenProvider.generateAccessToken(user);
-
-        return ResponseEntity.ok(TokenResponse.builder()
-            .accessToken(newAccessToken)
-            .refreshToken(refreshToken)
-            .tokenType("Bearer")
-            .expiresIn(900L)
-            .build());
+        // 登出
+        @PostMapping("/logout")
+        public ResponseEntity<Void> logout(@CurrentUser UserPrincipal user) {
+            refreshTokenService.delete(user.getId());
+            return ResponseEntity.noContent().build();
+        }
     }
+    ```
 
-    // 登出
-    @PostMapping("/logout")
-    public ResponseEntity<Void> logout(@CurrentUser UserPrincipal user) {
-        refreshTokenService.delete(user.getId());
-        return ResponseEntity.noContent().build();
+=== "Refresh Token 服務"
+
+    ``` java
+    // Refresh Token 服務（Redis 儲存）
+    @Service
+    @RequiredArgsConstructor
+    public class RefreshTokenService {
+
+        private final StringRedisTemplate redisTemplate;
+        private static final String KEY_PREFIX  = "refresh_token:";
+        private static final long   EXPIRE_DAYS = 7;
+
+        public void save(Long userId, String refreshToken) {
+            redisTemplate.opsForValue().set(
+                KEY_PREFIX + userId, refreshToken,
+                EXPIRE_DAYS, TimeUnit.DAYS
+            );
+        }
+
+        public boolean isValid(Long userId, String refreshToken) {
+            String stored = redisTemplate.opsForValue().get(KEY_PREFIX + userId);
+            return refreshToken.equals(stored);
+        }
+
+        public void delete(Long userId) {
+            redisTemplate.delete(KEY_PREFIX + userId);
+        }
     }
-}
+    ```
 
-// Refresh Token 服務（Redis 儲存）
-@Service
-@RequiredArgsConstructor
-public class RefreshTokenService {
-
-    private final StringRedisTemplate redisTemplate;
-    private static final String KEY_PREFIX  = "refresh_token:";
-    private static final long   EXPIRE_DAYS = 7;
-
-    public void save(Long userId, String refreshToken) {
-        redisTemplate.opsForValue().set(
-            KEY_PREFIX + userId, refreshToken,
-            EXPIRE_DAYS, TimeUnit.DAYS
-        );
-    }
-
-    public boolean isValid(Long userId, String refreshToken) {
-        String stored = redisTemplate.opsForValue().get(KEY_PREFIX + userId);
-        return refreshToken.equals(stored);
-    }
-
-    public void delete(Long userId) {
-        redisTemplate.delete(KEY_PREFIX + userId);
-    }
-}
-```
 
 ## JWT 安全問題與防禦
 

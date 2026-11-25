@@ -1,5 +1,9 @@
 # JavaScript 核心原理
 
+!!! abstract "本章重點"
+
+    原型鏈、閉包與非同步是 JavaScript 最核心、也最常被問到的三個概念。本章用範例說明它們的運作方式，並整理 Promise 與 async / await 的常見用法與陷阱。
+
 ## 原型鏈（Prototype Chain）
 
 ```javascript

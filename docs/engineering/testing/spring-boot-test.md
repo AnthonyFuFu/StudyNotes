@@ -1,5 +1,9 @@
 # Spring Boot Test
 
+!!! abstract "本章重點"
+
+    啟動整個 Spring 容器的測試很慢，測試切片只載入需要的部分。本章介紹 `@WebMvcTest`、`@DataJpaTest` 與完整的 `@SpringBootTest`，以及各自適合測試哪一層。
+
 ## 測試切片（Test Slices）
 
 ```
@@ -20,229 +24,285 @@ Spring Boot 提供多種測試切片，只加載相關的 Bean：
 
 ## @WebMvcTest（Controller 層測試）
 
-```java
-@WebMvcTest(OrderController.class)  // 只加載 OrderController
-class OrderControllerTest {
+=== "類別與共用設定"
 
-    @Autowired
-    private MockMvc mockMvc;  // 模擬 HTTP 請求，不啟動真實服務器
+    ``` java
+    @WebMvcTest(OrderController.class)  // 只加載 OrderController
+    class OrderControllerTest {
 
-    @MockBean  // 替換 Spring Context 中的 Bean
-    private OrderService orderService;
+        @Autowired
+        private MockMvc mockMvc;  // 模擬 HTTP 請求，不啟動真實服務器
 
-    @Autowired
-    private ObjectMapper objectMapper;
+        @MockBean  // 替換 Spring Context 中的 Bean
+        private OrderService orderService;
 
-    @Test
-    @DisplayName("GET /api/v1/orders/{id} - 查詢訂單成功")
-    void getOrder_ShouldReturn200_WhenOrderExists() throws Exception {
-        // Arrange
-        OrderDTO orderDTO = OrderDTO.builder()
-            .id(1L)
-            .status("PAID")
-            .amount(new BigDecimal("500"))
-            .build();
+        @Autowired
+        private ObjectMapper objectMapper;
 
-        when(orderService.findById(1L)).thenReturn(orderDTO);
+    ```
 
-        // Act & Assert
-        mockMvc.perform(get("/api/v1/orders/1")
-                .header("Authorization", "Bearer " + validJwtToken)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andDo(print())  // 打印請求/響應詳情（調試用）
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.success").value(true))
-            .andExpect(jsonPath("$.data.id").value(1))
-            .andExpect(jsonPath("$.data.status").value("PAID"))
-            .andExpect(jsonPath("$.data.amount").value(500));
+=== "查詢訂單成功"
+
+    ``` java
+        @Test
+        @DisplayName("GET /api/v1/orders/{id} - 查詢訂單成功")
+        void getOrder_ShouldReturn200_WhenOrderExists() throws Exception {
+            // Arrange
+            OrderDTO orderDTO = OrderDTO.builder()
+                .id(1L)
+                .status("PAID")
+                .amount(new BigDecimal("500"))
+                .build();
+
+            when(orderService.findById(1L)).thenReturn(orderDTO);
+
+            // Act & Assert
+            mockMvc.perform(get("/api/v1/orders/1")
+                    .header("Authorization", "Bearer " + validJwtToken)
+                    .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())  // 打印請求/響應詳情（調試用）
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.id").value(1))
+                .andExpect(jsonPath("$.data.status").value("PAID"))
+                .andExpect(jsonPath("$.data.amount").value(500));
+        }
+
+    ```
+
+=== "訂單不存在返回 404"
+
+    ``` java
+        @Test
+        @DisplayName("GET /api/v1/orders/{id} - 訂單不存在返回 404")
+        void getOrder_ShouldReturn404_WhenOrderNotFound() throws Exception {
+            when(orderService.findById(999L))
+                .thenThrow(new ResourceNotFoundException("訂單不存在：999"));
+
+            mockMvc.perform(get("/api/v1/orders/999")
+                    .header("Authorization", "Bearer " + validJwtToken))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.code").value("RESOURCE_001"));
+        }
+
+    ```
+
+=== "建立訂單成功，返回 201"
+
+    ``` java
+        @Test
+        @DisplayName("POST /api/v1/orders - 建立訂單成功，返回 201")
+        void createOrder_ShouldReturn201_WhenRequestValid() throws Exception {
+            // Arrange
+            CreateOrderRequest request = CreateOrderRequest.builder()
+                .userId(1L)
+                .address("台北市信義區")
+                .items(List.of(new OrderItemRequest(1L, 2)))
+                .build();
+
+            OrderDTO createdOrder = OrderDTO.builder()
+                .id(100L)
+                .status("PENDING")
+                .amount(new BigDecimal("200"))
+                .build();
+
+            when(orderService.create(any())).thenReturn(createdOrder);
+
+            // Act & Assert
+            mockMvc.perform(post("/api/v1/orders")
+                    .header("Authorization", "Bearer " + validJwtToken)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated())  // 201
+                .andExpect(header().exists("Location"))  // Location 頭
+                .andExpect(jsonPath("$.data.id").value(100))
+                .andExpect(jsonPath("$.data.status").value("PENDING"));
+        }
+
+    ```
+
+=== "請求體驗證失敗，返回 400"
+
+    ``` java
+        @Test
+        @DisplayName("POST /api/v1/orders - 請求體驗證失敗，返回 400")
+        void createOrder_ShouldReturn400_WhenRequestInvalid() throws Exception {
+            // 缺少必填欄位
+            String invalidRequest = "{\"userId\": null}";
+
+            mockMvc.perform(post("/api/v1/orders")
+                    .header("Authorization", "Bearer " + validJwtToken)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(invalidRequest))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.data.userId").exists());  // 欄位錯誤資訊
+        }
+
+    ```
+
+=== "未帶 Token 訪問受保護接口，返回 401"
+
+    ``` java
+        @Test
+        @DisplayName("未帶 Token 訪問受保護接口，返回 401")
+        void protectedEndpoint_ShouldReturn401_WhenNoToken() throws Exception {
+            mockMvc.perform(get("/api/v1/orders/1"))
+                .andExpect(status().isUnauthorized());
+        }
     }
+    ```
 
-    @Test
-    @DisplayName("GET /api/v1/orders/{id} - 訂單不存在返回 404")
-    void getOrder_ShouldReturn404_WhenOrderNotFound() throws Exception {
-        when(orderService.findById(999L))
-            .thenThrow(new ResourceNotFoundException("訂單不存在：999"));
-
-        mockMvc.perform(get("/api/v1/orders/999")
-                .header("Authorization", "Bearer " + validJwtToken))
-            .andExpect(status().isNotFound())
-            .andExpect(jsonPath("$.success").value(false))
-            .andExpect(jsonPath("$.code").value("RESOURCE_001"));
-    }
-
-    @Test
-    @DisplayName("POST /api/v1/orders - 建立訂單成功，返回 201")
-    void createOrder_ShouldReturn201_WhenRequestValid() throws Exception {
-        // Arrange
-        CreateOrderRequest request = CreateOrderRequest.builder()
-            .userId(1L)
-            .address("台北市信義區")
-            .items(List.of(new OrderItemRequest(1L, 2)))
-            .build();
-
-        OrderDTO createdOrder = OrderDTO.builder()
-            .id(100L)
-            .status("PENDING")
-            .amount(new BigDecimal("200"))
-            .build();
-
-        when(orderService.create(any())).thenReturn(createdOrder);
-
-        // Act & Assert
-        mockMvc.perform(post("/api/v1/orders")
-                .header("Authorization", "Bearer " + validJwtToken)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-            .andExpect(status().isCreated())  // 201
-            .andExpect(header().exists("Location"))  // Location 頭
-            .andExpect(jsonPath("$.data.id").value(100))
-            .andExpect(jsonPath("$.data.status").value("PENDING"));
-    }
-
-    @Test
-    @DisplayName("POST /api/v1/orders - 請求體驗證失敗，返回 400")
-    void createOrder_ShouldReturn400_WhenRequestInvalid() throws Exception {
-        // 缺少必填欄位
-        String invalidRequest = "{\"userId\": null}";
-
-        mockMvc.perform(post("/api/v1/orders")
-                .header("Authorization", "Bearer " + validJwtToken)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(invalidRequest))
-            .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.success").value(false))
-            .andExpect(jsonPath("$.data.userId").exists());  // 欄位錯誤資訊
-    }
-
-    @Test
-    @DisplayName("未帶 Token 訪問受保護接口，返回 401")
-    void protectedEndpoint_ShouldReturn401_WhenNoToken() throws Exception {
-        mockMvc.perform(get("/api/v1/orders/1"))
-            .andExpect(status().isUnauthorized());
-    }
-}
-```
 
 ## @DataJpaTest（Repository 層測試）
 
-```java
-@DataJpaTest  // 只加載 JPA 相關，使用 H2 記憶體資料庫
-@DisplayName("訂單 Repository 測試")
-class OrderRepositoryTest {
+=== "類別與共用設定"
 
-    @Autowired
-    private OrderRepository orderRepository;
+    ``` java
+    @DataJpaTest  // 只加載 JPA 相關，使用 H2 記憶體資料庫
+    @DisplayName("訂單 Repository 測試")
+    class OrderRepositoryTest {
 
-    @Autowired
-    private TestEntityManager entityManager;  // 專為測試設計的 EntityManager
+        @Autowired
+        private OrderRepository orderRepository;
 
-    private Order savedOrder;
+        @Autowired
+        private TestEntityManager entityManager;  // 專為測試設計的 EntityManager
 
-    @BeforeEach
-    void setUp() {
-        // 準備測試數據
-        Order order = Order.builder()
-            .userId(1L)
-            .status(OrderStatus.PAID)
-            .amount(new BigDecimal("500"))
-            .address("台北市")
-            .createdAt(LocalDateTime.now())
-            .build();
+        private Order savedOrder;
 
-        savedOrder = entityManager.persistAndFlush(order);
-    }
-
-    @Test
-    @DisplayName("根據 ID 查詢訂單")
-    void findById_ShouldReturnOrder_WhenExists() {
-        Optional<Order> found = orderRepository.findById(savedOrder.getId());
-
-        assertThat(found).isPresent()
-                         .get()
-                         .extracting(Order::getUserId, Order::getStatus)
-                         .containsExactly(1L, OrderStatus.PAID);
-    }
-
-    @Test
-    @DisplayName("根據用戶 ID 查詢訂單列表")
-    void findByUserId_ShouldReturnOrders() {
-        // 再建立一個同用戶的訂單
-        Order order2 = Order.builder()
-            .userId(1L)
-            .status(OrderStatus.PENDING)
-            .amount(new BigDecimal("200"))
-            .build();
-        entityManager.persistAndFlush(order2);
-
-        List<Order> orders = orderRepository.findByUserId(1L);
-
-        assertThat(orders).hasSize(2)
-                          .extracting(Order::getUserId)
-                          .containsOnly(1L);
-    }
-
-    @Test
-    @DisplayName("根據狀態和金額範圍查詢")
-    void findByStatusAndAmountBetween() {
-        List<Order> orders = orderRepository
-            .findByStatusAndAmountBetween(
-                OrderStatus.PAID,
-                new BigDecimal("100"),
-                new BigDecimal("1000")
-            );
-
-        assertThat(orders).isNotEmpty()
-                          .allMatch(o -> o.getStatus() == OrderStatus.PAID)
-                          .allMatch(o ->
-                              o.getAmount().compareTo(new BigDecimal("100")) >= 0 &&
-                              o.getAmount().compareTo(new BigDecimal("1000")) <= 0
-                          );
-    }
-
-    @Test
-    @DisplayName("保存訂單 - 驗證自動填充欄位")
-    void save_ShouldAutoFillAuditFields() {
-        Order newOrder = Order.builder()
-            .userId(2L)
-            .status(OrderStatus.PENDING)
-            .amount(new BigDecimal("300"))
-            .build();
-
-        Order saved = orderRepository.save(newOrder);
-        entityManager.flush();
-        entityManager.clear();  // 清除一級緩存，確保從 DB 讀取
-
-        Order fromDb = orderRepository.findById(saved.getId()).orElseThrow();
-        assertThat(fromDb.getCreatedAt()).isNotNull();
-        assertThat(fromDb.getUpdatedAt()).isNotNull();
-    }
-
-    @Test
-    @DisplayName("分頁查詢")
-    void findAll_WithPagination() {
-        // 建立更多測試數據
-        for (int i = 0; i < 15; i++) {
-            entityManager.persist(Order.builder()
+        @BeforeEach
+        void setUp() {
+            // 準備測試數據
+            Order order = Order.builder()
                 .userId(1L)
                 .status(OrderStatus.PAID)
-                .amount(new BigDecimal(100 + i))
-                .build());
+                .amount(new BigDecimal("500"))
+                .address("台北市")
+                .createdAt(LocalDateTime.now())
+                .build();
+
+            savedOrder = entityManager.persistAndFlush(order);
         }
-        entityManager.flush();
 
-        Page<Order> page = orderRepository.findByUserId(
-            1L, PageRequest.of(0, 10, Sort.by("amount").descending())
-        );
+    ```
 
-        assertThat(page.getContent()).hasSize(10);
-        assertThat(page.getTotalElements()).isGreaterThanOrEqualTo(16);
-        // 驗證排序（金額由大到小）
-        assertThat(page.getContent())
-            .extracting(Order::getAmount)
-            .isSortedAccordingTo(Comparator.reverseOrder());
+=== "根據 ID 查詢訂單"
+
+    ``` java
+        @Test
+        @DisplayName("根據 ID 查詢訂單")
+        void findById_ShouldReturnOrder_WhenExists() {
+            Optional<Order> found = orderRepository.findById(savedOrder.getId());
+
+            assertThat(found).isPresent()
+                             .get()
+                             .extracting(Order::getUserId, Order::getStatus)
+                             .containsExactly(1L, OrderStatus.PAID);
+        }
+
+    ```
+
+=== "根據用戶 ID 查詢訂單列表"
+
+    ``` java
+        @Test
+        @DisplayName("根據用戶 ID 查詢訂單列表")
+        void findByUserId_ShouldReturnOrders() {
+            // 再建立一個同用戶的訂單
+            Order order2 = Order.builder()
+                .userId(1L)
+                .status(OrderStatus.PENDING)
+                .amount(new BigDecimal("200"))
+                .build();
+            entityManager.persistAndFlush(order2);
+
+            List<Order> orders = orderRepository.findByUserId(1L);
+
+            assertThat(orders).hasSize(2)
+                              .extracting(Order::getUserId)
+                              .containsOnly(1L);
+        }
+
+    ```
+
+=== "根據狀態和金額範圍查詢"
+
+    ``` java
+        @Test
+        @DisplayName("根據狀態和金額範圍查詢")
+        void findByStatusAndAmountBetween() {
+            List<Order> orders = orderRepository
+                .findByStatusAndAmountBetween(
+                    OrderStatus.PAID,
+                    new BigDecimal("100"),
+                    new BigDecimal("1000")
+                );
+
+            assertThat(orders).isNotEmpty()
+                              .allMatch(o -> o.getStatus() == OrderStatus.PAID)
+                              .allMatch(o ->
+                                  o.getAmount().compareTo(new BigDecimal("100")) >= 0 &&
+                                  o.getAmount().compareTo(new BigDecimal("1000")) <= 0
+                              );
+        }
+
+    ```
+
+=== "驗證自動填充欄位"
+
+    ``` java
+        @Test
+        @DisplayName("保存訂單 - 驗證自動填充欄位")
+        void save_ShouldAutoFillAuditFields() {
+            Order newOrder = Order.builder()
+                .userId(2L)
+                .status(OrderStatus.PENDING)
+                .amount(new BigDecimal("300"))
+                .build();
+
+            Order saved = orderRepository.save(newOrder);
+            entityManager.flush();
+            entityManager.clear();  // 清除一級緩存，確保從 DB 讀取
+
+            Order fromDb = orderRepository.findById(saved.getId()).orElseThrow();
+            assertThat(fromDb.getCreatedAt()).isNotNull();
+            assertThat(fromDb.getUpdatedAt()).isNotNull();
+        }
+
+    ```
+
+=== "分頁查詢"
+
+    ``` java
+        @Test
+        @DisplayName("分頁查詢")
+        void findAll_WithPagination() {
+            // 建立更多測試數據
+            for (int i = 0; i < 15; i++) {
+                entityManager.persist(Order.builder()
+                    .userId(1L)
+                    .status(OrderStatus.PAID)
+                    .amount(new BigDecimal(100 + i))
+                    .build());
+            }
+            entityManager.flush();
+
+            Page<Order> page = orderRepository.findByUserId(
+                1L, PageRequest.of(0, 10, Sort.by("amount").descending())
+            );
+
+            assertThat(page.getContent()).hasSize(10);
+            assertThat(page.getTotalElements()).isGreaterThanOrEqualTo(16);
+            // 驗證排序（金額由大到小）
+            assertThat(page.getContent())
+                .extracting(Order::getAmount)
+                .isSortedAccordingTo(Comparator.reverseOrder());
+        }
     }
-}
-```
+    ```
+
 
 ## @SpringBootTest（整合測試）
 

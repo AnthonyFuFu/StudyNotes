@@ -1,5 +1,9 @@
 # 實戰：完整可觀測性平台
 
+!!! abstract "本章重點"
+
+    本章把 Metrics、Logs、Traces 三者整合成一套完整的可觀測性平台，示範以 Docker Compose 部署整個監控棧，並說明生產環境的告警分級與 SLI / SLO 的設計方式。
+
 ## 整合架構設計
 
 ``` mermaid

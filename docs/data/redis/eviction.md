@@ -1,5 +1,9 @@
 # 記憶體淘汰策略（8 種）
 
+!!! abstract "本章重點"
+
+    Redis 記憶體用完時，淘汰策略決定要刪掉哪些資料。本章整理 8 種淘汰策略的差異，以及 LRU 與 LFU 在 Redis 中的近似實作與選擇建議。
+
 當 Redis 記憶體達到 maxmemory 上限時，
 
 **根據 maxmemory-policy 決定如何騰出空間**

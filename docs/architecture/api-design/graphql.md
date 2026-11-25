@@ -1,5 +1,9 @@
 # GraphQL（靈活查詢語言）
 
+!!! abstract "本章重點"
+
+    GraphQL 讓客戶端自己指定需要的欄位，一次請求取回多種資源，解決 REST 的 Over-fetching 與 Under-fetching。本章介紹 Schema、Query / Mutation / Subscription，以及 Spring for GraphQL 的整合方式，最後與 REST 做取捨比較。
+
 ## 核心概念
 
 **GraphQL 解決的問題**
@@ -153,125 +157,134 @@ type Subscription {
 }
 ```
 
-```java
-// GraphQL Controller（@Controller，不是 @RestController）
+=== "Query 解析器"
 
-// ──── Query 解析器 ────
-@Controller
-@RequiredArgsConstructor
-public class UserGraphQLController {
+    ``` java
+    // GraphQL Controller（@Controller，不是 @RestController）
 
-    private final UserService    userService;
-    private final OrderService   orderService;
 
-    @QueryMapping  // 對應 schema 中的 query.user
-    public User user(@Argument Long id) {
-        return userService.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("用戶不存在：" + id));
+    @Controller
+    @RequiredArgsConstructor
+    public class UserGraphQLController {
+
+        private final UserService    userService;
+        private final OrderService   orderService;
+
+        @QueryMapping  // 對應 schema 中的 query.user
+        public User user(@Argument Long id) {
+            return userService.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("用戶不存在：" + id));
+        }
+
+        @QueryMapping
+        public User me(@AuthenticationPrincipal UserPrincipal currentUser) {
+            return userService.findById(currentUser.getId()).orElseThrow();
+        }
+
+        // 解析 User.orders 欄位（N+1 問題：用 DataLoader 解決）
+        @SchemaMapping(typeName = "User", field = "orders")
+        public CompletableFuture<List<Order>> orders(
+                User user,
+                @Argument int page,
+                @Argument int size,
+                DataLoader<Long, List<Order>> orderLoader) {
+            // DataLoader 自動批量合併 N 個用戶的訂單查詢為 1 個查詢！
+            return orderLoader.load(user.getId());
+        }
     }
 
-    @QueryMapping
-    public User me(@AuthenticationPrincipal UserPrincipal currentUser) {
-        return userService.findById(currentUser.getId()).orElseThrow();
+    @Controller
+    @RequiredArgsConstructor
+    public class ProductGraphQLController {
+
+        private final ProductService productService;
+
+        @QueryMapping
+        public Product product(@Argument Long id) {
+            return productService.findById(id).orElseThrow();
+        }
+
+        @QueryMapping
+        public ProductConnection products(
+                @Argument ProductFilterInput filter,
+                @Argument int page,
+                @Argument int size,
+                @Argument String sort) {
+
+            Page<Product> productPage = productService.search(filter, page, size, sort);
+
+            return ProductConnection.builder()
+                .items(productPage.getContent())
+                .pageInfo(PageInfo.builder()
+                    .total((int) productPage.getTotalElements())
+                    .page(page)
+                    .size(size)
+                    .totalPages(productPage.getTotalPages())
+                    .build())
+                .build();
+        }
     }
+    ```
 
-    // 解析 User.orders 欄位（N+1 問題：用 DataLoader 解決）
-    @SchemaMapping(typeName = "User", field = "orders")
-    public CompletableFuture<List<Order>> orders(
-            User user,
-            @Argument int page,
-            @Argument int size,
-            DataLoader<Long, List<Order>> orderLoader) {
-        // DataLoader 自動批量合併 N 個用戶的訂單查詢為 1 個查詢！
-        return orderLoader.load(user.getId());
+=== "Mutation 解析器"
+
+    ``` java
+    @Controller
+    @RequiredArgsConstructor
+    public class OrderGraphQLController {
+
+        private final OrderService              orderService;
+        private final SimpMessagingTemplate     messagingTemplate;
+
+        @MutationMapping
+        public Order createOrder(@Argument CreateOrderInput input,
+                                  @AuthenticationPrincipal UserPrincipal user) {
+            return orderService.create(input, user.getId());
+        }
+
+        @MutationMapping
+        public Order cancelOrder(@Argument Long id,
+                                  @Argument String reason) {
+            return orderService.cancel(id, reason);
+        }
+
+        // ──── Subscription 解析器 ────
+        @SubscriptionMapping
+        public Flux<Order> orderStatusChanged(@Argument Long orderId) {
+            // 返回 Flux（響應式流），每次訂單狀態變化都推送
+            return orderService.watchOrderStatus(orderId)
+                .map(status -> orderService.findById(orderId).orElseThrow());
+        }
     }
-}
+    ```
 
-@Controller
-@RequiredArgsConstructor
-public class ProductGraphQLController {
+=== "DataLoader"
 
-    private final ProductService productService;
+    ``` java
+    @Configuration
+    public class DataLoaderConfig {
 
-    @QueryMapping
-    public Product product(@Argument Long id) {
-        return productService.findById(id).orElseThrow();
+        @Bean
+        public BatchLoaderRegistry batchLoaderRegistry(OrderService orderService) {
+            BatchLoaderRegistry registry = new DefaultBatchLoaderRegistry();
+
+            // 批量加載用戶的訂單（多個用戶的訂單查詢合併為一次）
+            registry.forTypePair(Long.class, List.class)
+                .withName("orderLoader")
+                .registerBatchLoader((userIds, env) -> {
+                    // userIds = [1, 2, 3, 4, 5]（所有需要查訂單的用戶 ID）
+                    Map<Long, List<Order>> orderMap =
+                        orderService.findByUserIds(new ArrayList<>(userIds));
+                    // 返回與 userIds 順序對應的結果
+                    return Flux.fromIterable(userIds)
+                        .map(id -> orderMap.getOrDefault(id, Collections.emptyList()));
+                });
+
+            return registry;
+        }
     }
+    ```
 
-    @QueryMapping
-    public ProductConnection products(
-            @Argument ProductFilterInput filter,
-            @Argument int page,
-            @Argument int size,
-            @Argument String sort) {
-
-        Page<Product> productPage = productService.search(filter, page, size, sort);
-
-        return ProductConnection.builder()
-            .items(productPage.getContent())
-            .pageInfo(PageInfo.builder()
-                .total((int) productPage.getTotalElements())
-                .page(page)
-                .size(size)
-                .totalPages(productPage.getTotalPages())
-                .build())
-            .build();
-    }
-}
-
-// ──── Mutation 解析器 ────
-@Controller
-@RequiredArgsConstructor
-public class OrderGraphQLController {
-
-    private final OrderService              orderService;
-    private final SimpMessagingTemplate     messagingTemplate;
-
-    @MutationMapping
-    public Order createOrder(@Argument CreateOrderInput input,
-                              @AuthenticationPrincipal UserPrincipal user) {
-        return orderService.create(input, user.getId());
-    }
-
-    @MutationMapping
-    public Order cancelOrder(@Argument Long id,
-                              @Argument String reason) {
-        return orderService.cancel(id, reason);
-    }
-
-    // ──── Subscription 解析器 ────
-    @SubscriptionMapping
-    public Flux<Order> orderStatusChanged(@Argument Long orderId) {
-        // 返回 Flux（響應式流），每次訂單狀態變化都推送
-        return orderService.watchOrderStatus(orderId)
-            .map(status -> orderService.findById(orderId).orElseThrow());
-    }
-}
-
-// ──── DataLoader（解決 N+1 問題）────
-@Configuration
-public class DataLoaderConfig {
-
-    @Bean
-    public BatchLoaderRegistry batchLoaderRegistry(OrderService orderService) {
-        BatchLoaderRegistry registry = new DefaultBatchLoaderRegistry();
-
-        // 批量加載用戶的訂單（多個用戶的訂單查詢合併為一次）
-        registry.forTypePair(Long.class, List.class)
-            .withName("orderLoader")
-            .registerBatchLoader((userIds, env) -> {
-                // userIds = [1, 2, 3, 4, 5]（所有需要查訂單的用戶 ID）
-                Map<Long, List<Order>> orderMap =
-                    orderService.findByUserIds(new ArrayList<>(userIds));
-                // 返回與 userIds 順序對應的結果
-                return Flux.fromIterable(userIds)
-                    .map(id -> orderMap.getOrDefault(id, Collections.emptyList()));
-            });
-
-        return registry;
-    }
-}
-```
 
 ```yaml
 # application.yml

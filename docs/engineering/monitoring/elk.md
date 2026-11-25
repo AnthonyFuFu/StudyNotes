@@ -1,5 +1,9 @@
 # ELK Stack 深入
 
+!!! abstract "本章重點"
+
+    日誌是排查問題最直接的線索，但散落在每台機器上就很難查。本章介紹 ELK 的收集、處理、儲存與展示四層架構，並示範 Spring Boot 輸出結構化日誌、Filebeat 與 Logstash 的設定。
+
 ## ELK 架構
 
 ``` mermaid
@@ -77,90 +81,97 @@ flowchart TB
 </configuration>
 ```
 
-```java
-// MDC（Mapped Diagnostic Context）- 為日誌加上請求上下文
-@Component
-@Order(1)
-public class LoggingFilter extends OncePerRequestFilter {
+=== "MDC- 為日誌加上請求上下文"
 
-    @Override
-    protected void doFilterInternal(HttpServletRequest  request,
-                                    HttpServletResponse response,
-                                    FilterChain         chain)
-            throws ServletException, IOException {
-        try {
-            String traceId = Optional
-                .ofNullable(request.getHeader("X-Trace-Id"))
-                .orElse(UUID.randomUUID().toString().replace("-", ""));
+    ``` java
+    // MDC（Mapped Diagnostic Context）- 為日誌加上請求上下文
+    @Component
+    @Order(1)
+    public class LoggingFilter extends OncePerRequestFilter {
 
-            String requestId = UUID.randomUUID().toString()
-                .replace("-", "").substring(0, 8);
+        @Override
+        protected void doFilterInternal(HttpServletRequest  request,
+                                        HttpServletResponse response,
+                                        FilterChain         chain)
+                throws ServletException, IOException {
+            try {
+                String traceId = Optional
+                    .ofNullable(request.getHeader("X-Trace-Id"))
+                    .orElse(UUID.randomUUID().toString().replace("-", ""));
 
-            MDC.put("traceId",   traceId);
-            MDC.put("requestId", requestId);
-            MDC.put("method",    request.getMethod());
-            MDC.put("path",      request.getRequestURI());
-            MDC.put("clientIp",  getClientIp(request));
+                String requestId = UUID.randomUUID().toString()
+                    .replace("-", "").substring(0, 8);
 
-            response.setHeader("X-Trace-Id", traceId);
+                MDC.put("traceId",   traceId);
+                MDC.put("requestId", requestId);
+                MDC.put("method",    request.getMethod());
+                MDC.put("path",      request.getRequestURI());
+                MDC.put("clientIp",  getClientIp(request));
 
-            chain.doFilter(request, response);
+                response.setHeader("X-Trace-Id", traceId);
 
-        } finally {
-            MDC.clear();  // ⚠️ 必須清除！防止線程池中的線程污染
+                chain.doFilter(request, response);
+
+            } finally {
+                MDC.clear();  // ⚠️ 必須清除！防止線程池中的線程污染
+            }
+        }
+
+        private String getClientIp(HttpServletRequest request) {
+            String ip = request.getHeader("X-Forwarded-For");
+            if (ip == null || ip.isEmpty()) {
+                ip = request.getRemoteAddr();
+            }
+            return ip.split(",")[0].trim();
         }
     }
+    ```
 
-    private String getClientIp(HttpServletRequest request) {
-        String ip = request.getHeader("X-Forwarded-For");
-        if (ip == null || ip.isEmpty()) {
-            ip = request.getRemoteAddr();
-        }
-        return ip.split(",")[0].trim();
-    }
-}
+=== "日誌記錄最佳實踐"
 
-// 日誌記錄最佳實踐
-@Service
-@Slf4j
-public class OrderService {
+    ``` java
+    // 日誌記錄最佳實踐
+    @Service
+    @Slf4j
+    public class OrderService {
 
-    public Order createOrder(OrderRequest request) {
-        // ✅ 結構化日誌（Key-Value 形式，ELK 容易解析）
-        log.info("開始建立訂單, userId={}, productId={}, quantity={}",
-            request.getUserId(), request.getProductId(), request.getQuantity());
+        public Order createOrder(OrderRequest request) {
+            // ✅ 結構化日誌（Key-Value 形式，ELK 容易解析）
+            log.info("開始建立訂單, userId={}, productId={}, quantity={}",
+                request.getUserId(), request.getProductId(), request.getQuantity());
 
-        MDC.put("orderId", orderId.toString());
-        MDC.put("userId",  request.getUserId().toString());
+            MDC.put("orderId", orderId.toString());
+            MDC.put("userId",  request.getUserId().toString());
 
-        try {
-            Order order = processOrder(request);
+            try {
+                Order order = processOrder(request);
 
-            log.info("訂單建立成功, orderId={}, amount={}, status={}",
-                order.getId(), order.getAmount(), order.getStatus());
+                log.info("訂單建立成功, orderId={}, amount={}, status={}",
+                    order.getId(), order.getAmount(), order.getStatus());
 
-            return order;
+                return order;
 
-        } catch (InsufficientStockException e) {
-            // ✅ 業務異常用 warn（不是 error）
-            log.warn("庫存不足, orderId={}, productId={}, required={}, available={}",
-                orderId, request.getProductId(),
-                request.getQuantity(), e.getAvailableStock());
-            throw e;
+            } catch (InsufficientStockException e) {
+                // ✅ 業務異常用 warn（不是 error）
+                log.warn("庫存不足, orderId={}, productId={}, required={}, available={}",
+                    orderId, request.getProductId(),
+                    request.getQuantity(), e.getAvailableStock());
+                throw e;
 
-        } catch (Exception e) {
-            // ✅ 系統異常用 error，並包含堆棧
-            log.error("訂單建立失敗, orderId={}, errorType={}",
-                orderId, e.getClass().getSimpleName(), e);
-            throw new OrderCreationException("訂單建立失敗", e);
+            } catch (Exception e) {
+                // ✅ 系統異常用 error，並包含堆棧
+                log.error("訂單建立失敗, orderId={}, errorType={}",
+                    orderId, e.getClass().getSimpleName(), e);
+                throw new OrderCreationException("訂單建立失敗", e);
 
-        } finally {
-            MDC.remove("orderId");
-            MDC.remove("userId");
+            } finally {
+                MDC.remove("orderId");
+                MDC.remove("userId");
+            }
         }
     }
-}
-```
+    ```
+
 
 ## Filebeat 配置
 

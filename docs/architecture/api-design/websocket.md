@@ -1,5 +1,9 @@
 # WebSocket（即時通訊）
 
+!!! abstract "本章重點"
+
+    HTTP 只能由客戶端發起請求，需要伺服器主動推送時就要用 WebSocket。本章說明握手升級的原理，以及在 Spring Boot 中用 STOMP 協定實作訂閱、廣播與點對點訊息。
+
 ## WebSocket 原理
 
 **HTTP 請求/響應模式的問題**
@@ -53,204 +57,232 @@
 </dependency>
 ```
 
-```java
-// WebSocket 配置
-@Configuration
-@EnableWebSocketMessageBroker
-public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+=== "WebSocket 配置"
 
-    @Override
-    public void configureMessageBroker(MessageBrokerRegistry registry) {
-        // 啟用記憶體內消息代理，處理帶有 /topic 和 /queue 前綴的消息
-        registry.enableSimpleBroker("/topic", "/queue");
+    ``` java
+    // WebSocket 配置
+    @Configuration
+    @EnableWebSocketMessageBroker
+    public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-        // 應用程序處理帶有 /app 前綴的消息
-        registry.setApplicationDestinationPrefixes("/app");
+        @Override
+        public void configureMessageBroker(MessageBrokerRegistry registry) {
+            // 啟用記憶體內消息代理，處理帶有 /topic 和 /queue 前綴的消息
+            registry.enableSimpleBroker("/topic", "/queue");
 
-        // 點對點消息前綴（用戶私信）
-        registry.setUserDestinationPrefix("/user");
+            // 應用程序處理帶有 /app 前綴的消息
+            registry.setApplicationDestinationPrefixes("/app");
+
+            // 點對點消息前綴（用戶私信）
+            registry.setUserDestinationPrefix("/user");
+        }
+
+        @Override
+        public void registerStompEndpoints(StompEndpointRegistry registry) {
+            registry.addEndpoint("/ws")           // WebSocket 連接端點
+                .setAllowedOriginPatterns("*")    // 允許跨域
+                .withSockJS();                    // 支援 SockJS 降級（不支援 WS 時用輪詢）
+        }
+
+        @Override
+        public void configureClientInboundChannel(ChannelRegistration registration) {
+            // 加入認證攔截器
+            registration.interceptors(new AuthChannelInterceptor());
+        }
     }
+    ```
 
-    @Override
-    public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws")           // WebSocket 連接端點
-            .setAllowedOriginPatterns("*")    // 允許跨域
-            .withSockJS();                    // 支援 SockJS 降級（不支援 WS 時用輪詢）
-    }
+=== "WebSocket 認證攔截器"
 
-    @Override
-    public void configureClientInboundChannel(ChannelRegistration registration) {
-        // 加入認證攔截器
-        registration.interceptors(new AuthChannelInterceptor());
-    }
-}
+    ``` java
+    // WebSocket 認證攔截器
+    @Component
+    @RequiredArgsConstructor
+    public class AuthChannelInterceptor implements ChannelInterceptor {
 
-// WebSocket 認證攔截器
-@Component
-@RequiredArgsConstructor
-public class AuthChannelInterceptor implements ChannelInterceptor {
+        private final JwtTokenProvider jwtTokenProvider;
 
-    private final JwtTokenProvider jwtTokenProvider;
+        @Override
+        public Message<?> preSend(Message<?> message, MessageChannel channel) {
+            StompHeaderAccessor accessor =
+                MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
 
-    @Override
-    public Message<?> preSend(Message<?> message, MessageChannel channel) {
-        StompHeaderAccessor accessor =
-            MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
-
-        if (StompCommand.CONNECT.equals(accessor.getCommand())) {
-            String token = accessor.getFirstNativeHeader("Authorization");
-            if (token != null && token.startsWith("Bearer ")) {
-                token = token.substring(7);
-                if (jwtTokenProvider.validateToken(token)) {
-                    // 設定用戶身份（用於點對點消息）
-                    String username = jwtTokenProvider.getUsername(token);
-                    accessor.setUser(() -> username);
+            if (StompCommand.CONNECT.equals(accessor.getCommand())) {
+                String token = accessor.getFirstNativeHeader("Authorization");
+                if (token != null && token.startsWith("Bearer ")) {
+                    token = token.substring(7);
+                    if (jwtTokenProvider.validateToken(token)) {
+                        // 設定用戶身份（用於點對點消息）
+                        String username = jwtTokenProvider.getUsername(token);
+                        accessor.setUser(() -> username);
+                    }
                 }
             }
+            return message;
         }
-        return message;
     }
-}
-```
+    ```
 
-```java
-// ════════ 聊天室實戰 ════════
 
-// 消息 DTO
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class ChatMessage {
-    public enum MessageType { CHAT, JOIN, LEAVE, SYSTEM }
+=== "聊天室實戰"
 
-    private MessageType   type;
-    private String        content;
-    private String        sender;
-    private String        roomId;
-    private LocalDateTime timestamp;
-}
+    ``` java
+    // 消息 DTO
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public class ChatMessage {
+        public enum MessageType { CHAT, JOIN, LEAVE, SYSTEM }
 
-// 聊天室 Controller
-@Controller
-@RequiredArgsConstructor
-@Slf4j
-public class ChatController {
-
-    private final SimpMessagingTemplate messagingTemplate;
-    private final ChatRoomService       chatRoomService;
-
-    // ① 群組消息（廣播到聊天室所有成員）
-    // 客戶端：stompClient.send("/app/chat/{roomId}", {}, message)
-    @MessageMapping("/chat/{roomId}")
-    public void sendGroupMessage(@DestinationVariable String roomId,
-                                  ChatMessage message,
-                                  Principal principal) {
-        message.setSender(principal.getName());
-        message.setTimestamp(LocalDateTime.now());
-        message.setType(ChatMessage.MessageType.CHAT);
-
-        log.info("[{}] {} 發送消息：{}", roomId, message.getSender(), message.getContent());
-
-        // 廣播到聊天室訂閱者
-        // 訂閱：stompClient.subscribe('/topic/chat/{roomId}', callback)
-        messagingTemplate.convertAndSend(
-            "/topic/chat/" + roomId,
-            message
-        );
-
-        // 保存消息記錄
-        chatRoomService.saveMessage(roomId, message);
+        private MessageType   type;
+        private String        content;
+        private String        sender;
+        private String        roomId;
+        private LocalDateTime timestamp;
     }
 
-    // ② 點對點私信
-    // 客戶端：stompClient.send("/app/private/{recipientId}", {}, message)
-    @MessageMapping("/private/{recipientId}")
-    public void sendPrivateMessage(@DestinationVariable String recipientId,
-                                    ChatMessage message,
-                                    Principal principal) {
-        message.setSender(principal.getName());
-        message.setTimestamp(LocalDateTime.now());
-        message.setType(ChatMessage.MessageType.CHAT);
+    // 聊天室 Controller
+    @Controller
+    @RequiredArgsConstructor
+    @Slf4j
+    public class ChatController {
 
-        // 發送給特定用戶
-        // 訂閱：stompClient.subscribe('/user/queue/private', callback)
-        messagingTemplate.convertAndSendToUser(
-            recipientId,
-            "/queue/private",
-            message
-        );
+        private final SimpMessagingTemplate messagingTemplate;
+        private final ChatRoomService       chatRoomService;
 
-        log.info("{} → {}: {}", message.getSender(), recipientId, message.getContent());
-    }
+    ```
 
-    // ③ 用戶加入聊天室
-    @MessageMapping("/chat/{roomId}/join")
-    public void joinRoom(@DestinationVariable String roomId,
-                          Principal principal) {
-        String username = principal.getName();
-        chatRoomService.addUser(roomId, username);
+=== "① 群組消息"
 
-        ChatMessage notification = new ChatMessage(
-            ChatMessage.MessageType.JOIN,
-            username + " 加入了聊天室",
-            "系統",
-            roomId,
-            LocalDateTime.now()
-        );
+    ``` java
+        // 客戶端：stompClient.send("/app/chat/{roomId}", {}, message)
+        @MessageMapping("/chat/{roomId}")
+        public void sendGroupMessage(@DestinationVariable String roomId,
+                                      ChatMessage message,
+                                      Principal principal) {
+            message.setSender(principal.getName());
+            message.setTimestamp(LocalDateTime.now());
+            message.setType(ChatMessage.MessageType.CHAT);
 
-        messagingTemplate.convertAndSend("/topic/chat/" + roomId, notification);
-    }
+            log.info("[{}] {} 發送消息：{}", roomId, message.getSender(), message.getContent());
 
-    // ④ 用戶離開（WebSocket 斷開時觸發）
-    @EventListener
-    public void handleDisconnect(SessionDisconnectEvent event) {
-        StompHeaderAccessor accessor =
-            StompHeaderAccessor.wrap(event.getMessage());
-        String username = Optional.ofNullable(accessor.getUser())
-            .map(Principal::getName)
-            .orElse("Unknown");
+            // 廣播到聊天室訂閱者
+            // 訂閱：stompClient.subscribe('/topic/chat/{roomId}', callback)
+            messagingTemplate.convertAndSend(
+                "/topic/chat/" + roomId,
+                message
+            );
 
-        String roomId = chatRoomService.getUserRoom(username);
-        if (roomId != null) {
-            chatRoomService.removeUser(roomId, username);
+            // 保存消息記錄
+            chatRoomService.saveMessage(roomId, message);
+        }
+
+    ```
+
+=== "② 點對點私信"
+
+    ``` java
+        // 客戶端：stompClient.send("/app/private/{recipientId}", {}, message)
+        @MessageMapping("/private/{recipientId}")
+        public void sendPrivateMessage(@DestinationVariable String recipientId,
+                                        ChatMessage message,
+                                        Principal principal) {
+            message.setSender(principal.getName());
+            message.setTimestamp(LocalDateTime.now());
+            message.setType(ChatMessage.MessageType.CHAT);
+
+            // 發送給特定用戶
+            // 訂閱：stompClient.subscribe('/user/queue/private', callback)
+            messagingTemplate.convertAndSendToUser(
+                recipientId,
+                "/queue/private",
+                message
+            );
+
+            log.info("{} → {}: {}", message.getSender(), recipientId, message.getContent());
+        }
+
+    ```
+
+=== "③ 用戶加入聊天室"
+
+    ``` java
+        @MessageMapping("/chat/{roomId}/join")
+        public void joinRoom(@DestinationVariable String roomId,
+                              Principal principal) {
+            String username = principal.getName();
+            chatRoomService.addUser(roomId, username);
 
             ChatMessage notification = new ChatMessage(
-                ChatMessage.MessageType.LEAVE,
-                username + " 離開了聊天室",
+                ChatMessage.MessageType.JOIN,
+                username + " 加入了聊天室",
                 "系統",
                 roomId,
                 LocalDateTime.now()
             );
+
             messagingTemplate.convertAndSend("/topic/chat/" + roomId, notification);
         }
+
+    ```
+
+=== "④ 用戶離開"
+
+    ``` java
+        @EventListener
+        public void handleDisconnect(SessionDisconnectEvent event) {
+            StompHeaderAccessor accessor =
+                StompHeaderAccessor.wrap(event.getMessage());
+            String username = Optional.ofNullable(accessor.getUser())
+                .map(Principal::getName)
+                .orElse("Unknown");
+
+            String roomId = chatRoomService.getUserRoom(username);
+            if (roomId != null) {
+                chatRoomService.removeUser(roomId, username);
+
+                ChatMessage notification = new ChatMessage(
+                    ChatMessage.MessageType.LEAVE,
+                    username + " 離開了聊天室",
+                    "系統",
+                    roomId,
+                    LocalDateTime.now()
+                );
+                messagingTemplate.convertAndSend("/topic/chat/" + roomId, notification);
+            }
+        }
     }
-}
+    ```
 
-// 服務器主動推送（如：訂單狀態更新、系統通知）
-@Service
-@RequiredArgsConstructor
-public class NotificationService {
+=== "服務器主動推送"
 
-    private final SimpMessagingTemplate messagingTemplate;
+    ``` java
+    // 服務器主動推送（如：訂單狀態更新、系統通知）
+    @Service
+    @RequiredArgsConstructor
+    public class NotificationService {
 
-    // 推送給特定用戶
-    public void pushToUser(String userId, Object notification) {
-        messagingTemplate.convertAndSendToUser(
-            userId,
-            "/queue/notifications",
-            notification
-        );
+        private final SimpMessagingTemplate messagingTemplate;
+
+        // 推送給特定用戶
+        public void pushToUser(String userId, Object notification) {
+            messagingTemplate.convertAndSendToUser(
+                userId,
+                "/queue/notifications",
+                notification
+            );
+        }
+
+        // 廣播給所有連線用戶
+        public void broadcast(Object notification) {
+            messagingTemplate.convertAndSend(
+                "/topic/system",
+                notification
+            );
+        }
     }
+    ```
 
-    // 廣播給所有連線用戶
-    public void broadcast(Object notification) {
-        messagingTemplate.convertAndSend(
-            "/topic/system",
-            notification
-        );
-    }
-}
-```
 
 ```javascript
 // 前端 JavaScript（使用 SockJS + STOMP.js）

@@ -1,75 +1,87 @@
 # 分散式鎖
 
+!!! abstract "本章重點"
+
+    多台機器同時操作同一份資源時，需要一把所有機器都看得到的鎖。本章從 `SET NX EX` 的基礎實作開始，說明鎖誤刪、過期、不可重入等問題，再介紹生產環境推薦的 Redisson。
+
 ## SET NX 實作（基礎版）
 
-```java
-// ❌ 錯誤方式一：SETNX + EXPIRE 兩步驟（非原子！）
-redisTemplate.opsForValue().setIfAbsent("lock:order", "1"); // 成功
-// 如果這裡程序崩潰 → 鎖永遠不會過期！（死鎖）
-redisTemplate.expire("lock:order", 30, TimeUnit.SECONDS);
+=== "正確方式：SET NX EX 原子命令"
 
-// ✅ 正確方式：SET NX EX 原子命令
-@Service
-public class RedisDistributedLock {
+    ``` java
+    // ❌ 錯誤方式一：SETNX + EXPIRE 兩步驟（非原子！）
+    redisTemplate.opsForValue().setIfAbsent("lock:order", "1"); // 成功
+    // 如果這裡程序崩潰 → 鎖永遠不會過期！（死鎖）
+    redisTemplate.expire("lock:order", 30, TimeUnit.SECONDS);
 
-    @Autowired
-    private StringRedisTemplate redisTemplate;
 
-    private static final String LOCK_PREFIX = "lock:";
+    // ✅ 正確方式：SET NX EX 原子命令
+    @Service
+    public class RedisDistributedLock {
 
-    public boolean tryLock(String lockKey, String requestId, long expireSeconds) {
-        String key = LOCK_PREFIX + lockKey;
-        // SET key value NX EX seconds → 原子操作
-        Boolean success = redisTemplate.opsForValue()
-            .setIfAbsent(key, requestId, Duration.ofSeconds(expireSeconds));
-        return Boolean.TRUE.equals(success);
-    }
+        @Autowired
+        private StringRedisTemplate redisTemplate;
 
-    public boolean unlock(String lockKey, String requestId) {
-        String key = LOCK_PREFIX + lockKey;
-        // ⚠️ 必須用 Lua Script 保證原子性！
-        // 防止誤刪其他請求的鎖
-        String script =
-            "if redis.call('get', KEYS[1]) == ARGV[1] then " +
-            "    return redis.call('del', KEYS[1]) " +
-            "else " +
-            "    return 0 " +
-            "end";
+        private static final String LOCK_PREFIX = "lock:";
 
-        Long result = redisTemplate.execute(
-            new DefaultRedisScript<>(script, Long.class),
-            List.of(key),
-            requestId
-        );
-        return Long.valueOf(1L).equals(result);
-    }
-}
-
-// 使用範例
-@Service
-@RequiredArgsConstructor
-public class OrderService {
-
-    private final RedisDistributedLock lock;
-
-    public void createOrder(Long userId) {
-        String lockKey   = "order:user:" + userId;
-        String requestId = UUID.randomUUID().toString(); // 唯一標識，防止誤刪
-
-        boolean locked = lock.tryLock(lockKey, requestId, 30);
-        if (!locked) {
-            throw new BusinessException("系統繁忙，請稍後再試");
+        public boolean tryLock(String lockKey, String requestId, long expireSeconds) {
+            String key = LOCK_PREFIX + lockKey;
+            // SET key value NX EX seconds → 原子操作
+            Boolean success = redisTemplate.opsForValue()
+                .setIfAbsent(key, requestId, Duration.ofSeconds(expireSeconds));
+            return Boolean.TRUE.equals(success);
         }
 
-        try {
-            // 業務邏輯（同一用戶同一時間只能有一個請求進入）
-            doCreateOrder(userId);
-        } finally {
-            lock.unlock(lockKey, requestId); // 釋放鎖
+        public boolean unlock(String lockKey, String requestId) {
+            String key = LOCK_PREFIX + lockKey;
+            // ⚠️ 必須用 Lua Script 保證原子性！
+            // 防止誤刪其他請求的鎖
+            String script =
+                "if redis.call('get', KEYS[1]) == ARGV[1] then " +
+                "    return redis.call('del', KEYS[1]) " +
+                "else " +
+                "    return 0 " +
+                "end";
+
+            Long result = redisTemplate.execute(
+                new DefaultRedisScript<>(script, Long.class),
+                List.of(key),
+                requestId
+            );
+            return Long.valueOf(1L).equals(result);
         }
     }
-}
-```
+    ```
+
+=== "使用範例"
+
+    ``` java
+    // 使用範例
+    @Service
+    @RequiredArgsConstructor
+    public class OrderService {
+
+        private final RedisDistributedLock lock;
+
+        public void createOrder(Long userId) {
+            String lockKey   = "order:user:" + userId;
+            String requestId = UUID.randomUUID().toString(); // 唯一標識，防止誤刪
+
+            boolean locked = lock.tryLock(lockKey, requestId, 30);
+            if (!locked) {
+                throw new BusinessException("系統繁忙，請稍後再試");
+            }
+
+            try {
+                // 業務邏輯（同一用戶同一時間只能有一個請求進入）
+                doCreateOrder(userId);
+            } finally {
+                lock.unlock(lockKey, requestId); // 釋放鎖
+            }
+        }
+    }
+    ```
+
 
 ## Redisson（生產推薦）
 

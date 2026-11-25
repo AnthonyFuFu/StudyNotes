@@ -1,5 +1,9 @@
 # Java 9 ~ 16 重要特性
 
+!!! abstract "本章重點"
+
+    Java 9 到 16 之間累積了許多實用的小改進。本章整理最常用的幾項：`var` 區域型別推斷、Text Block 多行字串、Switch 表達式與 `List.of` 等集合工廠方法。
+
 ## var - 局部類型推斷（Java 10）
 
 ```java

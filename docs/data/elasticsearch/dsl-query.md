@@ -1,5 +1,9 @@
 # DSL 查詢語法
 
+!!! abstract "本章重點"
+
+    Elasticsearch 的查詢以 JSON 形式的 DSL 撰寫。本章依序介紹全文查詢、精確查詢、Bool 複合查詢、聚合與巢狀查詢，並說明 `must` 與 `filter` 在評分與快取上的差異。
+
 ## 全文查詢
 
 ```json

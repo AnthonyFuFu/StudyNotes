@@ -1,5 +1,9 @@
 # Java 21 LTS 重點
 
+!!! abstract "本章重點"
+
+    Java 21 LTS 最重要的特性是虛擬執行緒，讓同步寫法也能撐住大量並發。本章同時介紹 Switch 模式匹配、Sequenced Collections，以及預覽中的結構化並發與 ScopedValue。
+
 ## Virtual Threads - 虛擬線程（最革命性！）
 
 ### 先理解問題：傳統線程的瓶頸

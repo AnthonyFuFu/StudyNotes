@@ -1,5 +1,9 @@
 # AQS 底層原理
 
+!!! abstract "本章重點"
+
+    AQS（AbstractQueuedSynchronizer）是 ReentrantLock、Semaphore、CountDownLatch 共同的底層框架。本章說明它如何用一個 `state` 變數加上 CLH 等待佇列，實作獲取鎖、排隊、阻塞與喚醒。
+
 ## AQS 架構
 
 AQS（AbstractQueuedSynchronizer）是 Java 並發的骨幹！

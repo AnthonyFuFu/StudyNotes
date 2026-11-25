@@ -1,5 +1,9 @@
 # CDN 原理
 
+!!! abstract "本章重點"
+
+    CDN 把靜態資源快取到離使用者最近的邊緣節點，大幅降低延遲與源站壓力。本章說明 CDN 的請求流程、快取策略與版本化資源，以及 CDN 附帶的安全防護功能。
+
 ## CDN 架構與工作流程
 
 CDN（Content Delivery Network）內容分發網路

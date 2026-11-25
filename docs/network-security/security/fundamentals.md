@@ -1,5 +1,9 @@
 # 資安基礎概念
 
+!!! abstract "本章重點"
+
+    資安從兩個基本問題開始：你是誰（認證）、你能做什麼（授權）。本章釐清兩者的差異，介紹對稱加密、非對稱加密與雜湊的用途，以及 HTTPS 如何結合它們。
+
 ## 認證（Authentication）vs 授權（Authorization）
 
 **認證（Authentication）= 你是誰？**

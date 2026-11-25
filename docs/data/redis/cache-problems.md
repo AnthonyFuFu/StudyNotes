@@ -1,5 +1,9 @@
 # 緩存三大問題
 
+!!! abstract "本章重點"
+
+    快取用得好可以擋下絕大部分的資料庫流量，用不好則會在特定時刻讓資料庫瞬間被打垮。本章說明快取穿透、擊穿、雪崩三種問題的成因，以及布隆過濾器、互斥鎖、隨機 TTL 等解法。
+
 ## 緩存穿透（Cache Penetration）
 
 **問題**
@@ -109,96 +113,103 @@ public User getUser(Long id) {
     - value 中加入 expire_time 欄位
     - 讀到過期時，非同步更新緩存（立即返回舊資料）
 
-```java
-// 方案一：互斥鎖
-public Product getProduct(Long id) {
-    String key     = "product:" + id;
-    String lockKey = "lock:rebuild:" + id;
+=== "方案一：互斥鎖"
 
-    // 1. 先查緩存
-    String cached = redisTemplate.opsForValue().get(key);
-    if (cached != null) {
-        return JSON.parseObject(cached, Product.class);
-    }
+    ``` java
+    // 方案一：互斥鎖
+    public Product getProduct(Long id) {
+        String key     = "product:" + id;
+        String lockKey = "lock:rebuild:" + id;
 
-    // 2. 緩存未命中，嘗試獲取鎖
-    String requestId = UUID.randomUUID().toString();
-    boolean locked = Boolean.TRUE.equals(
-        redisTemplate.opsForValue()
-            .setIfAbsent(lockKey, requestId, Duration.ofSeconds(3))
-    );
-
-    try {
-        if (locked) {
-            // 3. 獲得鎖 → 重建緩存
-            // 再查一次（雙重檢查，防止其他線程已經重建）
-            cached = redisTemplate.opsForValue().get(key);
-            if (cached != null) {
-                return JSON.parseObject(cached, Product.class);
-            }
-
-            Product product = productRepository.findById(id).orElseThrow();
-            redisTemplate.opsForValue().set(key, JSON.toJSONString(product),
-                Duration.ofMinutes(30));
-            return product;
-        } else {
-            // 4. 未獲得鎖 → 短暫等待後重試
-            Thread.sleep(50);
-            return getProduct(id); // 遞迴重試
+        // 1. 先查緩存
+        String cached = redisTemplate.opsForValue().get(key);
+        if (cached != null) {
+            return JSON.parseObject(cached, Product.class);
         }
-    } finally {
-        // 5. 釋放鎖（Lua 原子操作）
-        if (locked) {
-            unlock(lockKey, requestId);
-        }
-    }
-}
 
-// 方案二：邏輯過期（熱點數據，永不過期）
-@Data
-public class CacheWrapper<T> {
-    private T      data;
-    private LocalDateTime expireTime; // 邏輯過期時間（存在 value 裡）
-}
+        // 2. 緩存未命中，嘗試獲取鎖
+        String requestId = UUID.randomUUID().toString();
+        boolean locked = Boolean.TRUE.equals(
+            redisTemplate.opsForValue()
+                .setIfAbsent(lockKey, requestId, Duration.ofSeconds(3))
+        );
 
-public Product getProductWithLogicalExpire(Long id) {
-    String key    = "product:" + id;
-    String cached = redisTemplate.opsForValue().get(key);
+        try {
+            if (locked) {
+                // 3. 獲得鎖 → 重建緩存
+                // 再查一次（雙重檢查，防止其他線程已經重建）
+                cached = redisTemplate.opsForValue().get(key);
+                if (cached != null) {
+                    return JSON.parseObject(cached, Product.class);
+                }
 
-    CacheWrapper<Product> wrapper =
-        JSON.parseObject(cached, new TypeReference<CacheWrapper<Product>>() {});
-
-    // 未過期 → 直接返回
-    if (LocalDateTime.now().isBefore(wrapper.getExpireTime())) {
-        return wrapper.getData();
-    }
-
-    // 已過期 → 非同步重建，先返回舊資料
-    String lockKey = "lock:rebuild:" + id;
-    boolean locked = Boolean.TRUE.equals(
-        redisTemplate.opsForValue()
-            .setIfAbsent(lockKey, "1", Duration.ofSeconds(3))
-    );
-
-    if (locked) {
-        // 非同步重建緩存（不阻塞當前請求）
-        CompletableFuture.runAsync(() -> {
-            try {
                 Product product = productRepository.findById(id).orElseThrow();
-                CacheWrapper<Product> newWrapper = new CacheWrapper<>();
-                newWrapper.setData(product);
-                newWrapper.setExpireTime(LocalDateTime.now().plusMinutes(30));
-                redisTemplate.opsForValue()
-                    .set(key, JSON.toJSONString(newWrapper));
-            } finally {
-                redisTemplate.delete(lockKey);
+                redisTemplate.opsForValue().set(key, JSON.toJSONString(product),
+                    Duration.ofMinutes(30));
+                return product;
+            } else {
+                // 4. 未獲得鎖 → 短暫等待後重試
+                Thread.sleep(50);
+                return getProduct(id); // 遞迴重試
             }
-        }, executor);
+        } finally {
+            // 5. 釋放鎖（Lua 原子操作）
+            if (locked) {
+                unlock(lockKey, requestId);
+            }
+        }
+    }
+    ```
+
+=== "方案二：邏輯過期"
+
+    ``` java
+    // 方案二：邏輯過期（熱點數據，永不過期）
+    @Data
+    public class CacheWrapper<T> {
+        private T      data;
+        private LocalDateTime expireTime; // 邏輯過期時間（存在 value 裡）
     }
 
-    return wrapper.getData(); // 立即返回舊資料，不讓用戶等待
-}
-```
+    public Product getProductWithLogicalExpire(Long id) {
+        String key    = "product:" + id;
+        String cached = redisTemplate.opsForValue().get(key);
+
+        CacheWrapper<Product> wrapper =
+            JSON.parseObject(cached, new TypeReference<CacheWrapper<Product>>() {});
+
+        // 未過期 → 直接返回
+        if (LocalDateTime.now().isBefore(wrapper.getExpireTime())) {
+            return wrapper.getData();
+        }
+
+        // 已過期 → 非同步重建，先返回舊資料
+        String lockKey = "lock:rebuild:" + id;
+        boolean locked = Boolean.TRUE.equals(
+            redisTemplate.opsForValue()
+                .setIfAbsent(lockKey, "1", Duration.ofSeconds(3))
+        );
+
+        if (locked) {
+            // 非同步重建緩存（不阻塞當前請求）
+            CompletableFuture.runAsync(() -> {
+                try {
+                    Product product = productRepository.findById(id).orElseThrow();
+                    CacheWrapper<Product> newWrapper = new CacheWrapper<>();
+                    newWrapper.setData(product);
+                    newWrapper.setExpireTime(LocalDateTime.now().plusMinutes(30));
+                    redisTemplate.opsForValue()
+                        .set(key, JSON.toJSONString(newWrapper));
+                } finally {
+                    redisTemplate.delete(lockKey);
+                }
+            }, executor);
+        }
+
+        return wrapper.getData(); // 立即返回舊資料，不讓用戶等待
+    }
+    ```
+
 
 ## 緩存雪崩（Cache Avalanche）
 

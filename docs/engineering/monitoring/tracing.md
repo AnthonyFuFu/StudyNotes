@@ -1,5 +1,9 @@
 # 分散式鏈路追蹤
 
+!!! abstract "本章重點"
+
+    一個請求在微服務之間經過多個服務時，鏈路追蹤能指出時間花在哪一段。本章說明 Trace 與 Span 的概念、SkyWalking 的架構與 OpenTelemetry 的整合，並示範如何從調用樹找出瓶頸。
+
 ## SkyWalking 架構
 
 **一個用戶請求在微服務中的旅程**
@@ -59,64 +63,71 @@ logging:
     level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
 ```
 
-```java
-// 自定義 Span（追蹤業務操作）
-@Service
-@RequiredArgsConstructor
-public class OrderService {
+=== "自定義 Span"
 
-    private final Tracer tracer;
+    ``` java
+    // 自定義 Span（追蹤業務操作）
+    @Service
+    @RequiredArgsConstructor
+    public class OrderService {
 
-    public Order createOrder(OrderRequest request) {
-        Span span = tracer.nextSpan()
-            .name("createOrder")
-            .tag("userId",    request.getUserId().toString())
-            .tag("productId", request.getProductId().toString())
-            .start();
+        private final Tracer tracer;
 
-        try (Tracer.SpanInScope ws = tracer.withSpan(span)) {
-            Order order = processOrder(request);
+        public Order createOrder(OrderRequest request) {
+            Span span = tracer.nextSpan()
+                .name("createOrder")
+                .tag("userId",    request.getUserId().toString())
+                .tag("productId", request.getProductId().toString())
+                .start();
 
-            span.tag("orderId", order.getId().toString())
-                .tag("amount",  order.getAmount().toString());
+            try (Tracer.SpanInScope ws = tracer.withSpan(span)) {
+                Order order = processOrder(request);
 
-            return order;
+                span.tag("orderId", order.getId().toString())
+                    .tag("amount",  order.getAmount().toString());
 
-        } catch (Exception e) {
-            span.tag("error", e.getMessage()).error(e);
-            throw e;
-        } finally {
-            span.end();  // 必須結束 Span
+                return order;
+
+            } catch (Exception e) {
+                span.tag("error", e.getMessage()).error(e);
+                throw e;
+            } finally {
+                span.end();  // 必須結束 Span
+            }
+        }
+
+        // 使用 @Observed 注解（更簡潔，自動建立 Span + Metrics）
+        @Observed(
+            name            = "order.payment",
+            contextualName  = "處理訂單支付",
+            lowCardinalityKeyValues = {"service", "order"}
+        )
+        public void processPayment(Long orderId) {
+            // 自動追蹤這個方法
         }
     }
+    ```
 
-    // 使用 @Observed 注解（更簡潔，自動建立 Span + Metrics）
-    @Observed(
-        name            = "order.payment",
-        contextualName  = "處理訂單支付",
-        lowCardinalityKeyValues = {"service", "order"}
-    )
-    public void processPayment(Long orderId) {
-        // 自動追蹤這個方法
-    }
-}
+=== "跨服務傳遞 TraceId"
 
-// 跨服務傳遞 TraceId（Feign 客戶端攔截器）
-@Component
-public class TraceIdPropagationInterceptor implements RequestInterceptor {
+    ``` java
+    // 跨服務傳遞 TraceId（Feign 客戶端攔截器）
+    @Component
+    public class TraceIdPropagationInterceptor implements RequestInterceptor {
 
-    private final Tracer tracer;
+        private final Tracer tracer;
 
-    @Override
-    public void apply(RequestTemplate template) {
-        Span currentSpan = tracer.currentSpan();
-        if (currentSpan != null) {
-            template.header("X-Trace-Id",
-                currentSpan.context().traceId());
+        @Override
+        public void apply(RequestTemplate template) {
+            Span currentSpan = tracer.currentSpan();
+            if (currentSpan != null) {
+                template.header("X-Trace-Id",
+                    currentSpan.context().traceId());
+            }
         }
     }
-}
-```
+    ```
+
 
 ## 鏈路追蹤實戰分析
 

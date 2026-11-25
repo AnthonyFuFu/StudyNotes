@@ -1,5 +1,9 @@
 # synchronized 底層原理
 
+!!! abstract "本章重點"
+
+    synchronized 是 Java 最基本的同步機制。本章說明它背後的 Monitor 物件鎖運作方式，以及 JDK 6 之後由偏向鎖、輕量級鎖到重量級鎖的鎖升級機制。
+
 ## Monitor 物件鎖
 
 每個 Java 物件都有一個 Monitor（監視器鎖），由 C++ 的 `ObjectMonitor` 實作。

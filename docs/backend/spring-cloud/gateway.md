@@ -1,5 +1,9 @@
 # Spring Cloud Gateway
 
+!!! abstract "本章重點"
+
+    API 閘道是所有外部請求的統一入口，負責路由、認證、限流與日誌。本章介紹 Spring Cloud Gateway 的 Route / Predicate / Filter 三大概念與請求流程，並示範如何依 Header 實作灰度發布。
+
 ## 核心架構
 
 ``` mermaid

@@ -1,5 +1,9 @@
 # 實戰：Spring Boot 完整部署流程
 
+!!! abstract "本章重點"
+
+    本章把前面的 Docker、Kubernetes、CI 串起來，用 Helm Chart 管理多環境的部署設定，並附上完整的 CI/CD 流程總覽與常用的 kubectl 指令速查。
+
 ## Helm Chart（K8s 應用包管理）
 
 Helm 是 K8s 的「套件管理器」（類似 apt / npm），將複雜的 K8s YAML 模板化，方便管理多環境。

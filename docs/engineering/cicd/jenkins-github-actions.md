@@ -1,5 +1,9 @@
 # Jenkins + GitHub Actions
 
+!!! abstract "本章重點"
+
+    CI 工具負責在每次提交時自動建置、測試與打包。本章分別示範 Jenkins Pipeline 與 GitHub Actions Workflow 的寫法，並比較兩者適合的情境。
+
 ## Jenkins Pipeline
 
 ```groovy

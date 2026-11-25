@@ -1,5 +1,9 @@
 # Redis Cluster 架構
 
+!!! abstract "本章重點"
+
+    單台 Redis 的記憶體與吞吐量有上限，Redis Cluster 把資料分散到多個節點。本章說明 16384 個槽位的分配方式、客戶端如何找到正確的節點，以及節點故障時的自動切換。
+
 ## 16384 槽位（Slot）
 
 **Redis Cluster 不使用一致性 Hash，使用槽位分配**

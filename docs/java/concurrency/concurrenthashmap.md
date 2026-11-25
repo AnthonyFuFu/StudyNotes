@@ -1,5 +1,9 @@
 # ConcurrentHashMap 底層原理
 
+!!! abstract "本章重點"
+
+    ConcurrentHashMap 是高並發下最常用的 Map。本章比較 JDK 7 分段鎖與 JDK 8 CAS + synchronized 的實作差異，說明它為什麼能同時兼顧執行緒安全與效能。
+
 ## JDK 7 vs JDK 8
 
 **JDK 7（Segment 分段鎖）**

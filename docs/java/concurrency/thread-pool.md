@@ -1,5 +1,9 @@
 # 線程池
 
+!!! abstract "本章重點"
+
+    執行緒的建立與切換成本很高，執行緒池讓執行緒可以重複使用。本章逐一說明 ThreadPoolExecutor 的 7 個參數、任務提交的流程、四種拒絕策略，以及如何監控執行緒池的狀態。
+
 ## ThreadPoolExecutor 7 個參數
 
 ```java

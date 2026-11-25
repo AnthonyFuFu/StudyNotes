@@ -1,5 +1,9 @@
 # Vue 核心原理
 
+!!! abstract "本章重點"
+
+    Vue 的核心是響應式系統：資料改變時畫面自動更新。本章比較 Vue 2 的 `Object.defineProperty` 與 Vue 3 的 Proxy 實作差異，並說明 Composition API 如何讓邏輯更容易重用。
+
 ## 響應式系統對比（Vue 2 vs Vue 3）
 
 ```javascript

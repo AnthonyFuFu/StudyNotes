@@ -1,5 +1,9 @@
 # React 核心原理
 
+!!! abstract "本章重點"
+
+    本章從 Virtual DOM 與 Diff 演算法開始，說明 React 16 引入 Fiber 架構的原因，再深入 Hooks 的運作規則與常見陷阱，最後比較各種狀態管理方案。
+
 ## Virtual DOM 與 Diff 算法
 
 ```

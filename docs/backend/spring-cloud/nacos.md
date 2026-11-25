@@ -1,5 +1,9 @@
 # Nacos
 
+!!! abstract "本章重點"
+
+    Nacos 同時提供服務註冊發現與設定中心兩項能力，是 Spring Cloud Alibaba 的核心元件。本章說明服務註冊、心跳與健康檢查的流程，以及設定的動態刷新與多環境管理。
+
 ## 服務發現（Service Registry）
 
 **服務發現核心流程**

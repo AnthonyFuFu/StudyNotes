@@ -1,5 +1,9 @@
 # 效能優化
 
+!!! abstract "本章重點"
+
+    Redis 本身很快，瓶頸常常出在網路往返次數。本章介紹 Pipeline 批次執行命令，以及用 Lua Script 把多個命令合併成一個原子操作。
+
 ## Pipeline（批量命令）
 
 ```java

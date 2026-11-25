@@ -1,5 +1,9 @@
 # TypeScript 深度
 
+!!! abstract "本章重點"
+
+    TypeScript 在編譯期就能找出型別錯誤，讓大型前端專案更好維護。本章介紹型別系統的基礎、泛型，以及 `Partial`、`Pick`、`Omit`、`Record` 等實用工具型別。
+
 ## 類型系統
 
 ```typescript

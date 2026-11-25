@@ -1,5 +1,9 @@
 # 持久化機制
 
+!!! abstract "本章重點"
+
+    Redis 是記憶體資料庫，重啟後資料要靠持久化恢復。本章比較 RDB 快照與 AOF 日誌的原理與優缺點，並說明生產環境推薦的混合持久化設定。
+
 ## RDB（Redis Database Backup）
 
 RDB = 快照（Snapshot）
