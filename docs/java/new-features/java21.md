@@ -4,31 +4,39 @@
 
 ### 先理解問題：傳統線程的瓶頸
 
-```
-傳統平台線程（Platform Thread）：
+**傳統平台線程（Platform Thread）**
 
-Java Thread  ←──1:1映射──→  OS Thread
-                              │
-                              ↓
-                          佔用大量記憶體（~1MB/線程）
-                          線程切換成本高（OS 層面）
-
-問題：
-Spring Boot 預設線程池大小 200
-→ 最多同時處理 200 個請求
-→ 請求在等待 DB / IO 時，線程被白白佔用！
+``` mermaid
+flowchart LR
+    JT["Java Thread"] <-- "1:1 映射" --> OT["OS Thread<br>~1MB / 線程<br>切換成本高"]
 ```
 
-```
-虛擬線程（Virtual Thread）：
+!!! warning "問題"
 
-Virtual Thread  ←──M:N映射──→  少量 Carrier Threads（OS Thread）
-（可建立百萬個）                  （= CPU 核心數）
+    Spring Boot 預設線程池大小 200 → 最多同時處理 200 個請求。請求在等待 DB / IO 時，線程被白白佔用。
 
-Virtual Thread 等待 IO 時，自動讓出 Carrier Thread
-IO 完成時，Virtual Thread 重新掛載繼續執行
-→ 10,000 個請求同時進行，佔用極少資源！
+**虛擬線程（Virtual Thread）**
+
+``` mermaid
+flowchart LR
+    subgraph VTS ["Virtual Threads（可建立百萬個）"]
+        direction TB
+        V1["VT 1"]
+        V2["VT 2"]
+        V3["VT 3"]
+        V4["… VT N"]
+    end
+    subgraph CTS ["Carrier Threads（＝ CPU 核心數）"]
+        direction TB
+        C1["OS Thread 1"]
+        C2["OS Thread 2"]
+    end
+    VTS <-- "M:N 映射" --> CTS
 ```
+
+- Virtual Thread 等待 IO 時，自動讓出 Carrier Thread
+- IO 完成時，Virtual Thread 重新掛載繼續執行
+- **10,000 個請求同時進行，佔用極少資源**
 
 ### 實際使用
 

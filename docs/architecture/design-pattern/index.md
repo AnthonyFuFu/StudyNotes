@@ -8,6 +8,39 @@ icon: lucide/puzzle
 
 **核心技術**：GoF 23 種 / SOLID 原則 / Spring 中的應用
 
+## 學習地圖
+
+``` mermaid
+mindmap
+  root((設計模式（GoF 23種）))
+    創建型模式（Creational）5種 - 怎麼創建對象
+      單例模式（Singleton）
+      工廠方法模式（Factory Method）
+      抽象工廠模式（Abstract Factory）
+      建造者模式（Builder）
+      原型模式（Prototype）
+    結構型模式（Structural）7種 - 怎麼組合對象
+      代理模式（Proxy）← AOP 底層原理
+      裝飾者模式（Decorator）
+      適配器模式（Adapter）
+      外觀模式（Facade）
+      橋接模式（Bridge）
+      組合模式（Composite）
+      享元模式（Flyweight）
+    行為型模式（Behavioral）11種 - 怎麼讓對象協作
+      觀察者模式（Observer）← 事件驅動核心
+      策略模式（Strategy）← 消滅 if-else
+      模板方法模式（Template Method）
+      責任鏈模式（Chain of Responsibility）
+      狀態模式（State）
+      命令模式（Command）
+      迭代器模式（Iterator）
+      中介者模式（Mediator）
+      備忘錄模式（Memento）
+      訪問者模式（Visitor）
+      直譯器模式（Interpreter）
+```
+
 ## 章節導覽
 
 <div class="grid cards" markdown>
@@ -37,38 +70,6 @@ icon: lucide/puzzle
     觀察者模式（Observer）⭐ 事件驅動核心 · 策略模式（Strategy）⭐ 消滅 if-else · 模板方法模式 · 責任鏈模式 · 狀態模式 …
 
 </div>
-
-??? abstract "原始學習路線圖"
-
-    ```
-    設計模式（GoF 23種）
-    ├── 1️⃣ 創建型模式（Creational）5種 - 怎麼創建對象
-    │   ├── 單例模式（Singleton）
-    │   ├── 工廠方法模式（Factory Method）
-    │   ├── 抽象工廠模式（Abstract Factory）
-    │   ├── 建造者模式（Builder）
-    │   └── 原型模式（Prototype）
-    ├── 2️⃣ 結構型模式（Structural）7種 - 怎麼組合對象
-    │   ├── 代理模式（Proxy）← AOP 底層原理
-    │   ├── 裝飾者模式（Decorator）
-    │   ├── 適配器模式（Adapter）
-    │   ├── 外觀模式（Facade）
-    │   ├── 橋接模式（Bridge）
-    │   ├── 組合模式（Composite）
-    │   └── 享元模式（Flyweight）
-    └── 3️⃣ 行為型模式（Behavioral）11種 - 怎麼讓對象協作
-        ├── 觀察者模式（Observer）← 事件驅動核心
-        ├── 策略模式（Strategy）← 消滅 if-else
-        ├── 模板方法模式（Template Method）
-        ├── 責任鏈模式（Chain of Responsibility）
-        ├── 狀態模式（State）
-        ├── 命令模式（Command）
-        ├── 迭代器模式（Iterator）
-        ├── 中介者模式（Mediator）
-        ├── 備忘錄模式（Memento）
-        ├── 訪問者模式（Visitor）
-        └── 直譯器模式（Interpreter）
-    ```
 
 ## 重點速覽
 

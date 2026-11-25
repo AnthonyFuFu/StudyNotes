@@ -2,39 +2,27 @@
 
 ## Monitor 物件鎖
 
-```
-每個 Java 物件都有一個 Monitor（監視器鎖）
-Monitor 由 C++ 的 ObjectMonitor 實作
+每個 Java 物件都有一個 Monitor（監視器鎖），由 C++ 的 `ObjectMonitor` 實作。
 
-ObjectMonitor 結構：
-┌─────────────────────────────────────────┐
-│             ObjectMonitor               │
-│                                         │
-│  _owner      → 當前持有鎖的線程          │
-│  _count      → 重入次數（ReentrantLock） │
-│  _EntryList  → 等待鎖的線程佇列（BLOCKED）│
-│  _WaitSet    → 呼叫 wait() 的線程集合    │
-└─────────────────────────────────────────┘
+| ObjectMonitor 欄位 | 意義 |
+|-------------------|------|
+| `_owner` | 當前持有鎖的線程 |
+| `_count` | 重入次數 |
+| `_EntryList` | 等待鎖的線程佇列（BLOCKED） |
+| `_WaitSet` | 呼叫 `wait()` 的線程集合 |
 
-synchronized 運作流程：
+**synchronized 運作流程**
 
-線程 A 嘗試進入 synchronized：
-  ① 查看 _owner 是否為 null
-  ② 為 null → 設定 _owner = 線程 A，_count = 1 → 進入
-  ③ 不為 null 且是自己 → _count++ → 重入（可重入鎖）
-  ④ 不為 null 且是別人 → 進入 _EntryList 等待
-
-線程 A 呼叫 wait()：
-  ① _count-- 直到為 0 → 釋放鎖（_owner = null）
-  ② 線程 A 進入 _WaitSet
-
-呼叫 notify()：
-  ① 從 _WaitSet 取出一個線程 → 移到 _EntryList
-  ② 等待重新競爭鎖
-
-位元組碼層面：
-  monitorenter → 進入 synchronized
-  monitorexit  → 離開 synchronized（正常 + 異常都有）
+``` mermaid
+flowchart TB
+    IN(["線程嘗試進入 synchronized<br>monitorenter"]) --> Q{"_owner 是否為 null？"}
+    Q -->|"是"| OWN["_owner = 當前線程<br>_count = 1 → 進入"]
+    Q -->|"否，是自己"| RE["_count++<br>重入（可重入鎖）"]
+    Q -->|"否，是別人"| EL["進入 _EntryList 等待<br>BLOCKED"]
+    OWN -->|"wait()"| WS["_count 歸零釋放鎖<br>進入 _WaitSet"]
+    WS -->|"notify()"| EL
+    EL -->|"鎖釋放後重新競爭"| Q
+    OWN -->|"monitorexit<br>正常 + 異常都有"| OUT(["離開 synchronized"])
 ```
 
 ```java
@@ -91,41 +79,40 @@ Thread t2 = new Thread(() -> {
 
 ## 鎖升級機制（JDK 6+ 優化）
 
+**背景**：重量級鎖需要作業系統介入（核心態切換），代價極高。JDK 6 引入鎖升級，根據競爭情況自動升級。
+
+**物件頭 Mark Word（64 bit）**
+
+| 鎖狀態 | 存儲內容 | 標誌位 |
+|--------|---------|-------|
+| 無鎖 | hashCode(25) ・ age(4) | `01` |
+| 偏向鎖 | threadId(54) | `01` |
+| 輕量級鎖 | 指向棧幀的指針(62) | `00` |
+| 重量級鎖 | 指向 Monitor 的指針(62) | `10` |
+| GC 標記 | | `11` |
+
+**升級流程**
+
+``` mermaid
+stateDiagram-v2
+    direction LR
+    NoLock: 無鎖
+    Biased: 偏向鎖
+    Light: 輕量級鎖
+    Heavy: 重量級鎖
+    NoLock --> Biased: 第一個線程進入
+    Biased --> Light: 其他線程嘗試競爭
+    Light --> Heavy: 自旋超過次數
 ```
-背景：重量級鎖需要作業系統介入（核心態切換），代價極高
-JDK 6 引入鎖升級，根據競爭情況自動升級
 
-物件頭（Object Header）Mark Word（64bit）：
+| 階段 | 機制 | 適合場景 |
+|------|------|---------|
+| **偏向鎖**（Biased Lock） | 在 Mark Word 記錄線程 ID，同一個線程再次進入直接進，不需要 CAS | 只有一個線程 |
+| **輕量級鎖**（Lightweight Lock） | 在棧幀建立 Lock Record，CAS 將 Mark Word 改為指向它（自旋） | 競爭少，線程交替執行 |
+| **重量級鎖**（Heavyweight Lock） | 進入核心態，真正的 Monitor 鎖；未獲得鎖的線程阻塞（不消耗 CPU） | 高競爭、長臨界區 |
 
-鎖狀態      │ 存儲內容
-────────────┼─────────────────────────────────
-無鎖        │ hashCode(25) │ age(4) │ 01
-偏向鎖      │ threadId(54) │ 01
-輕量級鎖    │ 指向棧幀的指針(62) │ 00
-重量級鎖    │ 指向 Monitor 的指針(62) │ 10
-GC 標記     │ 11
+自旋次數預設 10 次，JDK 6 之後改為自適應。
 
-升級流程：
+!!! warning
 
-無鎖
-  │ 第一個線程進入 synchronized
-  ↓
-偏向鎖（Biased Lock）
-  記錄線程 ID 在 Mark Word
-  之後同一個線程進入 → 直接進，不需要 CAS！
-  適合：只有一個線程的場景
-  │ 其他線程嘗試競爭
-  ↓
-輕量級鎖（Lightweight Lock）
-  CAS 方式嘗試獲取鎖（自旋）
-  在線程的棧幀建立 Lock Record，CAS 將 Mark Word 改為指向 Lock Record
-  適合：競爭少，線程交替執行（不同時）
-  │ 自旋超過次數（預設 10 次，JDK 6 後自適應）
-  ↓
-重量級鎖（Heavyweight Lock）
-  進入核心態，真正的 Monitor 鎖
-  未獲得鎖的線程阻塞（不消耗 CPU）
-  適合：高競爭、長臨界區
-
-⚠️ 鎖只能升級，不能降級（偏向鎖可以撤銷）
-```
+    鎖只能升級，不能降級（偏向鎖可以撤銷）。

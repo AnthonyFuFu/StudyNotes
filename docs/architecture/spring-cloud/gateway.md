@@ -2,27 +2,21 @@
 
 ## 核心架構
 
-```
-請求流程：
-
-客戶端請求
-    ↓
-Gateway Handler Mapping（匹配路由）
-    ↓
-Gateway Web Handler
-    ↓
-Pre Filter Chain（前置過濾器）
-    ├── 認證過濾器（驗證 JWT）
-    ├── 限流過濾器（令牌桶）
-    └── 日誌過濾器（記錄請求）
-    ↓
-下游微服務（轉發請求）
-    ↓
-Post Filter Chain（後置過濾器）
-    ├── 響應頭過濾器
-    └── 日誌過濾器（記錄響應）
-    ↓
-返回客戶端
+``` mermaid
+flowchart TB
+    C(["客戶端請求"]) --> HM["Gateway Handler Mapping<br>匹配路由"] --> WH["Gateway Web Handler"]
+    WH --> PRE
+    subgraph PRE ["Pre Filter Chain（前置過濾器）"]
+        direction LR
+        p1["認證過濾器<br>驗證 JWT"] --> p2["限流過濾器<br>令牌桶"] --> p3["日誌過濾器<br>記錄請求"]
+    end
+    PRE --> DS["下游微服務<br>轉發請求"]
+    DS --> POST
+    subgraph POST ["Post Filter Chain（後置過濾器）"]
+        direction LR
+        q1["響應頭過濾器"] --> q2["日誌過濾器<br>記錄響應"]
+    end
+    POST --> R(["返回客戶端"])
 ```
 
 ```yaml

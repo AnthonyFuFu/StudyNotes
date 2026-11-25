@@ -25,25 +25,32 @@ AQS 核心：
   state = N  → 允許 N 個線程同時訪問
 ```
 
+**CLH 佇列（等待佇列）**
+
+``` mermaid
+flowchart LR
+    H["Head<br>虛節點"] --> N1["Node（T1）<br>RUNNING"] --> N2["Node（T2）<br>WAITING"] --> N3["Node（T3）<br>WAITING"] --> NULL(["null"])
 ```
-CLH 佇列（等待佇列）：
 
-Head（虛節點）→ Node(T1) → Node(T2) → Node(T3) → null
-                 │             │             │
-              RUNNING      WAITING        WAITING
+=== "獲取鎖流程"
 
-獲取鎖流程：
-① 嘗試 CAS 修改 state（tryAcquire）
-② 成功 → 設定 exclusiveOwnerThread = 當前線程
-③ 失敗 → 加入 CLH 佇列尾部（CAS 方式，線程安全）
-④ 前驅節點是 Head → 再次嘗試獲取（公平鎖機制）
-⑤ 還是失敗 → LockSupport.park() 阻塞自己
+    ``` mermaid
+    flowchart TB
+        A["① CAS 修改 state<br>tryAcquire"] -->|成功| B["② exclusiveOwnerThread = 當前線程"]
+        A -->|失敗| C["③ CAS 加入 CLH 佇列尾部"]
+        C --> D{"④ 前驅節點是 Head？"}
+        D -->|是| A2["再次嘗試獲取"]
+        A2 -->|成功| B
+        A2 -->|失敗| E["⑤ LockSupport.park()<br>阻塞自己"]
+        D -->|否| E
+    ```
 
-釋放鎖流程：
-① tryRelease：state-- 直到為 0
-② unparkSuccessor：喚醒 CLH 佇列中的第一個等待線程
-③ 被喚醒的線程再次嘗試獲取鎖
-```
+=== "釋放鎖流程"
+
+    ``` mermaid
+    flowchart LR
+        R1["① tryRelease<br>state-- 直到為 0"] --> R2["② unparkSuccessor<br>喚醒第一個等待線程"] --> R3["③ 被喚醒的線程<br>再次嘗試獲取鎖"]
+    ```
 
 ```java
 // 自定義鎖（理解 AQS 用）

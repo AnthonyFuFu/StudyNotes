@@ -2,22 +2,15 @@
 
 ## 類加載的完整流程（7 個步驟）
 
-```
-.class 文件
-    │
-    ▼
-┌─────────┐    ┌─────────┐    ┌─────────┐
-│  載入    │ →  │  驗證    │ →  │  準備    │
-│ Loading  │    │  Verify  │    │ Prepare  │
-└─────────┘    └─────────┘    └────┬────┘
-                                   │
-              ┌────────────────────┘
-              ▼
-         ┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐
-         │  解析    │ →  │  初始化  │ →  │  使用    │ →  │  卸載    │
-         │ Resolve  │    │  Init    │    │   Use    │    │ Unload  │
-         └─────────┘    └─────────┘    └─────────┘    └─────────┘
-              ↑──────連接（Linking）──────┘
+``` mermaid
+flowchart LR
+    F[/".class 文件"/] --> A["載入<br>Loading"]
+    subgraph LINK ["連接 Linking"]
+        direction LR
+        B["驗證<br>Verify"] --> C["準備<br>Prepare"] --> D["解析<br>Resolve"]
+    end
+    A --> B
+    D --> E["初始化<br>Init"] --> U["使用<br>Use"] --> X["卸載<br>Unload"]
 ```
 
 ### 每個階段詳解：
@@ -93,47 +86,36 @@ Demo[] arr = new Demo[10];       // 建立陣列 → 不觸發
 
 ## 雙親委派模型（Parent Delegation Model）
 
-```
-類加載器層次結構：
+**類加載器層次結構**
 
-              ┌─────────────────────┐
-              │  Bootstrap ClassLoader │  ← 啟動類加載器
-              │  （C++ 實現，Java 看不到）│    載入 JDK 核心類
-              │  路徑：jre/lib/rt.jar  │    String, Object, ...
-              └──────────┬──────────┘
-                         │  parent
-              ┌──────────┴──────────┐
-              │  Extension ClassLoader │  ← 擴展類加載器
-              │  路徑：jre/lib/ext/*.jar│    載入 JDK 擴展類
-              └──────────┬──────────┘
-                         │  parent
-              ┌──────────┴──────────┐
-              │  Application ClassLoader│ ← 應用程序類加載器
-              │  路徑：classpath        │   載入你寫的類
-              └──────────┬──────────┘
-                         │  parent
-              ┌──────────┴──────────┐
-              │   Custom ClassLoader  │  ← 自定義類加載器
-              └─────────────────────┘
+``` mermaid
+flowchart BT
+    CUS["Custom ClassLoader<br>自定義類加載器"]
+    APP["Application ClassLoader<br>應用程序類加載器<br>路徑：classpath（你寫的類）"]
+    EXT["Extension ClassLoader<br>擴展類加載器<br>路徑：jre/lib/ext/*.jar"]
+    BOOT["Bootstrap ClassLoader<br>啟動類加載器（C++ 實現，Java 看不到）<br>路徑：jre/lib/rt.jar（String、Object …）"]
+    CUS -- parent --> APP -- parent --> EXT -- parent --> BOOT
 ```
 
 ### 雙親委派流程：
 
-```
-當 AppClassLoader 要載入 "com.example.Demo" 時：
-
-AppClassLoader：
-    └→ 先委派給 ExtClassLoader
-        └→ 再委派給 BootstrapClassLoader
-            └→ Bootstrap 嘗試載入 → 找不到
-        ← Bootstrap 返回「找不到」
-        ExtClassLoader 嘗試載入 → 找不到
-    ← Ext 返回「找不到」
-    AppClassLoader 自己載入 → 找到了！✅
-
-當要載入 "java.lang.String" 時：
-AppClassLoader → ExtClassLoader → Bootstrap
-Bootstrap 在 rt.jar 找到了！✅ 使用 Bootstrap 載入的 String
+``` mermaid
+sequenceDiagram
+    autonumber
+    participant App as AppClassLoader
+    participant Ext as ExtClassLoader
+    participant Boot as BootstrapClassLoader
+    Note over App,Boot: 載入 com.example.Demo
+    App->>Ext: 先委派給父加載器
+    Ext->>Boot: 再委派給父加載器
+    Boot-->>Ext: rt.jar 找不到
+    Note over Ext: 自己嘗試 → 找不到
+    Ext-->>App: 返回「找不到」
+    Note over App: 自己載入 → 找到了 ✅
+    Note over App,Boot: 載入 java.lang.String
+    App->>Ext: 委派
+    Ext->>Boot: 委派
+    Note over Boot: 在 rt.jar 找到 ✅<br>使用 Bootstrap 載入的 String
 ```
 
 ### 為什麼要有雙親委派？

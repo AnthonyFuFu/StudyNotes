@@ -8,6 +8,35 @@ icon: lucide/layers
 
 **核心技術**：資料結構底層 / 持久化 / 分散式鎖 / 緩存問題 / Cluster
 
+## 學習地圖
+
+``` mermaid
+mindmap
+  root((Redis 深度))
+    五大資料結構 + 底層編碼
+      String / List / Hash / Set / ZSet
+      ZipList / SkipList / Dict / IntSet
+    持久化機制
+      RDB（快照）
+      AOF（追加日誌）
+      混合模式（推薦）
+    記憶體淘汰策略（8 種）
+    分散式鎖
+      SET NX + Lua Script
+      Redisson（生產推薦）
+    緩存三大問題
+      緩存穿透
+      緩存擊穿
+      緩存雪崩
+    Redis Cluster 架構
+      16384 槽位分配
+      一致性 Hash
+    效能優化
+      Pipeline
+      Lua Script
+    熱 Key / 大 Key 處理
+```
+
 ## 章節導覽
 
 <div class="grid cards" markdown>
@@ -61,34 +90,6 @@ icon: lucide/layers
     熱 Key · 大 Key
 
 </div>
-
-??? abstract "原始學習路線圖"
-
-    ```
-    Redis 深度
-    ├── 1️⃣ 五大資料結構 + 底層編碼
-    │   ├── String / List / Hash / Set / ZSet
-    │   └── ZipList / SkipList / Dict / IntSet
-    ├── 2️⃣ 持久化機制
-    │   ├── RDB（快照）
-    │   ├── AOF（追加日誌）
-    │   └── 混合模式（推薦）
-    ├── 3️⃣ 記憶體淘汰策略（8 種）
-    ├── 4️⃣ 分散式鎖
-    │   ├── SET NX + Lua Script
-    │   └── Redisson（生產推薦）
-    ├── 5️⃣ 緩存三大問題
-    │   ├── 緩存穿透
-    │   ├── 緩存擊穿
-    │   └── 緩存雪崩
-    ├── 6️⃣ Redis Cluster 架構
-    │   ├── 16384 槽位分配
-    │   └── 一致性 Hash
-    ├── 7️⃣ 效能優化
-    │   ├── Pipeline
-    │   └── Lua Script
-    └── 8️⃣ 熱 Key / 大 Key 處理
-    ```
 
 ## 核心要點總結
 

@@ -72,25 +72,21 @@ AOF 重寫（rewrite）：
 
 ## 混合持久化（推薦 ✅）
 
+Redis 4.0 引入，結合 RDB 和 AOF 的優點。開啟方式：`aof-use-rdb-preamble yes`。
+
+**AOF 重寫後的檔案格式**
+
+``` mermaid
+block-beta
+    columns 5
+    rdb["RDB 格式快照<br>重寫時的記憶體"]:2 aof["AOF 格式的增量命令<br>重寫完成後的新命令"]:3
 ```
-Redis 4.0 引入，結合 RDB 和 AOF 的優點
 
-aof-use-rdb-preamble yes（開啟混合模式）
+**恢復時**：① 先快速載入 RDB 部分 → ② 再重放少量 AOF 增量部分，兼顧速度和完整性。
 
-AOF 重寫時的格式：
-  ┌─────────────────┬──────────────────────────┐
-  │   RDB 格式快照   │  AOF 格式的增量命令        │
-  │（重寫時的記憶體）  │（重寫完成後的新命令）       │
-  └─────────────────┴──────────────────────────┘
+!!! tip "生產建議"
 
-恢復時：
-  ① 先快速載入 RDB 部分（快！）
-  ② 再重放 AOF 增量部分（少量）
-  → 兼顧速度和完整性
-
-生產建議：
-  ✅ 開啟 AOF（appendonly yes）
-  ✅ 開啟混合模式（aof-use-rdb-preamble yes）
-  ✅ AOF 同步策略用 everysec
-  ✅ 定期手動 bgsave 做備份
-```
+    - ✅ 開啟 AOF（`appendonly yes`）
+    - ✅ 開啟混合模式（`aof-use-rdb-preamble yes`）
+    - ✅ AOF 同步策略用 `everysec`
+    - ✅ 定期手動 `bgsave` 做備份

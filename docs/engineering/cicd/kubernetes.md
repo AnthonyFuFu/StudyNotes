@@ -2,46 +2,43 @@
 
 ## K8s 整體架構
 
+``` mermaid
+flowchart TB
+    subgraph CP ["Control Plane（主節點）"]
+        direction LR
+        API["API Server<br>集群入口，所有操作都經過它"]
+        ETCD[("etcd<br>分散式 KV 存儲<br>集群狀態")]
+        CM["Controller Manager<br>Node / Deployment /<br>ReplicaSet / Service Ctrl"]
+        SCH["Scheduler<br>決定 Pod 運行在哪個 Node"]
+        API <--> ETCD
+        CM <--> API
+        SCH <--> API
+    end
+    subgraph N1 ["Worker Node 1"]
+        direction TB
+        K1["kubelet / kube-proxy"] --> P11["Pod"] & P12["Pod"]
+    end
+    subgraph N2 ["Worker Node 2"]
+        direction TB
+        K2["kubelet / kube-proxy"] --> P21["Pod"] & P22["Pod"]
+    end
+    subgraph N3 ["Worker Node 3"]
+        direction TB
+        K3["kubelet / kube-proxy"] --> P31["Pod"]
+    end
+    API -- 控制 --> K1 & K2 & K3
 ```
-Kubernetes 集群架構：
 
-┌────────────────────────────────────────────────────────────────┐
-│                      Control Plane（主節點）                    │
-│                                                                │
-│  ┌──────────────┐  ┌───────────┐  ┌────────────────────────┐  │
-│  │  API Server  │  │  etcd     │  │  Controller Manager    │  │
-│  │（集群入口，   │  │（分散式    │  │  ├─ Node Controller    │  │
-│  │  所有操作     │  │  KV存儲，  │  │  ├─ Deployment Ctrl   │  │
-│  │  都經過它）   │  │  集群狀態） │  │  ├─ ReplicaSet Ctrl   │  │
-│  └──────────────┘  └───────────┘  │  └─ Service Ctrl       │  │
-│                                   └────────────────────────┘  │
-│  ┌──────────────────────────────────────────────────────────┐  │
-│  │  Scheduler（調度器）                                       │  │
-│  │  決定 Pod 應該運行在哪個 Node 上                            │  │
-│  └──────────────────────────────────────────────────────────┘  │
-└────────────────────────────────────────────────────────────────┘
-                              │ 控制
-         ┌────────────────────┼────────────────────┐
-         ↓                    ↓                    ↓
-┌──────────────────┐ ┌──────────────────┐ ┌──────────────────┐
-│   Worker Node 1  │ │   Worker Node 2  │ │   Worker Node 3  │
-│  ┌────┐  ┌────┐  │ │  ┌────┐  ┌────┐  │ │  ┌────┐          │
-│  │Pod │  │Pod │  │ │  │Pod │  │Pod │  │ │  │Pod │          │
-│  └────┘  └────┘  │ │  └────┘  └────┘  │ │  └────┘          │
-│  ┌────────────┐  │ │  ┌────────────┐  │ │  ┌────────────┐  │
-│  │  kubelet   │  │ │  │  kubelet   │  │ │  │  kubelet   │  │
-│  │ kube-proxy │  │ │  │ kube-proxy │  │ │  │ kube-proxy │  │
-│  └────────────┘  │ │  └────────────┘  │ │  └────────────┘  │
-└──────────────────┘ └──────────────────┘ └──────────────────┘
+**核心組件職責**
 
-核心組件職責：
-API Server：   集群的統一入口，所有操作都通過 RESTful API
-etcd：         儲存所有集群狀態（高可用 KV 存儲）
-Scheduler：    根據資源需求選擇最合適的 Node
-Controller：   持續監控集群狀態，確保實際狀態 = 期望狀態
-kubelet：      每個 Node 上的代理，負責 Pod 的生命週期
-kube-proxy：   每個 Node 上的網路代理，實現 Service 負載均衡
-```
+| 組件 | 職責 |
+|------|------|
+| **API Server** | 集群的統一入口，所有操作都通過 RESTful API |
+| **etcd** | 儲存所有集群狀態（高可用 KV 存儲） |
+| **Scheduler** | 根據資源需求選擇最合適的 Node |
+| **Controller** | 持續監控集群狀態，確保實際狀態 = 期望狀態 |
+| **kubelet** | 每個 Node 上的代理，負責 Pod 的生命週期 |
+| **kube-proxy** | 每個 Node 上的網路代理，實現 Service 負載均衡 |
 
 ## 核心資源對象
 

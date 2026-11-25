@@ -2,58 +2,76 @@
 
 ## Docker 核心原理
 
+**Docker 不是虛擬機！**
+
+=== "虛擬機（VM）"
+
+    ``` mermaid
+    block-beta
+        columns 2
+        A["App A"] B["App B"]
+        GA["Guest OS"] GB["Guest OS"]
+        H["Hypervisor"]:2
+        OS["Host OS"]:2
+        HW["Hardware"]:2
+    ```
+
+=== "Docker 容器"
+
+    ``` mermaid
+    block-beta
+        columns 2
+        A["App A"] B["App B"]
+        R["Container Runtime"]:2
+        OS["Host OS"]:2
+        HW["Hardware"]:2
+    ```
+
+| | 虛擬機 VM | 容器 Container |
+|---|---|---|
+| 作業系統 | 每個都有完整 Guest OS | 共享 Host OS 核心 |
+| 啟動速度 | 慢（分鐘） | 快（秒） |
+| 資源佔用 | GB 級 | MB 級 |
+
+Docker 底層由三項 Linux 技術組成：
+
+**① Namespace（命名空間）：隔離**
+
+| Namespace | 隔離內容 |
+|-----------|---------|
+| PID | 容器有自己的進程 ID 空間 |
+| Network | 獨立的網路介面、IP |
+| Mount | 獨立的文件系統視圖 |
+| UTS | 獨立的主機名 |
+| IPC | 獨立的進程間通訊 |
+| User | 獨立的用戶 / 組 ID |
+
+**② Cgroups（Control Groups）：限制資源**
+
+| 資源 | 參數 |
+|------|------|
+| CPU 使用率 | `--cpus="0.5"`（最多用半個核） |
+| 記憶體 | `--memory="512m"` |
+| 磁碟 IO | `--device-write-bps` |
+
+**③ Union File System（UnionFS）：分層儲存**
+
+Image 是只讀的分層結構，容器運行時在最上面加一個可寫層（Container Layer）。
+
+``` mermaid
+block-beta
+    columns 1
+    CL["Container Layer（可寫，容器刪除即消失）"]
+    block:IMG
+        columns 1
+        APP["App Layer（你的應用）"]
+        DEP["Dependencies Layer（依賴）"]
+        JDK["JDK Layer"]
+        BASE["Base OS Layer（ubuntu / alpine）"]
+    end
 ```
-Docker 不是虛擬機！
 
-虛擬機（VM）：                    Docker 容器：
-┌────────────────────┐           ┌────────────────────┐
-│  App A  │  App B   │           │  App A  │  App B   │
-├─────────┼──────────┤           ├─────────┼──────────┤
-│ Guest OS│ Guest OS │           │    Container       │
-├─────────┴──────────┤           │    Runtime         │
-│    Hypervisor      │           ├────────────────────┤
-├────────────────────┤           │    Host OS         │
-│    Host OS         │           ├────────────────────┤
-├────────────────────┤           │    Hardware        │
-│    Hardware        │           └────────────────────┘
-└────────────────────┘
-
-VM：每個都有完整 OS，啟動慢（分鐘），佔用 GB
-容器：共享 Host OS 核心，啟動快（秒），佔用 MB
-```
-
-```
-Docker 底層技術：
-
-① Namespace（命名空間）- 隔離
-  ┌────────────────────────────────────────────┐
-  │  PID Namespace    → 容器有自己的進程 ID 空間  │
-  │  Network Namespace → 獨立的網路介面、IP       │
-  │  Mount Namespace  → 獨立的文件系統視圖        │
-  │  UTS Namespace    → 獨立的主機名             │
-  │  IPC Namespace    → 獨立的進程間通訊          │
-  │  User Namespace   → 獨立的用戶/組 ID         │
-  └────────────────────────────────────────────┘
-
-② Cgroups（Control Groups）- 限制資源
-  限制 CPU 使用率：--cpus="0.5"（最多用半個核）
-  限制記憶體：     --memory="512m"
-  限制磁碟 IO：   --device-write-bps
-
-③ Union File System（UnionFS）- 分層儲存
-  Image 是只讀的分層結構
-  容器運行時加一個可寫層（Container Layer）
-
-  ┌─────────────────────────────┐ ← Container Layer（可寫，容器刪除即消失）
-  ├─────────────────────────────┤ ← App Layer（你的應用）
-  ├─────────────────────────────┤ ← Dependencies Layer（依賴）
-  ├─────────────────────────────┤ ← JDK Layer
-  └─────────────────────────────┘ ← Base OS Layer（ubuntu/alpine）
-        Image（只讀分層）
-
-優點：多個容器共享相同的底層（節省空間）
-      ubuntu 層只需要下載一次
-```
+下方四層為 **Image（只讀分層）**。多個容器可以共享相同的底層，節省空間，例如 ubuntu 層只需要下載一次。
 
 ## Dockerfile 最佳實踐
 
@@ -278,25 +296,20 @@ docker-compose up -d --scale app=3 # 擴展服務實例數量
 
 ## Docker 網路
 
-```
-Docker 網路模式：
+| 網路模式 | 說明 | 用法 |
+|---------|------|------|
+| **① Bridge**（預設） | 容器有自己的 IP，通過虛擬網橋通訊；容器間可以用 container_name 互相訪問 | 預設 |
+| **② Host** | 容器直接使用主機網路，效能最好，但沒有網路隔離 | `--network host` |
+| **③ None** | 無網路（完全隔離） | `--network none` |
+| **④ Overlay** | 跨主機的容器通訊（Swarm / K8s 使用） | |
 
-① Bridge（預設）：
-   容器有自己的 IP，通過虛擬網橋通訊
-   容器間可以用 container_name 互相訪問
+**Bridge 模式示意**
 
-   Host ─── docker0(172.17.0.1) ─── container1(172.17.0.2)
-                                 └── container2(172.17.0.3)
-
-② Host：
-   容器直接使用主機網路，效能最好，但沒有網路隔離
-   --network host
-
-③ None：
-   無網路（完全隔離）
-
-④ Overlay：
-   跨主機的容器通訊（Swarm / K8s 使用）
+``` mermaid
+flowchart LR
+    H["Host"] --- D["docker0<br>172.17.0.1"]
+    D --- C1["container1<br>172.17.0.2"]
+    D --- C2["container2<br>172.17.0.3"]
 ```
 
 ```bash

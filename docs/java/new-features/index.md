@@ -8,6 +8,30 @@ icon: lucide/sparkles
 
 **核心技術**：Virtual Threads / Record / Sealed Class / Pattern Matching
 
+## 學習地圖
+
+``` mermaid
+mindmap
+  root((Java 新特性))
+    Java 8 核心回顧（基礎，面試常考）
+      Lambda & 函數式接口
+      Stream API 進階
+      Optional
+    Java 9 ~ 16 重要特性
+      var 局部類型推斷
+      Text Block（文字塊）
+      Switch 表達式
+    Java 17 LTS 重點
+      Sealed Classes（封閉類）
+      Pattern Matching for instanceof
+      Record Classes（記錄類）
+    Java 21 LTS 重點 ⭐ 最重要
+      Virtual Threads（虛擬線程）← 革命性
+      Pattern Matching for Switch
+      Sequenced Collections
+      Structured Concurrency
+```
+
 ## 章節導覽
 
 <div class="grid cards" markdown>
@@ -49,29 +73,6 @@ icon: lucide/sparkles
     實戰整合範例
 
 </div>
-
-??? abstract "原始學習路線圖"
-
-    ```
-    Java 新特性
-    ├── 1️⃣ Java 8 核心回顧（基礎，面試常考）
-    │   ├── Lambda & 函數式接口
-    │   ├── Stream API 進階
-    │   └── Optional
-    ├── 2️⃣ Java 9 ~ 16 重要特性
-    │   ├── var 局部類型推斷
-    │   ├── Text Block（文字塊）
-    │   └── Switch 表達式
-    ├── 3️⃣ Java 17 LTS 重點
-    │   ├── Sealed Classes（封閉類）
-    │   ├── Pattern Matching for instanceof
-    │   └── Record Classes（記錄類）
-    └── 4️⃣ Java 21 LTS 重點 ⭐ 最重要
-        ├── Virtual Threads（虛擬線程）← 革命性
-        ├── Pattern Matching for Switch
-        ├── Sequenced Collections
-        └── Structured Concurrency
-    ```
 
 ## 重點速覽
 

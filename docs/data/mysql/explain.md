@@ -12,17 +12,12 @@ ORDER BY o.created_at DESC
 LIMIT 10;
 ```
 
-```
-EXPLAIN 輸出欄位詳解：
+**EXPLAIN 輸出範例**
 
-┌────┬─────────┬────────────┬──────┬──────────────┬──────────────┬────────┬──────────┬──────┬───────────────────────────┐
-│ id │ select_ │   table    │ type │ possible_    │     key      │ key_  │   rows   │filter│          Extra            │
-│    │  type   │            │      │    keys      │              │  len  │          │      │                           │
-├────┼─────────┼────────────┼──────┼──────────────┼──────────────┼────────┼──────────┼──────┼───────────────────────────┤
-│  1 │ SIMPLE  │     u      │ ref  │status_idx    │  status_idx  │  62   │   500    │ 100% │ Using where               │
-│  1 │ SIMPLE  │     o      │ ref  │user_id_idx   │ user_id_idx  │   8   │    10    │  33% │ Using index condition     │
-└────┴─────────┴────────────┴──────┴──────────────┴──────────────┴────────┴──────────┴──────┴───────────────────────────┘
-```
+| id | select_type | table | type | possible_keys | key | key_len | rows | filtered | Extra |
+|----|-------------|-------|------|---------------|-----|---------|------|----------|-------|
+| 1 | SIMPLE | u | `ref` | status_idx | status_idx | 62 | 500 | 100% | Using where |
+| 1 | SIMPLE | o | `ref` | user_id_idx | user_id_idx | 8 | 10 | 33% | Using index condition |
 
 ### type 欄位（效能由好到差）：
 

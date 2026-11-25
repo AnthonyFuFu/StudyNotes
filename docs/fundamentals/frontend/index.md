@@ -8,6 +8,39 @@ icon: lucide/palette
 
 **核心技術**：React / Vue 原理 / 效能優化 / TypeScript
 
+## 學習地圖
+
+``` mermaid
+mindmap
+  root((前端深度))
+    瀏覽器渲染原理
+      關鍵渲染路徑
+      重排（Reflow）vs 重繪（Repaint）
+      事件循環（Event Loop）
+    JavaScript 核心原理
+      原型鏈 / 繼承
+      閉包（Closure）
+      作用域 / 變數提升
+      非同步（Promise / async-await）
+    TypeScript 深度
+      類型系統
+      泛型
+      實用工具類型
+    React 核心原理
+      Virtual DOM / Diff 算法
+      Fiber 架構
+      Hooks 深度
+      狀態管理
+    Vue 核心原理
+      響應式系統（Vue 2 vs Vue 3）
+      虛擬 DOM / Diff
+      Composition API
+    前端效能優化
+      載入效能
+      渲染效能
+      網路效能
+```
+
 ## 章節導覽
 
 <div class="grid cards" markdown>
@@ -49,38 +82,6 @@ icon: lucide/palette
     載入效能 · 渲染效能 · 網路效能
 
 </div>
-
-??? abstract "原始學習路線圖"
-
-    ```
-    前端深度
-    ├── 1️⃣ 瀏覽器渲染原理
-    │   ├── 關鍵渲染路徑
-    │   ├── 重排（Reflow）vs 重繪（Repaint）
-    │   └── 事件循環（Event Loop）
-    ├── 2️⃣ JavaScript 核心原理
-    │   ├── 原型鏈 / 繼承
-    │   ├── 閉包（Closure）
-    │   ├── 作用域 / 變數提升
-    │   └── 非同步（Promise / async-await）
-    ├── 3️⃣ TypeScript 深度
-    │   ├── 類型系統
-    │   ├── 泛型
-    │   └── 實用工具類型
-    ├── 4️⃣ React 核心原理
-    │   ├── Virtual DOM / Diff 算法
-    │   ├── Fiber 架構
-    │   ├── Hooks 深度
-    │   └── 狀態管理
-    ├── 5️⃣ Vue 核心原理
-    │   ├── 響應式系統（Vue 2 vs Vue 3）
-    │   ├── 虛擬 DOM / Diff
-    │   └── Composition API
-    └── 6️⃣ 前端效能優化
-        ├── 載入效能
-        ├── 渲染效能
-        └── 網路效能
-    ```
 
 ## 核心要點總結
 

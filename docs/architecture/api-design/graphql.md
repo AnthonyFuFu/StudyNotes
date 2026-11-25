@@ -368,24 +368,25 @@ subscription WatchOrder($orderId: ID!) {
 
 ## GraphQL vs REST 比較
 
-```
-┌──────────────────┬─────────────────────┬───────────────────────┐
-│                  │        REST         │       GraphQL         │
-├──────────────────┼─────────────────────┼───────────────────────┤
-│ 數據獲取          │ 固定結構             │ 客戶端自定義           │
-│ Over-fetching    │ ❌ 常見              │ ✅ 完全避免            │
-│ Under-fetching   │ ❌ 常見              │ ✅ 一次請求解決        │
-│ API 端點         │ 多個（每個資源一個）   │ 單一（/graphql）       │
-│ 版本管理          │ 需要（v1, v2）       │ 不需要（欄位演化）      │
-│ 學習曲線          │ ✅ 低               │ ❌ 較高               │
-│ 快取             │ ✅ HTTP 快取         │ ❌ 較複雜（需 Apollo）  │
-│ N+1 問題         │ 需手動處理           │ DataLoader 解決        │
-│ 文件             │ Swagger/OpenAPI     │ GraphiQL（自文件化）    │
-│ 適用場景          │ 公開 API、簡單場景   │ 複雜前端需求、BFF 層    │
-└──────────────────┴─────────────────────┴───────────────────────┘
+| | REST | GraphQL |
+|---|------|---------|
+| 數據獲取 | 固定結構 | 客戶端自定義 |
+| Over-fetching | ❌ 常見 | ✅ 完全避免 |
+| Under-fetching | ❌ 常見 | ✅ 一次請求解決 |
+| API 端點 | 多個（每個資源一個） | 單一（`/graphql`） |
+| 版本管理 | 需要（v1, v2） | 不需要（欄位演化） |
+| 學習曲線 | ✅ 低 | ❌ 較高 |
+| 快取 | ✅ HTTP 快取 | ❌ 較複雜（需 Apollo） |
+| N+1 問題 | 需手動處理 | DataLoader 解決 |
+| 文件 | Swagger / OpenAPI | GraphiQL（自文件化） |
+| 適用場景 | 公開 API、簡單場景 | 複雜前端需求、BFF 層 |
 
-BFF（Backend For Frontend）模式：
-  不同客戶端（Web / iOS / Android）有不同的數據需求
-  GraphQL 作為 BFF 層，各客戶端按需查詢
-  避免為每個客戶端維護不同的 REST API
+**BFF（Backend For Frontend）模式**
+
+``` mermaid
+flowchart LR
+    WEB["Web"] & IOS["iOS"] & AND["Android"] -- "按需查詢" --> BFF["GraphQL BFF 層"]
+    BFF --> S1["用戶服務"] & S2["訂單服務"] & S3["商品服務"]
 ```
+
+不同客戶端（Web / iOS / Android）有不同的數據需求。GraphQL 作為 BFF 層讓各客戶端按需查詢，避免為每個客戶端維護不同的 REST API。

@@ -8,6 +8,35 @@ icon: lucide/search
 
 **核心技術**：倒排索引 / DSL 查詢 / 聚合 / ELK Stack
 
+## 學習地圖
+
+``` mermaid
+mindmap
+  root((Elasticsearch))
+    核心原理
+      倒排索引（Inverted Index）
+      分散式架構（Cluster / Node / Shard）
+      文件讀寫流程
+    資料模型
+      Index / Document / Field
+      Mapping（欄位類型定義）
+      分析器（Analyzer）
+    DSL 查詢語法
+      全文查詢（match / multi_match）
+      精確查詢（term / terms / range）
+      複合查詢（bool）
+      聚合查詢（aggregation）
+      高亮 / 排序 / 分頁
+    Spring Boot 整合
+      Spring Data Elasticsearch
+      ElasticsearchRestTemplate
+      完整電商搜索實戰
+    生產實戰
+      效能調優
+      索引設計最佳實踐
+      ELK Stack 日誌系統
+```
+
 ## 章節導覽
 
 <div class="grid cards" markdown>
@@ -43,34 +72,6 @@ icon: lucide/search
     索引設計最佳實踐 · 效能調優 · ELK Stack 日誌系統建置
 
 </div>
-
-??? abstract "原始學習路線圖"
-
-    ```
-    Elasticsearch
-    ├── 1️⃣ 核心原理
-    │   ├── 倒排索引（Inverted Index）
-    │   ├── 分散式架構（Cluster / Node / Shard）
-    │   └── 文件讀寫流程
-    ├── 2️⃣ 資料模型
-    │   ├── Index / Document / Field
-    │   ├── Mapping（欄位類型定義）
-    │   └── 分析器（Analyzer）
-    ├── 3️⃣ DSL 查詢語法
-    │   ├── 全文查詢（match / multi_match）
-    │   ├── 精確查詢（term / terms / range）
-    │   ├── 複合查詢（bool）
-    │   ├── 聚合查詢（aggregation）
-    │   └── 高亮 / 排序 / 分頁
-    ├── 4️⃣ Spring Boot 整合
-    │   ├── Spring Data Elasticsearch
-    │   ├── ElasticsearchRestTemplate
-    │   └── 完整電商搜索實戰
-    └── 5️⃣ 生產實戰
-        ├── 效能調優
-        ├── 索引設計最佳實踐
-        └── ELK Stack 日誌系統
-    ```
 
 ## 重點速覽
 

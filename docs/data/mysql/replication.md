@@ -2,42 +2,45 @@
 
 ## Binlog 複製原理
 
+``` mermaid
+flowchart LR
+    W(["寫操作<br>INSERT / UPDATE / DELETE"]) --> M
+    subgraph Master
+        M[("Binlog<br>二進位日誌")]
+    end
+    subgraph Slave1 ["Slave 1"]
+        R1[("Relay Log<br>中繼日誌")] -- SQL Thread --> S1["重放 SQL"]
+    end
+    subgraph Slave2 ["Slave 2"]
+        R2[("Relay Log<br>中繼日誌")] -- SQL Thread --> S2["重放 SQL"]
+    end
+    M -- I/O Thread --> R1
+    M -- I/O Thread --> R2
+    S1 & S2 --> Q(["讀操作<br>SELECT"])
 ```
-主從複製架構：
 
-┌──────────────┐        ┌──────────────┐        ┌──────────────┐
-│   Master     │        │    Slave 1   │        │    Slave 2   │
-│              │        │              │        │              │
-│  ┌────────┐  │        │  ┌────────┐  │        │  ┌────────┐  │
-│  │ Binlog │──┼──────→ │  │ Relay  │  │        │  │ Relay  │  │
-│  │（二進位 │  │  I/O   │  │  Log   │  │        │  │  Log   │  │
-│  │ 日誌）  │  │  Thread│  └────┬───┘  │        │  └────────┘  │
-│  └────────┘  │        │       │SQL   │        │              │
-│              │        │       ↓Thread│        │              │
-│  寫操作      │        │  ┌────────┐  │        │  讀操作      │
-│  INSERT      │        │  │ 重放   │  │        │  SELECT      │
-│  UPDATE      │        │  │ SQL    │  │        │              │
-│  DELETE      │        │  └────────┘  │        │              │
-└──────────────┘        └──────────────┘        └──────────────┘
+**複製流程**
 
-複製流程：
-① Master 執行 SQL，寫入 Binlog
-② Slave 的 I/O Thread 連接 Master，讀取 Binlog
-③ Slave 將 Binlog 寫入本地 Relay Log（中繼日誌）
-④ Slave 的 SQL Thread 重放 Relay Log 中的 SQL
+1. Master 執行 SQL，寫入 Binlog
+2. Slave 的 I/O Thread 連接 Master，讀取 Binlog
+3. Slave 將 Binlog 寫入本地 Relay Log（中繼日誌）
+4. Slave 的 SQL Thread 重放 Relay Log 中的 SQL
 
-Binlog 格式：
-  STATEMENT：記錄 SQL 語句（小，但可能不一致）
-  ROW：記錄每行的實際變化（大，但準確）← 推薦
-  MIXED：混合模式
+**Binlog 格式**
 
-主從延遲問題：
-  Master 寫入後立即查 Slave 可能看到舊數據！
-  解決方案：
-  ① 寫後讀：寫操作後的讀請求，路由到 Master
-  ② 半同步複製：Master 等至少一個 Slave 確認收到才返回
-  ③ 並行複製：Slave 多線程重放（MySQL 5.6+）
-```
+| 格式 | 記錄內容 | 特性 |
+|------|---------|------|
+| `STATEMENT` | SQL 語句 | 體積小，但可能主從不一致 |
+| `ROW` :star: | 每一行的實際變化 | 體積大，但準確（推薦） |
+| `MIXED` | 混合模式 | 由 MySQL 自動選擇 |
+
+!!! warning "主從延遲問題"
+
+    Master 寫入後立即查 Slave，可能讀到舊資料。解決方案：
+
+    1. **寫後讀**：寫操作之後的讀請求，路由到 Master
+    2. **半同步複製**：Master 等至少一個 Slave 確認收到才返回
+    3. **並行複製**：Slave 多執行緒重放（MySQL 5.6+）
 
 ## 讀寫分離實作（Spring Boot）
 

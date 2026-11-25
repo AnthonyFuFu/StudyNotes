@@ -2,43 +2,34 @@
 
 ## SkyWalking 架構
 
+**一個用戶請求在微服務中的旅程**
+
+``` mermaid
+flowchart LR
+    U(["用戶請求"]) --> GW["API Gateway<br>10ms"] --> OS["訂單服務<br>500ms ← 哪裡慢？"]
+    OS --> US["用戶服務<br>20ms"]
+    OS --> IS["庫存服務<br>30ms"]
+    OS --> DB[("MySQL 查詢<br>400ms ← 原來是這裡！")]
+    OS --> RD[("Redis 查詢<br>5ms")]
 ```
-為什麼需要鏈路追蹤？
 
-一個用戶請求在微服務中的旅程：
+- **沒有鏈路追蹤**：看著 500ms 不知道哪裡慢
+- **有了鏈路追蹤**：立刻定位到 MySQL 查詢耗時 400ms
 
-用戶請求
-   ↓
-API Gateway（10ms）
-   ↓
-訂單服務（500ms）← 哪裡慢？
-   ├→ 用戶服務（20ms）
-   ├→ 庫存服務（30ms）
-   ├→ MySQL 查詢（400ms）← 原來是這裡！
-   └→ Redis 查詢（5ms）
+**SkyWalking 架構**
 
-沒有鏈路追蹤：看著 500ms 不知道哪裡慢
-有了鏈路追蹤：立刻定位到 MySQL 查詢耗時 400ms
-
-SkyWalking 架構：
-
-┌─────────────────────────────────────────────────────────────┐
-│                    應用層（Agent 自動注入）                    │
-│  訂單服務              用戶服務              庫存服務           │
-│  [SW Agent]          [SW Agent]          [SW Agent]        │
-└─────────────────────────────┬───────────────────────────────┘
-                              │ gRPC 上報 Span 數據
-                              ↓
-┌─────────────────────────────────────────────────────────────┐
-│                    OAP Server（分析引擎）                     │
-│  接收 Span → 分析依賴關係 → 計算指標 → 存儲                   │
-└──────────────────┬──────────────────────┬───────────────────┘
-                   │                      │
-                   ↓                      ↓
-         ┌──────────────┐       ┌──────────────────┐
-         │ Elasticsearch│       │  SkyWalking UI   │
-         │（存儲鏈路數據）│       │ （視覺化展示）      │
-         └──────────────┘       └──────────────────┘
+``` mermaid
+flowchart TB
+    subgraph APPS ["應用層（Agent 自動注入）"]
+        direction LR
+        A1["訂單服務<br>SW Agent"]
+        A2["用戶服務<br>SW Agent"]
+        A3["庫存服務<br>SW Agent"]
+    end
+    OAP["OAP Server（分析引擎）<br>接收 Span → 分析依賴關係 → 計算指標 → 存儲"]
+    APPS -- "gRPC 上報 Span 數據" --> OAP
+    OAP --> ES[("Elasticsearch<br>存儲鏈路數據")]
+    OAP --> UI["SkyWalking UI<br>視覺化展示"]
 ```
 
 ## Spring Boot 整合（OpenTelemetry 現代標準）
@@ -132,33 +123,38 @@ public class TraceIdPropagationInterceptor implements RequestInterceptor {
 
 ## 鏈路追蹤實戰分析
 
+**① 拓撲圖（Topology）**：自動繪製服務依賴關係圖，顯示每條鏈路的 QPS 和錯誤率。
+
+``` mermaid
+flowchart LR
+    U(["用戶"]) --> GW["API Gateway"] --> OS["訂單服務"]
+    OS --> DB[("MySQL")]
+    OS --> IS["庫存服務"]
+    OS --> PS["支付服務"] --> EXT["外部支付平台"]
 ```
-SkyWalking UI 關鍵功能：
 
-① 拓撲圖（Topology）
-   自動繪製服務依賴關係圖
-   顯示每條鏈路的 QPS 和錯誤率
+**② Span 詳情（定位瓶頸）**：點開一條 Trace，看到完整的調用樹與每段耗時。
 
-   用戶 → API Gateway → 訂單服務 → MySQL
-                                 → 庫存服務
-                                 → 支付服務 → 外部支付平台
-
-② Span 詳情（定位瓶頸）
-   點開一條 Trace，看到完整的調用樹：
-
-   OrderService.createOrder         [0ms ~ 523ms]  總耗時 523ms
-   ├─ UserService.getUser           [5ms ~ 25ms]   耗時 20ms
-   ├─ InventoryService.check        [30ms ~ 60ms]  耗時 30ms
-   ├─ MySQL: SELECT * FROM orders   [65ms ~ 465ms] 耗時 400ms ← 瓶頸！
-   │    SQL: SELECT * FROM orders WHERE user_id=?
-   │    行數: 50,000 行 ← 缺少索引！
-   └─ Redis: SET order:123          [470ms ~ 475ms] 耗時 5ms
-
-③ 服務指標（Service Metrics）
-   SLA、吞吐量、延遲的趨勢圖
-
-④ 告警規則
-   - 服務 P99 延遲 > 2s → 告警
-   - 服務錯誤率 > 5% → 告警
-   - 服務不可用 → 告警
+``` mermaid
+gantt
+    title OrderService.createOrder（總耗時 523ms）
+    dateFormat x
+    axisFormat %Lms
+    section 調用
+    UserService.getUser（20ms）        : 5, 25
+    InventoryService.check（30ms）     : 30, 60
+    MySQL SELECT orders（400ms）瓶頸    : crit, 65, 465
+    Redis SET order:123（5ms）          : 470, 475
 ```
+
+!!! warning "瓶頸分析"
+
+    `SELECT * FROM orders WHERE user_id=?` 掃描了 50,000 行，原因是缺少索引。
+
+**③ 服務指標（Service Metrics）**：SLA、吞吐量、延遲的趨勢圖。
+
+**④ 告警規則**
+
+- 服務 P99 延遲 > 2s → 告警
+- 服務錯誤率 > 5% → 告警
+- 服務不可用 → 告警

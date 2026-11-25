@@ -8,6 +8,37 @@ icon: lucide/shield-check
 
 **核心技術**：Spring Security / OAuth2 / JWT / SSO / 攻擊防禦
 
+## 學習地圖
+
+``` mermaid
+mindmap
+  root((資安))
+    資安基礎概念
+      認證 vs 授權
+      OWASP Top 10 常見漏洞
+      加密基礎（對稱/非對稱）
+    Spring Security 核心原理
+      過濾器鏈架構
+      SecurityContext
+      認證流程
+      授權流程
+    JWT 深入原理與實作
+      JWT 結構
+      完整實作
+      JWT 安全問題
+    OAuth2 完整教學
+      四種授權模式
+      Spring Authorization Server
+      第三方登入（Google / GitHub）
+    SSO 單點登入
+      OAuth2 + JWT 實現 SSO
+    常見攻擊防禦
+      SQL 注入
+      XSS
+      CSRF
+      其他攻擊
+```
+
 ## 章節導覽
 
 <div class="grid cards" markdown>
@@ -49,36 +80,6 @@ icon: lucide/shield-check
     SQL 注入 · XSS · CSRF · 其他重要攻擊防禦
 
 </div>
-
-??? abstract "原始學習路線圖"
-
-    ```
-    資安
-    ├── 1️⃣ 資安基礎概念
-    │   ├── 認證 vs 授權
-    │   ├── OWASP Top 10 常見漏洞
-    │   └── 加密基礎（對稱/非對稱）
-    ├── 2️⃣ Spring Security 核心原理
-    │   ├── 過濾器鏈架構
-    │   ├── SecurityContext
-    │   ├── 認證流程
-    │   └── 授權流程
-    ├── 3️⃣ JWT 深入原理與實作
-    │   ├── JWT 結構
-    │   ├── 完整實作
-    │   └── JWT 安全問題
-    ├── 4️⃣ OAuth2 完整教學
-    │   ├── 四種授權模式
-    │   ├── Spring Authorization Server
-    │   └── 第三方登入（Google / GitHub）
-    ├── 5️⃣ SSO 單點登入
-    │   └── OAuth2 + JWT 實現 SSO
-    └── 6️⃣ 常見攻擊防禦
-        ├── SQL 注入
-        ├── XSS
-        ├── CSRF
-        └── 其他攻擊
-    ```
 
 ## 重點速覽
 

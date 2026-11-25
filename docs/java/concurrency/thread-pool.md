@@ -16,40 +16,27 @@ ThreadPoolExecutor executor = new ThreadPoolExecutor(
 );
 ```
 
+**線程池工作流程**
+
+``` mermaid
+flowchart TB
+    T(["提交任務"]) --> C{"核心線程數 < corePoolSize？"}
+    C -->|是| C1["創建新核心線程執行"]
+    C -->|否| Q{"佇列未滿？"}
+    Q -->|是| Q1["加入等待佇列"]
+    Q -->|否| M{"線程數 < maximumPoolSize？"}
+    M -->|是| M1["創建非核心線程執行"]
+    M -->|否| R["執行拒絕策略！"]
 ```
-線程池工作流程：
 
-提交任務
-  │
-  ├→ 核心線程數 < corePoolSize？
-  │   是 → 創建新核心線程執行
-  │
-  ├→ 佇列未滿？
-  │   是 → 加入等待佇列
-  │
-  ├→ 線程數 < maximumPoolSize？
-  │   是 → 創建非核心線程執行
-  │
-  └→ 執行拒絕策略！
+**四種拒絕策略**
 
-四種拒絕策略：
-
-AbortPolicy（預設）：
-  拋出 RejectedExecutionException
-  ❌ 不推薦（會讓調用方崩潰）
-
-CallerRunsPolicy（推薦）：
-  由提交任務的線程自己執行
-  ✅ 起到降速效果，不丟任務
-
-DiscardPolicy：
-  靜默丟棄任務
-  ❌ 任務丟失，難以排查
-
-DiscardOldestPolicy：
-  丟棄佇列中最老的任務
-  ❌ 可能丟失重要任務
-```
+| 策略 | 行為 | 評價 |
+|------|------|------|
+| `AbortPolicy`（預設） | 拋出 `RejectedExecutionException` | ❌ 不推薦，會讓調用方崩潰 |
+| `CallerRunsPolicy` | 由提交任務的線程自己執行 | ✅ **推薦**，起到降速效果，不丟任務 |
+| `DiscardPolicy` | 靜默丟棄任務 | ❌ 任務丟失，難以排查 |
+| `DiscardOldestPolicy` | 丟棄佇列中最老的任務 | ❌ 可能丟失重要任務 |
 
 ```java
 // ❌ 不要用 Executors 工廠方法！

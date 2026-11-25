@@ -22,52 +22,35 @@ HTTPS 的聰明做法：
 
 ## TLS 1.3 握手流程（簡化版）
 
+``` mermaid
+sequenceDiagram
+    participant C as Client
+    participant S as Server
+    C->>S: Client Hello<br>支援的 TLS 版本、加密套件列表、Client 隨機數
+    S->>C: Server Hello<br>選定的加密套件、Server 隨機數
+    S->>C: Certificate（Server 的 SSL 憑證）
+    S->>C: Server Key Exchange（ECDHE 公鑰參數）
+    S->>C: Server Hello Done
+    Note over C: 驗證憑證（CA 鏈）<br>生成 Pre-Master Secret
+    C->>S: Client Key Exchange<br>用 Server 公鑰加密的 Pre-Master Secret
+    Note over C,S: 雙方各自計算 Master Secret<br>= Client 隨機數 + Server 隨機數 + Pre-Master Secret
+    C->>S: Change Cipher Spec（之後用對稱加密）
+    C->>S: Finished
+    S->>C: Change Cipher Spec
+    S->>C: Finished
+    Note over C,S: TLS 握手完成，開始加密傳輸
 ```
-         Client                      Server
-           │                           │
-           │─── Client Hello ─────────→│
-           │    （支援的 TLS 版本）        │
-           │    （支援的加密套件列表）      │
-           │    （Client 隨機數）         │
-           │                           │
-           │←── Server Hello ──────────│
-           │    （選定的加密套件）         │
-           │    （Server 隨機數）         │
-           │←── Certificate ───────────│
-           │    （Server 的 SSL 憑證）    │
-           │←── Server Key Exchange ───│
-           │    （ECDHE 公鑰參數）        │
-           │←── Server Hello Done ─────│
-           │                           │
-           │  Client 驗證憑證（CA 鏈）    │
-           │  生成 Pre-Master Secret    │
-           │─── Client Key Exchange ──→│
-           │    （用 Server 公鑰加密的     │
-           │      Pre-Master Secret）   │
-           │                           │
-           │  雙方各自計算 Master Secret  │
-           │  （Client隨機數+Server隨機數  │
-           │    +Pre-Master Secret）    │
-           │                           │
-           │─── Change Cipher Spec ───→│  之後用對稱加密
-           │─── Finished ─────────────→│
-           │←── Change Cipher Spec ────│
-           │←── Finished ──────────────│
-           │                           │
-           │   [TLS 握手完成，開始傳輸]    │
 
-TLS 1.3 改進（比 TLS 1.2 更快更安全）：
-  ✅ 握手從 2-RTT 降到 1-RTT（更快建連）
-  ✅ 0-RTT 恢復（重連不需要完整握手）
-  ✅ 移除不安全的加密算法（RSA 金鑰交換、RC4 等）
-  ✅ 強制前向保密（Forward Secrecy）
-     → 即使私鑰洩漏，過去的通訊也無法解密
+**TLS 1.3 改進（比 TLS 1.2 更快更安全）**
 
-前向保密（Forward Secrecy）：
-  每次連接生成臨時金鑰（ECDHE）
-  連接結束後金鑰銷毀
-  → 攻擊者錄下加密流量，未來即使拿到服務器私鑰也無法解密
-```
+- ✅ 握手從 2-RTT 降到 1-RTT（更快建連）
+- ✅ 0-RTT 恢復（重連不需要完整握手）
+- ✅ 移除不安全的加密算法（RSA 金鑰交換、RC4 等）
+- ✅ 強制前向保密（Forward Secrecy）：即使私鑰洩漏，過去的通訊也無法解密
+
+!!! info "前向保密（Forward Secrecy）"
+
+    每次連接生成臨時金鑰（ECDHE），連接結束後金鑰銷毀。攻擊者就算錄下加密流量，未來拿到服務器私鑰也無法解密。
 
 ## SSL 憑證體系（CA 信任鏈）
 

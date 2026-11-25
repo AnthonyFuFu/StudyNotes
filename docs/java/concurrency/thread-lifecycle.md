@@ -2,36 +2,29 @@
 
 ## 六種狀態
 
-```
-Java Thread 狀態（java.lang.Thread.State）：
+| 狀態 | 意義 |
+|------|------|
+| `NEW` | 剛建立，還沒 `start()` |
+| `RUNNABLE` | 運行中或等待 CPU 調度 |
+| `BLOCKED` | 等待 synchronized 鎖 |
+| `WAITING` | 無限期等待（`wait()` / `join()` / `park()`） |
+| `TIMED_WAITING` | 有限期等待（`sleep()` / `wait(ms)` / `join(ms)`） |
+| `TERMINATED` | 執行完畢 |
 
-NEW           → 剛建立，還沒 start()
-RUNNABLE      → 運行中或等待 CPU 調度
-BLOCKED       → 等待 synchronized 鎖
-WAITING       → 無限期等待（wait() / join() / park()）
-TIMED_WAITING → 有限期等待（sleep() / wait(ms) / join(ms)）
-TERMINATED    → 執行完畢
+**狀態轉換圖**
 
-狀態轉換圖：
-
-              start()
-NEW ─────────────────────────→ RUNNABLE
-                                  │    │
-               synchronized 鎖被占 │    │ 搶到鎖
-                                  ↓    │
-                               BLOCKED ┘
-
-              Object.wait()
-              Thread.join()        notify() / notifyAll()
-              LockSupport.park()   LockSupport.unpark()
-RUNNABLE ──────────────────→ WAITING ──────────────────→ RUNNABLE
-
-              Thread.sleep(ms)
-              Object.wait(ms)      超時或喚醒
-RUNNABLE ──────────────────→ TIMED_WAITING ─────────────→ RUNNABLE
-
-              run() 執行完畢
-RUNNABLE ──────────────────→ TERMINATED
+``` mermaid
+stateDiagram-v2
+    [*] --> NEW
+    NEW --> RUNNABLE: start()
+    RUNNABLE --> BLOCKED: synchronized 鎖被占
+    BLOCKED --> RUNNABLE: 搶到鎖
+    RUNNABLE --> WAITING: wait() / join() / park()
+    WAITING --> RUNNABLE: notify() / notifyAll() / unpark()
+    RUNNABLE --> TIMED_WAITING: sleep(ms) / wait(ms)
+    TIMED_WAITING --> RUNNABLE: 超時或喚醒
+    RUNNABLE --> TERMINATED: run() 執行完畢
+    TERMINATED --> [*]
 ```
 
 ```java

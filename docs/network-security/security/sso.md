@@ -2,27 +2,18 @@
 
 ## SSO 架構設計
 
-```
-SSO 目標：用戶只登入一次，可以訪問多個系統
+**SSO 目標**：用戶只登入一次，就可以訪問多個系統。
 
-                    ┌──────────────────────────┐
-                    │    Authorization Server   │
-                    │   （統一認證中心）           │
-                    │   Spring Authorization    │
-                    │        Server             │
-                    └──────────┬───────────────┘
-                               │ 簽發 Token
-              ┌────────────────┼────────────────┐
-              ↓                ↓                ↓
-        ┌──────────┐    ┌──────────┐    ┌──────────┐
-        │  訂單系統  │    │  用戶系統  │    │  商品系統  │
-        │ Resource │    │ Resource │    │ Resource │
-        │  Server  │    │  Server  │    │  Server  │
-        └──────────┘    └──────────┘    └──────────┘
-
-用戶只需在 Authorization Server 登入一次
-各 Resource Server 用公鑰驗證 JWT（不需要請求 Auth Server）
+``` mermaid
+flowchart TB
+    AS["Authorization Server<br>統一認證中心<br>Spring Authorization Server"]
+    AS -- "簽發 Token" --> O["訂單系統<br>Resource Server"]
+    AS -- "簽發 Token" --> U["用戶系統<br>Resource Server"]
+    AS -- "簽發 Token" --> P["商品系統<br>Resource Server"]
 ```
+
+- 用戶只需在 Authorization Server 登入一次
+- 各 Resource Server 用公鑰驗證 JWT，不需要再請求 Auth Server
 
 ## Spring Authorization Server 實作
 

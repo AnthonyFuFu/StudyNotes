@@ -2,11 +2,9 @@
 
 ## Helm Chart（K8s 應用包管理）
 
-```
-Helm 是 K8s 的「套件管理器」（類似 apt / npm）
-將複雜的 K8s YAML 模板化，方便管理多環境
+Helm 是 K8s 的「套件管理器」（類似 apt / npm），將複雜的 K8s YAML 模板化，方便管理多環境。
 
-目錄結構：
+``` text title="Chart 目錄結構"
 myapp/
 ├── Chart.yaml              ← Chart 基本資訊
 ├── values.yaml             ← 預設值
@@ -105,48 +103,32 @@ helm uninstall myapp -n production
 
 ## 完整 CI/CD 流程總覽
 
-```
-開發者 git push → GitHub
-         │
-         ▼
-GitHub Actions 觸發
-         │
-    ┌────┴──────────────────────────────────────┐
-    │              CI 階段                       │
-    │  ① 拉取程式碼                              │
-    │  ② Maven 建置                             │
-    │  ③ 單元測試 + 覆蓋率檢查（>80%）           │
-    │  ④ SonarQube 靜態分析                     │
-    │  ⑤ OWASP 依賴漏洞掃描                     │
-    │  ⑥ 建置 Docker Image（多平台）             │
-    │  ⑦ Trivy 容器安全掃描                     │
-    │  ⑧ 推送到 Harbor Registry                 │
-    └────┬──────────────────────────────────────┘
-         │ CI 通過
-    ┌────┴──────────────────────────────────────┐
-    │            CD - Staging 階段               │
-    │  ① Helm upgrade（更新 Staging）           │
-    │  ② 等待 Rollout 完成                      │
-    │  ③ Smoke Test（基本功能驗證）             │
-    │  ④ 整合測試                               │
-    └────┬──────────────────────────────────────┘
-         │ Staging 通過
-         │ ↓ 打 Release Tag 或人工審核
-    ┌────┴──────────────────────────────────────┐
-    │            CD - Production 階段            │
-    │  ① GitHub Environment 保護（審核）        │
-    │  ② Helm upgrade（滾動更新生產）           │
-    │  ③ 等待 Rollout 完成                      │
-    │  ④ 生產冒煙測試                           │
-    │  ⑤ 通知 Slack                            │
-    └────┬──────────────────────────────────────┘
-         │
-    ┌────┴──────────────────────────────────────┐
-    │              監控告警                      │
-    │  Prometheus 指標 → Grafana 儀表板          │
-    │  ELK 日誌分析                             │
-    │  PagerDuty 告警通知                       │
-    └───────────────────────────────────────────┘
+``` mermaid
+flowchart TB
+    PUSH(["開發者 git push → GitHub"]) --> GA["GitHub Actions 觸發"]
+    GA --> CI
+    subgraph CI ["CI 階段"]
+        direction LR
+        c1["① 拉取程式碼"] --> c2["② Maven 建置"] --> c3["③ 單元測試<br>覆蓋率 > 80%"] --> c4["④ SonarQube<br>靜態分析"]
+        c4 --> c5["⑤ OWASP<br>依賴漏洞掃描"] --> c6["⑥ 建置 Docker Image<br>多平台"] --> c7["⑦ Trivy<br>容器安全掃描"] --> c8["⑧ 推送到<br>Harbor Registry"]
+    end
+    CI -- "CI 通過" --> STG
+    subgraph STG ["CD - Staging 階段"]
+        direction LR
+        s1["① Helm upgrade"] --> s2["② 等待 Rollout"] --> s3["③ Smoke Test"] --> s4["④ 整合測試"]
+    end
+    STG -- "打 Release Tag 或人工審核" --> PRD
+    subgraph PRD ["CD - Production 階段"]
+        direction LR
+        p1["① Environment 審核"] --> p2["② Helm upgrade<br>滾動更新"] --> p3["③ 等待 Rollout"] --> p4["④ 生產冒煙測試"] --> p5["⑤ 通知 Slack"]
+    end
+    PRD --> MON
+    subgraph MON ["監控告警"]
+        direction LR
+        m1["Prometheus → Grafana"]
+        m2["ELK 日誌分析"]
+        m3["PagerDuty 告警"]
+    end
 ```
 
 ## 常用 kubectl 指令速查

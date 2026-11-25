@@ -8,6 +8,40 @@ icon: lucide/flask-conical
 
 **核心技術**：JUnit 5 / Mockito / Testcontainers / TDD
 
+## 學習地圖
+
+``` mermaid
+mindmap
+  root((測試))
+    測試基礎概念
+      測試金字塔
+      測試分類
+      好測試的標準（FIRST 原則）
+    JUnit 5 深入
+      核心注解
+      參數化測試
+      條件測試
+      測試生命週期
+    Mockito 深入
+      Mock / Stub / Spy
+      常用 API
+      驗證行為
+      ArgumentCaptor
+    Spring Boot Test
+      @SpringBootTest（整合測試）
+      @WebMvcTest（Controller 層測試）
+      @DataJpaTest（Repository 層測試）
+      @MockBean / @SpyBean
+    Testcontainers（真實環境整合測試）
+      核心原理
+      MySQL / Redis / Kafka 整合
+      與 Spring Boot 整合
+    TDD（測試驅動開發）
+      Red-Green-Refactor 循環
+      TDD 實戰範例
+      測試覆蓋率
+```
+
 ## 章節導覽
 
 <div class="grid cards" markdown>
@@ -50,51 +84,16 @@ icon: lucide/flask-conical
 
 </div>
 
-??? abstract "原始學習路線圖"
-
-    ```
-    測試
-    ├── 1️⃣ 測試基礎概念
-    │   ├── 測試金字塔
-    │   ├── 測試分類
-    │   └── 好測試的標準（FIRST 原則）
-    ├── 2️⃣ JUnit 5 深入
-    │   ├── 核心注解
-    │   ├── 參數化測試
-    │   ├── 條件測試
-    │   └── 測試生命週期
-    ├── 3️⃣ Mockito 深入
-    │   ├── Mock / Stub / Spy
-    │   ├── 常用 API
-    │   ├── 驗證行為
-    │   └── ArgumentCaptor
-    ├── 4️⃣ Spring Boot Test
-    │   ├── @SpringBootTest（整合測試）
-    │   ├── @WebMvcTest（Controller 層測試）
-    │   ├── @DataJpaTest（Repository 層測試）
-    │   └── @MockBean / @SpyBean
-    ├── 5️⃣ Testcontainers（真實環境整合測試）
-    │   ├── 核心原理
-    │   ├── MySQL / Redis / Kafka 整合
-    │   └── 與 Spring Boot 整合
-    └── 6️⃣ TDD（測試驅動開發）
-        ├── Red-Green-Refactor 循環
-        ├── TDD 實戰範例
-        └── 測試覆蓋率
-    ```
-
 ## 重點速覽
 
 ### 測試金字塔
 
-```
-              ╱▔▔▔▔▔▔▔▔▔╲
-             ╱   E2E 測試  ╲   10%  → Selenium / Playwright
-            ╱───────────────╲
-           ╱   整合測試       ╲  20%  → @SpringBootTest / Testcontainers
-          ╱─────────────────── ╲
-         ╱      單元測試         ╲ 70%  → JUnit 5 + Mockito（毫秒級）
-        ╱▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁╲
+``` mermaid
+block-beta
+    columns 5
+    space:2 e2e["E2E 10%<br>Selenium / Playwright"] space:2
+    space int["整合測試 20%<br>@SpringBootTest / Testcontainers"]:3 space
+    unit["單元測試 70%<br>JUnit 5 + Mockito（毫秒級）"]:5
 ```
 
 ### 測試工具對照

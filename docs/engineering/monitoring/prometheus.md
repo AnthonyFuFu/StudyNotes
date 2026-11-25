@@ -2,41 +2,31 @@
 
 ## 架構原理
 
+``` mermaid
+flowchart LR
+    subgraph TARGETS ["被監控的服務"]
+        direction TB
+        SB["Spring Boot<br>/actuator/prometheus"]
+        EX["MySQL Exporter<br>Node Exporter<br>Redis Exporter"]
+    end
+    subgraph SERVER ["Prometheus Server"]
+        direction TB
+        RET["Retrieval 拉取引擎<br>每 15 秒拉取"]
+        TSDB[("TSDB 本地時序資料庫<br>高效壓縮，預設保留 15 天")]
+        API["HTTP API"]
+        RET --> TSDB --> API
+    end
+    RET -- "Scrape（HTTP Pull）" --> TARGETS
+    API -- "Query（PromQL）" --> CON["Grafana<br>AlertManager"]
 ```
-Prometheus 架構：
 
-┌─────────────────────────────────────────────────────────────┐
-│                      Prometheus Server                       │
-│                                                             │
-│  ┌─────────────────┐     ┌───────────────────────────────┐  │
-│  │  Retrieval      │     │         TSDB                  │  │
-│  │  （拉取引擎）    │────→ │  （Time Series Database）      │  │
-│  │                 │     │  本地時序資料庫                  │  │
-│  │  每 15 秒拉取    │     │  高效壓縮，預設保留 15 天        │  │
-│  └────────┬────────┘     └──────────────┬────────────────┘  │
-│           │                             │                   │
-│           │                        ┌────┴─────┐             │
-│           │                        │ HTTP API  │             │
-│           │                        └────┬─────┘             │
-└───────────│─────────────────────────────│───────────────────┘
-            │ Scrape（HTTP Pull）          │ Query（PromQL）
-            ↓                             ↓
-  ┌──────────────────┐           ┌──────────────────┐
-  │  被監控的服務     │           │    Grafana        │
-  │  Spring Boot     │           │    AlertManager   │
-  │  /actuator/      │           └──────────────────┘
-  │  prometheus      │
-  │  MySQL Exporter  │
-  │  Node Exporter   │
-  │  Redis Exporter  │
-  └──────────────────┘
+**核心設計：Pull 模式（拉取）**
 
-核心設計：Pull 模式（拉取）
-  Prometheus 主動去服務的 /metrics 端點拉取指標
-  優點：Prometheus 控制拉取頻率，服務不需要知道 Prometheus 的地址
-  缺點：短生命週期的任務（Job）可能來不及被拉取
-  解決：PushGateway（Job 主動推送到 Gateway，Prometheus 再拉取）
-```
+Prometheus 主動去服務的 `/metrics` 端點拉取指標。
+
+- **優點**：Prometheus 控制拉取頻率，服務不需要知道 Prometheus 的地址
+- **缺點**：短生命週期的任務（Job）可能來不及被拉取
+- **解決**：PushGateway（Job 主動推送到 Gateway，Prometheus 再拉取）
 
 ## 資料模型與指標類型
 

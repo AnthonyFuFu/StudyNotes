@@ -8,6 +8,33 @@ icon: lucide/cloud
 
 **核心技術**：Nacos / OpenFeign / Gateway / Sentinel / 分散式配置
 
+## 學習地圖
+
+``` mermaid
+mindmap
+  root((Spring Cloud 微服務))
+    微服務核心概念
+      單體 vs 微服務
+      Spring Cloud 生態全覽
+    Nacos
+      服務發現（Service Registry）
+      配置中心（Config Center）
+    OpenFeign（聲明式 HTTP 客戶端）
+      基本使用
+      攔截器 / 超時 / 重試
+      整合 Sentinel 熔斷
+    Spring Cloud Gateway
+      路由（Route）
+      斷言（Predicate）
+      過濾器（Filter）
+      限流 / 認證 / 灰度發布
+    Sentinel（限流 / 熔斷 / 降級）
+      核心概念
+      流量控制規則
+      熔斷降級規則
+      Spring Boot 整合
+```
+
 ## 章節導覽
 
 <div class="grid cards" markdown>
@@ -43,32 +70,6 @@ icon: lucide/cloud
     核心概念
 
 </div>
-
-??? abstract "原始學習路線圖"
-
-    ```
-    Spring Cloud 微服務
-    ├── 1️⃣ 微服務核心概念
-    │   ├── 單體 vs 微服務
-    │   └── Spring Cloud 生態全覽
-    ├── 2️⃣ Nacos
-    │   ├── 服務發現（Service Registry）
-    │   └── 配置中心（Config Center）
-    ├── 3️⃣ OpenFeign（聲明式 HTTP 客戶端）
-    │   ├── 基本使用
-    │   ├── 攔截器 / 超時 / 重試
-    │   └── 整合 Sentinel 熔斷
-    ├── 4️⃣ Spring Cloud Gateway
-    │   ├── 路由（Route）
-    │   ├── 斷言（Predicate）
-    │   ├── 過濾器（Filter）
-    │   └── 限流 / 認證 / 灰度發布
-    └── 5️⃣ Sentinel（限流 / 熔斷 / 降級）
-        ├── 核心概念
-        ├── 流量控制規則
-        ├── 熔斷降級規則
-        └── Spring Boot 整合
-    ```
 
 ## 核心要點總結
 

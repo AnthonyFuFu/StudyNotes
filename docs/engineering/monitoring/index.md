@@ -8,6 +8,40 @@ Metrics、Logs、Traces 三大支柱，以及 Prometheus、Grafana、ELK、鏈�
 
 **核心技術**：Prometheus / Grafana / ELK / SkyWalking / SLO
 
+## 學習地圖
+
+``` mermaid
+mindmap
+  root((監控與可觀測性))
+    可觀測性三大支柱
+      Metrics（指標）
+      Logs（日誌）
+      Traces（鏈路追蹤）
+    Prometheus 深入
+      架構原理
+      資料模型與 PromQL
+      Spring Boot 整合
+      告警規則（AlertManager）
+    Grafana 深入
+      儀表板設計原則
+      關鍵面板配置
+      變數（Variables）
+    ELK Stack 深入
+      ELK 架構
+      Spring Boot 結構化日誌
+      Filebeat 配置
+      Logstash Pipeline
+      Kibana 使用技巧
+    分散式鏈路追蹤
+      SkyWalking 架構
+      Spring Boot 整合
+      鏈路分析實戰
+    實戰：完整可觀測性平台
+      整合架構設計
+      Docker Compose 部署
+      生產告警體系
+```
+
 ## 章節導覽
 
 <div class="grid cards" markdown>
@@ -50,57 +84,37 @@ Metrics、Logs、Traces 三大支柱，以及 Prometheus、Grafana、ELK、鏈�
 
 </div>
 
-??? abstract "原始學習路線圖"
-
-    ```
-    監控與可觀測性
-    ├── 1️⃣ 可觀測性三大支柱
-    │   ├── Metrics（指標）
-    │   ├── Logs（日誌）
-    │   └── Traces（鏈路追蹤）
-    ├── 2️⃣ Prometheus 深入
-    │   ├── 架構原理
-    │   ├── 資料模型與 PromQL
-    │   ├── Spring Boot 整合
-    │   └── 告警規則（AlertManager）
-    ├── 3️⃣ Grafana 深入
-    │   ├── 儀表板設計原則
-    │   ├── 關鍵面板配置
-    │   └── 變數（Variables）
-    ├── 4️⃣ ELK Stack 深入
-    │   ├── ELK 架構
-    │   ├── Spring Boot 結構化日誌
-    │   ├── Filebeat 配置
-    │   ├── Logstash Pipeline
-    │   └── Kibana 使用技巧
-    ├── 5️⃣ 分散式鏈路追蹤
-    │   ├── SkyWalking 架構
-    │   ├── Spring Boot 整合
-    │   └── 鏈路分析實戰
-    └── 6️⃣ 實戰：完整可觀測性平台
-        ├── 整合架構設計
-        ├── Docker Compose 部署
-        └── 生產告警體系
-    ```
-
 ## 重點速覽
 
 ### 可觀測性三大支柱
 
-```
-┌──────────────┐  ┌──────────────┐  ┌──────────────┐
-│   Metrics    │  │     Logs     │  │   Traces     │
-│   （指標）    │  │   （日誌）    │  │ （鏈路追蹤）   │
-│              │  │              │  │              │
-│ Prometheus   │  │  ELK Stack   │  │ SkyWalking   │
-│  + Grafana   │  │              │  │  / Zipkin    │
-└──────────────┘  └──────────────┘  └──────────────┘
+<div class="grid cards" markdown>
 
-三者協作：
-  Metrics 告訴你「P99 延遲突然升到 5 秒！」
-  Traces  告訴你「瓶頸在 MySQL 查詢，耗時 4.8 秒」
-  Logs    告訴你「慢查詢 SQL：缺少索引」
-```
+-   __Metrics（指標）__
+
+    ---
+
+    Prometheus + Grafana
+
+    告訴你「P99 延遲突然升到 5 秒！」
+
+-   __Traces（鏈路追蹤）__
+
+    ---
+
+    SkyWalking / Zipkin
+
+    告訴你「瓶頸在 MySQL 查詢，耗時 4.8 秒」
+
+-   __Logs（日誌）__
+
+    ---
+
+    ELK Stack
+
+    告訴你「慢查詢 SQL：缺少索引」
+
+</div>
 
 ### 告警分級體系
 

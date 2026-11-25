@@ -88,34 +88,19 @@
 
 ## 事件循環（Event Loop）
 
-```
-JavaScript 是單線程的，Event Loop 讓它能處理非同步：
+JavaScript 是單線程的，Event Loop 讓它能處理非同步。
 
-┌─────────────────────────────────────┐
-│           Call Stack（調用棧）         │
-│  執行同步程式碼，LIFO（後進先出）        │
-└────────────────┬────────────────────┘
-                 │ 棧空了
-                 ↓
-┌─────────────────────────────────────┐
-│        Microtask Queue（微任務佇列）   │
-│  Promise.then / MutationObserver    │
-│  queueMicrotask                     │
-│  優先於 Macrotask！清空後才執行 Macro  │
-└────────────────┬────────────────────┘
-                 │ 微任務佇列清空
-                 ↓
-┌─────────────────────────────────────┐
-│        Macrotask Queue（宏任務佇列）   │
-│  setTimeout / setInterval           │
-│  I/O / UI rendering                 │
-│  每次只取一個宏任務執行                 │
-└─────────────────────────────────────┘
-
-執行順序：
-  同步程式碼 → 清空微任務佇列 → 執行一個宏任務
-  → 清空微任務佇列 → 執行一個宏任務 → ...
+``` mermaid
+flowchart TB
+    CS["Call Stack（調用棧）<br>執行同步程式碼，LIFO"]
+    MI["Microtask Queue（微任務佇列）<br>Promise.then / MutationObserver / queueMicrotask<br>優先於 Macrotask，全部清空"]
+    MA["Macrotask Queue（宏任務佇列）<br>setTimeout / setInterval / I/O / UI rendering<br>每次只取一個執行"]
+    CS -- "棧空了" --> MI
+    MI -- "微任務佇列清空" --> MA
+    MA -- "執行一個宏任務後" --> CS
 ```
+
+**執行順序**：同步程式碼 → 清空微任務佇列 → 執行一個宏任務 → 清空微任務佇列 → 執行一個宏任務 → …
 
 ```javascript
 // 事件循環面試題

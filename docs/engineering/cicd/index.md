@@ -8,6 +8,36 @@ DevOps 核心概念、Docker 與 Kubernetes 深入、Jenkins / GitHub Actions �
 
 **核心技術**：Docker / Kubernetes / Jenkins / GitHub Actions / Helm
 
+## 學習地圖
+
+``` mermaid
+mindmap
+  root((CI/CD 與 DevOps))
+    DevOps 核心概念
+      什麼是 DevOps
+      CI/CD 流水線
+      DevOps 工具鏈全覽
+    Docker 深入
+      核心原理（Namespace / Cgroups）
+      Dockerfile 最佳實踐
+      Docker Compose
+      Docker 網路與儲存
+    Kubernetes 深入
+      架構原理
+      核心資源對象
+      服務發現與負載均衡
+      配置與密鑰管理
+      滾動更新與回滾
+    Jenkins + GitHub Actions
+      Jenkins Pipeline
+      GitHub Actions Workflow
+      完整 CI/CD 流水線
+    實戰：Spring Boot 完整部署流程
+      程式碼 → Docker Image
+      Image → Kubernetes
+      自動化流水線
+```
+
 ## 章節導覽
 
 <div class="grid cards" markdown>
@@ -43,35 +73,6 @@ DevOps 核心概念、Docker 與 Kubernetes 深入、Jenkins / GitHub Actions �
     Helm Chart · 完整 CI/CD 流程總覽 · 常用 kubectl 指令速查
 
 </div>
-
-??? abstract "原始學習路線圖"
-
-    ```
-    CI/CD 與 DevOps
-    ├── 1️⃣ DevOps 核心概念
-    │   ├── 什麼是 DevOps
-    │   ├── CI/CD 流水線
-    │   └── DevOps 工具鏈全覽
-    ├── 2️⃣ Docker 深入
-    │   ├── 核心原理（Namespace / Cgroups）
-    │   ├── Dockerfile 最佳實踐
-    │   ├── Docker Compose
-    │   └── Docker 網路與儲存
-    ├── 3️⃣ Kubernetes 深入
-    │   ├── 架構原理
-    │   ├── 核心資源對象
-    │   ├── 服務發現與負載均衡
-    │   ├── 配置與密鑰管理
-    │   └── 滾動更新與回滾
-    ├── 4️⃣ Jenkins + GitHub Actions
-    │   ├── Jenkins Pipeline
-    │   ├── GitHub Actions Workflow
-    │   └── 完整 CI/CD 流水線
-    └── 5️⃣ 實戰：Spring Boot 完整部署流程
-        ├── 程式碼 → Docker Image
-        ├── Image → Kubernetes
-        └── 自動化流水線
-    ```
 
 ## 重點速覽
 

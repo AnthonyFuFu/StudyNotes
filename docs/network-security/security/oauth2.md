@@ -18,43 +18,36 @@ OAuth2 解決的問題：
 
 ### 模式一：授權碼模式（Authorization Code）⭐ 最安全
 
-```
-Client           User            Auth Server      Resource Server
-  │    點擊登入    │                  │                   │
-  │──── 重定向到授權頁面 ────────────→│                   │
-  │    GET /authorize?               │                   │
-  │      client_id=xxx               │                   │
-  │      redirect_uri=xxx            │                   │
-  │      scope=email,profile         │                   │
-  │      state=random_string ←防CSRF │                   │
-  │      response_type=code          │                   │
-  │                 用戶登入並授權     │                   │
-  │←─── 重定向回 redirect_uri ───────│                   │
-  │     ?code=AUTH_CODE              │                   │
-  │     &state=random_string         │                   │
-  │──── POST /token ────────────────→│                   │
-  │     grant_type=authorization_code│                   │
-  │     code=AUTH_CODE               │                   │
-  │     client_secret=xxx ←後端私密   │                   │
-  │←─── access_token + refresh_token ─│                   │
-  │──── GET /userinfo ──────────────────────────────────→│
-  │     Authorization: Bearer access_token               │
-  │←─── 用戶資料（email, name, picture）─────────────────│
+``` mermaid
+sequenceDiagram
+    autonumber
+    actor U as User
+    participant C as Client
+    participant A as Auth Server
+    participant R as Resource Server
+    U->>C: 點擊登入
+    C->>A: 重定向到授權頁面 GET /authorize
+    Note right of C: client_id、redirect_uri<br>scope=email,profile<br>state=random_string（防 CSRF）<br>response_type=code
+    U->>A: 用戶登入並授權
+    A->>C: 重定向回 redirect_uri<br>?code=AUTH_CODE&state=random_string
+    C->>A: POST /token<br>grant_type=authorization_code、code、client_secret（後端私密）
+    A->>C: access_token + refresh_token
+    C->>R: GET /userinfo<br>Authorization: Bearer access_token
+    R->>C: 用戶資料（email、name、picture）
 ```
 
 ### 模式二：客戶端憑證模式（Client Credentials）
 
-```
-適用：服務器間通訊（沒有用戶參與）
-例：微服務 A 調用微服務 B
+**適用**：服務器間通訊（沒有用戶參與），例如微服務 A 調用微服務 B。
 
-Client（微服務 A）        Auth Server
-  │── POST /token ──────→│
-  │   grant_type=client_credentials
-  │   client_id=service-a
-  │   client_secret=xxx
-  │←── access_token ─────│
-  │── 帶 Token 調用微服務 B
+``` mermaid
+sequenceDiagram
+    participant A as 微服務 A（Client）
+    participant AS as Auth Server
+    participant B as 微服務 B
+    A->>AS: POST /token<br>grant_type=client_credentials<br>client_id=service-a、client_secret
+    AS->>A: access_token
+    A->>B: 帶 Token 調用
 ```
 
 ### 模式三：隱式模式（Implicit）⚠️ 已不推薦

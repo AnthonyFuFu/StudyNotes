@@ -17,35 +17,27 @@ Redis 的每種資料結構，會根據「元素數量」和「元素大小」
 
 ## String（字串）
 
+**底層編碼（三種）**
+
+| 編碼 | 條件 | 特點 |
+|------|------|------|
+| `int` | 整數值，且範圍在 long 內（如 `SET counter 100`） | 直接用 long 存，不需要字串物件 |
+| `embstr` | 字串長度 ≤ 44 bytes | RedisObject + SDS 一次性分配連續記憶體，只需一次 malloc |
+| `raw` | 字串長度 > 44 bytes | RedisObject 和 SDS 分開分配，兩次 malloc |
+
+**SDS（Simple Dynamic String）結構**
+
+``` mermaid
+block-beta
+    columns 6
+    len["len<br>已用長度"] alloc["alloc<br>容量"] flags["flags<br>類型"] buf["buf[]<br>實際字串內容"]:3
 ```
-底層編碼（三種）：
 
-int：
-  整數值，且範圍在 long 內
-  如：SET counter 100
-  → 直接用 long 存，不需要字串物件
+相較 C 字串的優勢：
 
-embstr（嵌入式字串）：
-  字串長度 ≤ 44 bytes
-  RedisObject + SDS 一次性分配連續記憶體
-  → 記憶體局部性好，只需一次 malloc
-
-raw（普通 SDS）：
-  字串長度 > 44 bytes
-  RedisObject 和 SDS 分開分配
-  → 兩次 malloc
-
-SDS（Simple Dynamic String）結構：
-  ┌──────┬──────┬──────┬─────────────────┐
-  │ len  │ alloc│ flags│      buf[]       │
-  │（已用）│（容量）│（類型）│   實際字串內容    │
-  └──────┴──────┴──────┴─────────────────┘
-
-  vs C 字串的優勢：
-  ✅ O(1) 取得長度（直接讀 len，不用遍歷）
-  ✅ 二進制安全（可以存 \0）
-  ✅ 預分配空間，減少記憶體重分配次數
-```
+- ✅ O(1) 取得長度（直接讀 len，不用遍歷）
+- ✅ 二進制安全（可以存 `\0`）
+- ✅ 預分配空間，減少記憶體重分配次數
 
 ```java
 // String 常用場景

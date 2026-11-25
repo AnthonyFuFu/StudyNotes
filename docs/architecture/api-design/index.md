@@ -8,6 +8,33 @@ RESTful 設計規範，以及 gRPC、WebSocket、GraphQL 各自的適用場景�
 
 **核心技術**：RESTful / gRPC / WebSocket / GraphQL
 
+## 學習地圖
+
+``` mermaid
+mindmap
+  root((API 設計與通訊協議))
+    RESTful API 設計最佳實踐
+      REST 設計原則
+      HTTP 方法與冪等性
+      HTTP Status Code
+      API 版本管理
+      統一響應格式
+      API 安全設計
+    gRPC（高效能 RPC 框架）
+      核心原理與 Protobuf
+      四種通訊模式
+      Spring Boot 整合
+      gRPC vs REST 比較
+    WebSocket（即時通訊）
+      WebSocket 原理
+      Spring Boot 整合（STOMP）
+      聊天室實戰
+    GraphQL（靈活查詢語言）
+      核心概念（Query / Mutation / Subscription）
+      Spring Boot 整合
+      GraphQL vs REST 比較
+```
+
 ## 章節導覽
 
 <div class="grid cards" markdown>
@@ -37,32 +64,6 @@ RESTful 設計規範，以及 gRPC、WebSocket、GraphQL 各自的適用場景�
     核心概念 · Spring Boot 整合 GraphQL · GraphQL vs REST 比較
 
 </div>
-
-??? abstract "原始學習路線圖"
-
-    ```
-    API 設計與通訊協議
-    ├── 1️⃣ RESTful API 設計最佳實踐
-    │   ├── REST 設計原則
-    │   ├── HTTP 方法與冪等性
-    │   ├── HTTP Status Code
-    │   ├── API 版本管理
-    │   ├── 統一響應格式
-    │   └── API 安全設計
-    ├── 2️⃣ gRPC（高效能 RPC 框架）
-    │   ├── 核心原理與 Protobuf
-    │   ├── 四種通訊模式
-    │   ├── Spring Boot 整合
-    │   └── gRPC vs REST 比較
-    ├── 3️⃣ WebSocket（即時通訊）
-    │   ├── WebSocket 原理
-    │   ├── Spring Boot 整合（STOMP）
-    │   └── 聊天室實戰
-    └── 4️⃣ GraphQL（靈活查詢語言）
-        ├── 核心概念（Query / Mutation / Subscription）
-        ├── Spring Boot 整合
-        └── GraphQL vs REST 比較
-    ```
 
 ## 重點速覽
 

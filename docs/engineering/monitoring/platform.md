@@ -2,35 +2,19 @@
 
 ## 整合架構設計
 
-```
-完整可觀測性平台架構：
-
-┌─────────────────────────────────────────────────────────────┐
-│                       應用層                                 │
-│  Spring Boot Apps（Micrometer + Logback JSON + OTel Agent） │
-└──────┬────────────────┬────────────────┬────────────────────┘
-       │ Metrics        │ Logs           │ Traces
-       ↓                ↓                ↓
-┌──────────────┐ ┌──────────────┐ ┌──────────────────────┐
-│  Prometheus  │ │   Filebeat   │ │  SkyWalking OAP /   │
-│  （拉取指標） │ │ （收集日誌）  │ │  OpenTelemetry      │
-└──────┬───────┘ └──────┬───────┘ └──────────┬───────────┘
-       │                │                    │
-       ↓                ↓                    ↓
-┌──────────────┐ ┌──────────────┐ ┌──────────────────────┐
-│   Grafana    │ │Elasticsearch │ │  SkyWalking UI       │
-│（指標儀表板） │ │ + Kibana     │ │  （鏈路視覺化）        │
-│（告警）      │ │（日誌搜索）   │ └──────────────────────┘
-└──────┬───────┘ └──────────────┘
-       │
-       ↓
-┌──────────────────┐
-│  統一告警通知      │
-│  AlertManager    │
-│  → Slack         │
-│  → PagerDuty     │
-│  → Email         │
-└──────────────────┘
+``` mermaid
+flowchart TB
+    APP["Spring Boot Apps<br>Micrometer + Logback JSON + OTel Agent"]
+    APP -- Metrics --> PROM["Prometheus<br>拉取指標"]
+    APP -- Logs --> FB["Filebeat<br>收集日誌"]
+    APP -- Traces --> OAP["SkyWalking OAP /<br>OpenTelemetry"]
+    PROM --> GF["Grafana<br>指標儀表板・告警"]
+    FB --> ES["Elasticsearch + Kibana<br>日誌搜索"]
+    OAP --> SWUI["SkyWalking UI<br>鏈路視覺化"]
+    GF --> AM["AlertManager<br>統一告警通知"]
+    AM --> SL["Slack"]
+    AM --> PD["PagerDuty"]
+    AM --> EM["Email"]
 ```
 
 ## Docker Compose 部署完整監控棧

@@ -8,6 +8,30 @@ icon: lucide/network
 
 **核心技術**：CAP / BASE / 分散式事務 / 限流熔斷 / 分庫分表
 
+## 學習地圖
+
+``` mermaid
+mindmap
+  root((系統設計))
+    基礎理論（CAP / BASE / ACID）
+    分散式系統核心
+      一致性模型
+      分散式事務
+      分散式鎖
+    高可用設計
+      限流（Rate Limiting）
+      熔斷（Circuit Breaker）
+      降級（Fallback）
+    高效能設計
+      分庫分表
+      讀寫分離
+      緩存設計
+    架構設計
+      負載均衡
+      微服務設計原則
+      消息隊列使用場景
+```
+
 ## 章節導覽
 
 <div class="grid cards" markdown>
@@ -49,29 +73,6 @@ icon: lucide/network
     系統設計面試答題框架
 
 </div>
-
-??? abstract "原始學習路線圖"
-
-    ```
-    系統設計
-    ├── 1️⃣ 基礎理論（CAP / BASE / ACID）
-    ├── 2️⃣ 分散式系統核心
-    │   ├── 一致性模型
-    │   ├── 分散式事務
-    │   └── 分散式鎖
-    ├── 3️⃣ 高可用設計
-    │   ├── 限流（Rate Limiting）
-    │   ├── 熔斷（Circuit Breaker）
-    │   └── 降級（Fallback）
-    ├── 4️⃣ 高效能設計
-    │   ├── 分庫分表
-    │   ├── 讀寫分離
-    │   └── 緩存設計
-    └── 5️⃣ 架構設計
-        ├── 負載均衡
-        ├── 微服務設計原則
-        └── 消息隊列使用場景
-    ```
 
 ## 重點速覽
 

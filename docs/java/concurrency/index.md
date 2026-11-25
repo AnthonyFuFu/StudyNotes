@@ -8,6 +8,37 @@ icon: lucide/zap
 
 **核心技術**：Thread / synchronized / AQS / 線程池 / CompletableFuture
 
+## 學習地圖
+
+``` mermaid
+mindmap
+  root((Java 並發深度))
+    Thread 生命週期與狀態轉換
+    synchronized 底層原理
+      Monitor 物件鎖
+      鎖升級：偏向 → 輕量 → 重量
+    volatile 原理
+      記憶體屏障
+      MESI 緩存一致性協議
+    AQS 底層原理
+      CLH 等待佇列
+      獨佔 / 共享模式
+    鎖進階
+      ReentrantLock
+      ReadWriteLock
+      StampedLock
+    ThreadLocal
+      底層原理
+      記憶體洩漏問題
+    線程池
+      ThreadPoolExecutor 7 個參數
+      拒絕策略
+      線程池調優
+    ConcurrentHashMap 底層原理
+      JDK 8 CAS + Synchronized
+    CompletableFuture 異步編排
+```
+
 ## 章節導覽
 
 <div class="grid cards" markdown>
@@ -67,36 +98,6 @@ icon: lucide/zap
     核心 API
 
 </div>
-
-??? abstract "原始學習路線圖"
-
-    ```
-    Java 並發深度
-    ├── 1️⃣ Thread 生命週期與狀態轉換
-    ├── 2️⃣ synchronized 底層原理
-    │   ├── Monitor 物件鎖
-    │   └── 鎖升級：偏向 → 輕量 → 重量
-    ├── 3️⃣ volatile 原理
-    │   ├── 記憶體屏障
-    │   └── MESI 緩存一致性協議
-    ├── 4️⃣ AQS 底層原理
-    │   ├── CLH 等待佇列
-    │   └── 獨佔 / 共享模式
-    ├── 5️⃣ 鎖進階
-    │   ├── ReentrantLock
-    │   ├── ReadWriteLock
-    │   └── StampedLock
-    ├── 6️⃣ ThreadLocal
-    │   ├── 底層原理
-    │   └── 記憶體洩漏問題
-    ├── 7️⃣ 線程池
-    │   ├── ThreadPoolExecutor 7 個參數
-    │   ├── 拒絕策略
-    │   └── 線程池調優
-    ├── 8️⃣ ConcurrentHashMap 底層原理
-    │   └── JDK 8 CAS + Synchronized
-    └── 9️⃣ CompletableFuture 異步編排
-    ```
 
 ## 核心要點總結
 

@@ -2,31 +2,24 @@
 
 ## 過濾器鏈架構（最重要！）
 
-```
-HTTP 請求進來
-      ↓
-┌─────────────────────────────────────────────────────────┐
-│              Spring Security Filter Chain                │
-│                                                         │
-│  ┌───────────────────────────────────────────────────┐  │
-│  │ 1. DisableEncodeUrlFilter                         │  │
-│  │ 2. WebAsyncManagerIntegrationFilter               │  │
-│  │ 3. SecurityContextHolderFilter          ← 核心    │  │
-│  │ 4. HeaderWriterFilter                             │  │
-│  │ 5. CorsFilter                                     │  │
-│  │ 6. CsrfFilter                           ← CSRF    │  │
-│  │ 7. LogoutFilter                                   │  │
-│  │ 8. UsernamePasswordAuthenticationFilter ← 登入    │  │
-│  │ 9. DefaultLoginPageGeneratingFilter               │  │
-│  │ 10. BasicAuthenticationFilter                     │  │
-│  │ 11. RequestCacheAwareFilter                       │  │
-│  │ 12. AnonymousAuthenticationFilter       ← 匿名    │  │
-│  │ 13. ExceptionTranslationFilter          ← 異常    │  │
-│  │ 14. AuthorizationFilter                 ← 授權    │  │
-│  └───────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────┘
-      ↓
-  DispatcherServlet → Controller
+``` mermaid
+flowchart TB
+    REQ(["HTTP 請求進來"]) --> FC
+    subgraph FC ["Spring Security Filter Chain"]
+        direction TB
+        f1["1. DisableEncodeUrlFilter"] --> f2["2. WebAsyncManagerIntegrationFilter"]
+        f2 --> f3["3. SecurityContextHolderFilter ⭐ 核心"]
+        f3 --> f4["4. HeaderWriterFilter"] --> f5["5. CorsFilter"]
+        f5 --> f6["6. CsrfFilter ⭐ CSRF"]
+        f6 --> f7["7. LogoutFilter"]
+        f7 --> f8["8. UsernamePasswordAuthenticationFilter ⭐ 登入"]
+        f8 --> f9["9. DefaultLoginPageGeneratingFilter"] --> f10["10. BasicAuthenticationFilter"]
+        f10 --> f11["11. RequestCacheAwareFilter"]
+        f11 --> f12["12. AnonymousAuthenticationFilter ⭐ 匿名"]
+        f12 --> f13["13. ExceptionTranslationFilter ⭐ 異常"]
+        f13 --> f14["14. AuthorizationFilter ⭐ 授權"]
+    end
+    FC --> DS["DispatcherServlet → Controller"]
 ```
 
 ```java

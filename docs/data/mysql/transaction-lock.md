@@ -38,52 +38,48 @@ SET SESSION transaction_isolation = 'READ-COMMITTED';
 
 ## MVCC（Multi-Version Concurrency Control）
 
+MVCC 是 InnoDB 實現高並發的核心機制。**核心思想**：讀不加鎖，寫不阻塞讀；通過保存數據的多個版本，讓讀操作看到歷史版本。
+
+**InnoDB 每行數據的隱藏欄位**
+
+| row_id（可選） | trx_id | roll_pointer | 數據 |
+|---------------|--------|--------------|------|
+| 隱藏主鍵 | 最後修改此行的事務 ID | 指向 Undo Log | 實際欄位值 |
+
+**Undo Log 版本鏈**：保存行的歷史版本。
+
+``` mermaid
+flowchart LR
+    V3["當前版本<br>name='Jane'<br>trx_id=100"] -- roll_pointer --> V2["歷史版本<br>name='John'<br>trx_id=50"] -- roll_pointer --> V1["更早版本<br>name='Joe'<br>trx_id=10"]
 ```
-MVCC 是 InnoDB 實現高並發的核心機制！
 
-核心思想：
-  讀不加鎖，寫不阻塞讀
-  通過保存數據的多個版本，讓讀操作看到歷史版本
+**ReadView（一致性視圖）**：事務建立快照時記錄
 
-InnoDB 每行數據隱藏三個欄位：
-  ┌──────────────────────────────────────────────────────┐
-  │  row_id  │  trx_id（事務ID）  │  roll_pointer  │ 數據 │
-  │（可選）    │  最後修改此行的事務 │  指向undo log   │      │
-  └──────────────────────────────────────────────────────┘
+| 欄位 | 意義 |
+|------|------|
+| `m_ids` | 當前活躍（未提交）的事務 ID 列表 |
+| `min_trx_id` | 活躍事務的最小 ID |
+| `max_trx_id` | 下一個事務的 ID（尚未分配） |
+| `creator_trx_id` | 當前事務的 ID |
 
-Undo Log（撤銷日誌）：
-  保存行的歷史版本鏈
+**版本可見性判斷**
 
-  當前版本：name='Jane' (trx_id=100)
-       ↓ roll_pointer
-  歷史版本：name='John' (trx_id=50)
-       ↓ roll_pointer
-  更早版本：name='Joe'  (trx_id=10)
-
-ReadView（一致性視圖）：
-  事務開始時，創建一個快照（ReadView）
-  記錄：
-    m_ids：當前活躍（未提交）的事務 ID 列表
-    min_trx_id：活躍事務的最小 ID
-    max_trx_id：下一個事務的 ID（尚未分配）
-    creator_trx_id：當前事務的 ID
-
-版本可見性判斷（讀取哪個版本）：
-  如果 trx_id == creator_trx_id → 自己修改的，可見 ✅
-  如果 trx_id < min_trx_id → 已提交的，可見 ✅
-  如果 trx_id >= max_trx_id → 還沒開始的事務，不可見 ❌
-  如果 min_trx_id <= trx_id < max_trx_id：
-    在 m_ids 中 → 未提交，不可見 ❌
-    不在 m_ids 中 → 已提交，可見 ✅
-
-REPEATABLE READ：
-  事務開始時建立 ReadView，整個事務期間用同一個 ReadView
-  → 保證同一事務兩次讀取結果相同！
-
-READ COMMITTED：
-  每次 SELECT 都建立新的 ReadView
-  → 可以讀到其他事務已提交的修改（不可重複讀）
+``` mermaid
+flowchart TB
+    S{"trx_id == creator_trx_id？"} -->|是| Y1["自己修改的 ✅ 可見"]
+    S -->|否| A{"trx_id < min_trx_id？"}
+    A -->|是| Y2["已提交 ✅ 可見"]
+    A -->|否| B{"trx_id >= max_trx_id？"}
+    B -->|是| N1["還沒開始的事務 ❌ 不可見"]
+    B -->|否| C{"在 m_ids 中？"}
+    C -->|是| N2["未提交 ❌ 不可見<br>沿 roll_pointer 找舊版本"]
+    C -->|否| Y3["已提交 ✅ 可見"]
 ```
+
+| 隔離級別 | ReadView 建立時機 | 效果 |
+|---------|-----------------|------|
+| **REPEATABLE READ** | 事務開始時建立，整個事務共用同一個 | 同一事務兩次讀取結果相同 |
+| **READ COMMITTED** | 每次 SELECT 都建立新的 | 可以讀到其他事務已提交的修改（不可重複讀） |
 
 ## 鎖機制
 

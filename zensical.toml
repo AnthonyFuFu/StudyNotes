@@ -187,6 +187,7 @@ nav = [
   { "附錄" = [
     { "Markdown 語法速查" = "markdown.md" },
   ] },
+  { "關於我" = "about.md" },
 ]
 
 # extra_css = ["stylesheets/extra.css"]
