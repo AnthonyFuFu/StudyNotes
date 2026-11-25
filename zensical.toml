@@ -1,7 +1,7 @@
 [project]
 site_url = "https://www.example.com/"
 site_name = "Study Notes"
-# site_description = "Anthony Fu Study Notes"
+site_description = "Java 後端工程師深度學習筆記"
 # site_author = "AnthonyFuFu"
 
 # copyright = "Copyright &copy; 2026 Your name"
@@ -11,8 +11,182 @@ site_name = "Study Notes"
 # edit_uri = "edit/main/docs/"
 
 nav = [
-  { "Study" = "index.md" },
-  { "Notes" = "markdown.md" },
+  { "首頁" = "index.md" },
+  { "Java 核心" = [
+    "java/index.md",
+    { "Java 新特性" = [
+      "java/new-features/index.md",
+      { "Java 8 核心回顧" = "java/new-features/java8.md" },
+      { "Java 9 ~ 16 重要特性" = "java/new-features/java9-16.md" },
+      { "Java 17 LTS 重點" = "java/new-features/java17.md" },
+      { "Java 21 LTS 重點" = "java/new-features/java21.md" },
+      { "版本對比速查表" = "java/new-features/version-comparison.md" },
+      { "實戰整合範例" = "java/new-features/practice.md" },
+    ] },
+    { "JVM 深度原理" = [
+      "java/jvm/index.md",
+      { "JVM 整體架構" = "java/jvm/architecture.md" },
+      { "記憶體模型" = "java/jvm/memory-areas.md" },
+      { "類加載機制" = "java/jvm/class-loading.md" },
+      { "GC 垃圾回收" = "java/jvm/gc.md" },
+      { "Java 記憶體模型" = "java/jvm/jmm.md" },
+      { "JVM 性能調優" = "java/jvm/tuning.md" },
+    ] },
+    { "Java 並發" = [
+      "java/concurrency/index.md",
+      { "Thread 生命週期與狀態轉換" = "java/concurrency/thread-lifecycle.md" },
+      { "synchronized 底層原理" = "java/concurrency/synchronized.md" },
+      { "volatile 原理" = "java/concurrency/volatile.md" },
+      { "AQS 底層原理" = "java/concurrency/aqs.md" },
+      { "鎖進階" = "java/concurrency/locks.md" },
+      { "ThreadLocal" = "java/concurrency/threadlocal.md" },
+      { "線程池" = "java/concurrency/thread-pool.md" },
+      { "ConcurrentHashMap 底層原理" = "java/concurrency/concurrenthashmap.md" },
+      { "CompletableFuture 異步編排" = "java/concurrency/completablefuture.md" },
+    ] },
+  ] },
+  { "資料儲存" = [
+    "data/index.md",
+    { "MySQL 深度優化" = [
+      "data/mysql/index.md",
+      { "索引原理" = "data/mysql/index.md" },
+      { "SQL 執行計劃分析" = "data/mysql/explain.md" },
+      { "事務與鎖" = "data/mysql/transaction-lock.md" },
+      { "主從複製與讀寫分離" = "data/mysql/replication.md" },
+      { "分庫分表" = "data/mysql/sharding.md" },
+      { "調優檢查清單" = "data/mysql/checklist.md" },
+    ] },
+    { "Redis 深度" = [
+      "data/redis/index.md",
+      { "資料結構與底層編碼" = "data/redis/data-structures.md" },
+      { "持久化機制" = "data/redis/persistence.md" },
+      { "記憶體淘汰策略" = "data/redis/eviction.md" },
+      { "分散式鎖" = "data/redis/distributed-lock.md" },
+      { "緩存三大問題" = "data/redis/cache-problems.md" },
+      { "Redis Cluster 架構" = "data/redis/cluster.md" },
+      { "效能優化" = "data/redis/performance.md" },
+      { "熱 Key / 大 Key 處理" = "data/redis/hot-big-key.md" },
+    ] },
+    { "Elasticsearch" = [
+      "data/elasticsearch/index.md",
+      { "核心原理" = "data/elasticsearch/core-principles.md" },
+      { "資料模型" = "data/elasticsearch/data-model.md" },
+      { "DSL 查詢語法" = "data/elasticsearch/dsl-query.md" },
+      { "Spring Boot 整合" = "data/elasticsearch/spring-boot.md" },
+      { "生產實戰" = "data/elasticsearch/production.md" },
+    ] },
+  ] },
+  { "架構設計" = [
+    "architecture/index.md",
+    { "系統設計" = [
+      "architecture/system-design/index.md",
+      { "基礎理論" = "architecture/system-design/theory.md" },
+      { "分散式系統核心" = "architecture/system-design/distributed.md" },
+      { "高可用設計" = "architecture/system-design/high-availability.md" },
+      { "高效能設計" = "architecture/system-design/high-performance.md" },
+      { "架構設計" = "architecture/system-design/architecture.md" },
+      { "系統設計面試答題框架" = "architecture/system-design/interview-framework.md" },
+    ] },
+    { "設計模式" = [
+      "architecture/design-pattern/index.md",
+      { "設計模式六大原則" = "architecture/design-pattern/principles.md" },
+      { "創建型模式" = "architecture/design-pattern/creational.md" },
+      { "結構型模式" = "architecture/design-pattern/structural.md" },
+      { "行為型模式" = "architecture/design-pattern/behavioral.md" },
+    ] },
+    { "Spring Cloud 微服務" = [
+      "architecture/spring-cloud/index.md",
+      { "微服務核心概念" = "architecture/spring-cloud/microservices.md" },
+      { "Nacos" = "architecture/spring-cloud/nacos.md" },
+      { "OpenFeign" = "architecture/spring-cloud/openfeign.md" },
+      { "Spring Cloud Gateway" = "architecture/spring-cloud/gateway.md" },
+      { "Sentinel" = "architecture/spring-cloud/sentinel.md" },
+    ] },
+    { "API 設計與通訊協議" = [
+      "architecture/api-design/index.md",
+      { "RESTful API 設計最佳實踐" = "architecture/api-design/restful.md" },
+      { "gRPC" = "architecture/api-design/grpc.md" },
+      { "WebSocket" = "architecture/api-design/websocket.md" },
+      { "GraphQL" = "architecture/api-design/graphql.md" },
+    ] },
+  ] },
+  { "網路與資安" = [
+    "network-security/index.md",
+    { "網路基礎" = [
+      "network-security/network/index.md",
+      { "TCP / IP 模型" = "network-security/network/tcp-ip-model.md" },
+      { "TCP 深度" = "network-security/network/tcp.md" },
+      { "HTTP 協議演進" = "network-security/network/http.md" },
+      { "HTTPS 與 TLS" = "network-security/network/https-tls.md" },
+      { "DNS 解析流程" = "network-security/network/dns.md" },
+      { "CDN 原理" = "network-security/network/cdn.md" },
+      { "面試題速查" = "network-security/network/interview.md" },
+    ] },
+    { "資安" = [
+      "network-security/security/index.md",
+      { "資安基礎概念" = "network-security/security/fundamentals.md" },
+      { "Spring Security 核心原理" = "network-security/security/spring-security.md" },
+      { "JWT 深入原理與實作" = "network-security/security/jwt.md" },
+      { "OAuth2 完整教學" = "network-security/security/oauth2.md" },
+      { "SSO 單點登入" = "network-security/security/sso.md" },
+      { "常見攻擊防禦" = "network-security/security/attack-defense.md" },
+    ] },
+  ] },
+  { "工程實踐" = [
+    "engineering/index.md",
+    { "測試" = [
+      "engineering/testing/index.md",
+      { "測試基礎概念" = "engineering/testing/fundamentals.md" },
+      { "JUnit 5 深入" = "engineering/testing/junit5.md" },
+      { "Mockito 深入" = "engineering/testing/mockito.md" },
+      { "Spring Boot Test" = "engineering/testing/spring-boot-test.md" },
+      { "Testcontainers" = "engineering/testing/testcontainers.md" },
+      { "TDD" = "engineering/testing/tdd.md" },
+    ] },
+    { "CI/CD 與 DevOps" = [
+      "engineering/cicd/index.md",
+      { "DevOps 核心概念" = "engineering/cicd/devops-concepts.md" },
+      { "Docker 深入" = "engineering/cicd/docker.md" },
+      { "Kubernetes 深入" = "engineering/cicd/kubernetes.md" },
+      { "Jenkins 與 GitHub Actions" = "engineering/cicd/jenkins-github-actions.md" },
+      { "實戰：完整部署流程" = "engineering/cicd/deployment.md" },
+    ] },
+    { "監控與可觀測性" = [
+      "engineering/monitoring/index.md",
+      { "可觀測性三大支柱" = "engineering/monitoring/three-pillars.md" },
+      { "Prometheus 深入" = "engineering/monitoring/prometheus.md" },
+      { "Grafana 深入" = "engineering/monitoring/grafana.md" },
+      { "ELK Stack 深入" = "engineering/monitoring/elk.md" },
+      { "分散式鏈路追蹤" = "engineering/monitoring/tracing.md" },
+      { "實戰：可觀測性平台" = "engineering/monitoring/platform.md" },
+    ] },
+  ] },
+  { "演算法與前端" = [
+    "fundamentals/index.md",
+    { "演算法與資料結構" = [
+      "fundamentals/algorithm/index.md",
+      { "複雜度分析" = "fundamentals/algorithm/complexity.md" },
+      { "陣列 / 字串" = "fundamentals/algorithm/array-string.md" },
+      { "鏈表" = "fundamentals/algorithm/linked-list.md" },
+      { "二元樹" = "fundamentals/algorithm/binary-tree.md" },
+      { "動態規劃" = "fundamentals/algorithm/dynamic-programming.md" },
+      { "排序演算法" = "fundamentals/algorithm/sorting.md" },
+      { "HashMap 應用題" = "fundamentals/algorithm/hashmap.md" },
+      { "解題思路速查" = "fundamentals/algorithm/cheatsheet.md" },
+    ] },
+    { "前端深度" = [
+      "fundamentals/frontend/index.md",
+      { "瀏覽器渲染原理" = "fundamentals/frontend/browser-rendering.md" },
+      { "JavaScript 核心原理" = "fundamentals/frontend/javascript.md" },
+      { "TypeScript 深度" = "fundamentals/frontend/typescript.md" },
+      { "React 核心原理" = "fundamentals/frontend/react.md" },
+      { "Vue 核心原理" = "fundamentals/frontend/vue.md" },
+      { "前端效能優化" = "fundamentals/frontend/performance.md" },
+    ] },
+  ] },
+  { "附錄" = [
+    { "Markdown 語法速查" = "markdown.md" },
+  ] },
 ]
 
 # extra_css = ["stylesheets/extra.css"]
@@ -43,12 +217,12 @@ features = [
   "navigation.path",
   # "navigation.prune",
   "navigation.sections",
-  # "navigation.tabs",
+  "navigation.tabs",
   # "navigation.tabs.sticky",
   "navigation.top",
   "navigation.tracking",
   "search.highlight",
-  # "toc.follow",
+  "toc.follow",
   # "toc.integrate",
 ]
 
