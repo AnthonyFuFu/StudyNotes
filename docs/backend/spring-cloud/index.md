@@ -4,9 +4,9 @@ icon: lucide/cloud
 
 # Spring Cloud 微服務
 
-微服務的核心概念，以及 Spring Cloud Alibaba 生態中註冊配置、服務呼叫、閘道與限流熔斷的實作。
+微服務的核心概念與各元件原理：先以 Spring Cloud Alibaba（Nacos、Sentinel）說明，再對照我實作的 Spring Cloud 官方 / Netflix 系（Eureka、Resilience4j、Config Server），最後部署到自建的 Kubernetes 叢集。
 
-**核心技術**：Nacos / OpenFeign / Gateway / Sentinel / 分散式配置
+**核心技術**：Eureka / Nacos / OpenFeign / Gateway / Resilience4j / Sentinel / Config Server / RabbitMQ / Zipkin / K8s
 
 ## 學習地圖
 
@@ -34,10 +34,18 @@ flowchart LR
     R --> c4
     p4("・核心概念<br>・流量控制規則<br>・熔斷降級規則<br>・Spring Boot 整合")
     c4 --- p4
+    c5["06 · 元件選型：Spring Cloud 與 Alibaba 對照"]
+    R --> c5
+    p5("・Eureka vs Nacos<br>・Resilience4j vs Sentinel<br>・Config Server vs Nacos Config")
+    c5 --- p5
+    c6["07 · 實戰：微服務專案與 K8s 部署"]
+    R --> c6
+    p6("・Eureka 叢集 + OpenFeign + Gateway<br>・Resilience4j 熔斷降級<br>・RabbitMQ 事件 + Zipkin + Prometheus<br>・Docker Compose → kubeadm K8s")
+    c6 --- p6
     classDef chapter stroke-width:2px
     classDef points fill:transparent,text-align:left
-    class c0,c1,c2,c3,c4 chapter
-    class p0,p1,p2,p3,p4 points
+    class c0,c1,c2,c3,c4,c5,c6 chapter
+    class p0,p1,p2,p3,p4,p5,p6 points
 ```
 
 ## 章節導覽
@@ -73,6 +81,18 @@ flowchart LR
     ---
 
     核心概念
+
+-   __[06 · 元件選型：Spring Cloud 與 Alibaba 對照](ecosystem-comparison.md)__
+
+    ---
+
+    元件對照 · 註冊中心 · 容錯 · 設定中心 · 怎麼選
+
+-   __[07 · 實戰：微服務專案與 K8s 部署](practice.md)__
+
+    ---
+
+    架構總覽 · Gateway 路由 · OpenFeign 降級 · RabbitMQ 事件 · 部署演進
 
 </div>
 

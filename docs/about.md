@@ -29,65 +29,109 @@ icon: lucide/user-round
 
 ## 技術棧
 
-=== "語言 & 框架"
+=== "後端"
 
     - Java 17 / 21（Virtual Threads / Record / Sealed Class）
-    - Spring Boot 3.x / Spring Cloud / Spring Security
-    - MyBatis-Plus / Spring Data JPA / Hibernate
+    - Spring Boot 3 / 4（MVC、WebFlux）、Spring Cloud、Spring Security
+    - C# / .NET 8：ASP.NET Core MVC、Razor Pages、EF Core
+    - Spring Data JPA / JdbcTemplate / R2DBC
 
-=== "資料庫 & 快取"
+=== "前端"
 
-    - MySQL 8.0（B+樹索引 / MVCC / 主從複製）
-    - Redis（快取 / 分散式鎖 / Session / 限流）
-    - Elasticsearch 8.x（全文搜索 / ELK 日誌）
+    - Vue 2 / 3（Router、Vuex）、React 19、Angular 21（SSR、Signals）
+    - TypeScript、Thymeleaf、Razor（.cshtml）、jQuery
+    - Ant Design、Angular Material、Tailwind CSS
+    - Electron 桌面應用
 
-=== "消息佇列"
+=== "資料 & 訊息"
 
-    - Apache Kafka（高吞吐量 / 事件驅動）
-    - RabbitMQ（可靠消息傳遞 / 死信佇列）
+    - MySQL 8 / MariaDB、PostgreSQL、SQL Server、SQLite
+    - Redis（Lua Script / 分散式鎖 / 高併發搶票）
+    - OpenSearch / Elasticsearch、Logstash
+    - Apache Kafka（Avro）、RabbitMQ
 
-=== "容器化 & CI/CD"
+=== "DevOps & 監控"
 
-    - Docker（多階段建置 / 最小化 Image）
-    - Kubernetes（Deployment / Service / HPA / Helm）
-    - GitHub Actions / Jenkins Pipeline
-    - SonarQube / Trivy / Harbor Registry
+    - Docker / Docker Compose、Kubernetes（kubeadm 自建叢集）
+    - GitHub Actions、GHCR、GitHub Pages、SonarQube
+    - Prometheus + Grafana、Zipkin、Micrometer
 
-=== "監控"
+=== "整合 & 其他"
 
-    - Prometheus + Grafana（指標）
-    - ELK Stack（日誌）
-    - SkyWalking（鏈路追蹤）
-    - Spring Boot Actuator（應用健康）
+    - AWS S3（分片上傳）、Azure OpenAI、Azure AI Vision、Tesseract OCR
+    - WebSocket（STOMP）、MediaMTX 直播（RTMP / HLS）
+    - iText PDF、Apache POI、SheetJS
+    - Python 爬蟲（pandas、BeautifulSoup）
 
-=== "API & 測試"
+## 專案作品
 
-    - RESTful API / gRPC / WebSocket / GraphQL
-    - JUnit 5 / Mockito / Testcontainers / TDD / JaCoCo
+<div class="grid cards" markdown>
 
-## 筆記目錄
+-   __holidayDessert__
 
-這份筆記系統性整理 Java 後端核心知識體系，共 17 個主題。每個主題首頁都有學習地圖、章節導覽與重點速覽。
+    ---
 
-| # | 主題 | 核心技術 |
-|---|------|---------|
-| 01 | [系統設計](architecture/system-design/index.md) | CAP / BASE / 分散式事務 / 限流熔斷 / 分庫分表 |
-| 02 | [Java 新特性](java/new-features/index.md) | Virtual Threads / Record / Sealed Class / Pattern Matching |
-| 03 | [JVM 深度原理](java/jvm/index.md) | 記憶體模型 / GC / 類加載 / JMM / 性能調優 |
-| 04 | [資安](network-security/security/index.md) | Spring Security / OAuth2 / JWT / SSO / 攻擊防禦 |
-| 05 | [CI/CD 與 DevOps](engineering/cicd/index.md) | Docker / Kubernetes / Jenkins / GitHub Actions / Helm |
-| 06 | [監控與可觀測性](engineering/monitoring/index.md) | Prometheus / Grafana / ELK / SkyWalking / SLO |
-| 07 | [MySQL 深度優化](data/mysql/index.md) | B+樹索引 / MVCC / 主從複製 / 分庫分表 / 雪花算法 |
-| 08 | [設計模式](architecture/design-pattern/index.md) | GoF 23 種 / SOLID 原則 / Spring 中的應用 |
-| 09 | [Elasticsearch](data/elasticsearch/index.md) | 倒排索引 / DSL 查詢 / 聚合 / ELK Stack |
-| 10 | [API 設計與通訊協議](architecture/api-design/index.md) | RESTful / gRPC / WebSocket / GraphQL |
-| 11 | [測試](engineering/testing/index.md) | JUnit 5 / Mockito / Testcontainers / TDD |
-| 12 | [Java 並發](java/concurrency/index.md) | Thread / synchronized / AQS / 線程池 / CompletableFuture |
-| 13 | [Redis 深度](data/redis/index.md) | 資料結構底層 / 持久化 / 分散式鎖 / 緩存問題 / Cluster |
-| 14 | [演算法與資料結構](fundamentals/algorithm/index.md) | 雙指針 / 滑動視窗 / 鏈表 / 樹 / DP / 排序 |
-| 15 | [Spring Cloud 微服務](architecture/spring-cloud/index.md) | Nacos / OpenFeign / Gateway / Sentinel / 分散式配置 |
-| 16 | [網路基礎](network-security/network/index.md) | TCP / HTTP / HTTPS / DNS / CDN |
-| 17 | [前端深度](fundamentals/frontend/index.md) | React / Vue 原理 / 效能優化 / TypeScript |
+    甜點電商暨會員票券管理系統。Spring Boot 3.5 + Thymeleaf，Redis Lua 四層防護高併發搶票、Kafka 非同步訂單、STOMP 客服聊天室、Google OAuth2 + JWT、OpenSearch、S3、Azure OpenAI。
+
+    [高併發搶票](backend/spring-boot/practice-seckill.md) · [即時通訊](architecture/api-design/realtime-streaming.md)
+
+-   __holiday_dessert_vue__
+
+    ---
+
+    holidayDessert 前台的 Vue 3 SPA 版本，與後端分開部署，STOMP 即時客服。
+
+    [Vue 3 前後端分離](frontend/vue/vue3-spa.md)
+
+-   __stock-observation__
+
+    ---
+
+    Spring Boot 4 WebFlux 股票觀測與直播平台：台股 / 美股行情、概念股分類、MediaMTX 直播、HTTP Range 影片串流。
+
+    [直播與影片串流](backend/webflux/practice-streaming.md)
+
+-   __microservicecloud__
+
+    ---
+
+    Spring Cloud 微服務：Eureka 叢集、OpenFeign、Gateway、Resilience4j、Config Server、RabbitMQ、Zipkin、Prometheus，部署到 kubeadm 自建 K8s。
+
+    [微服務與 K8s 部署](backend/spring-cloud/practice.md)
+
+-   __chineseArtwork__
+
+    ---
+
+    ASP.NET Core 8 中華書畫網站：MVC + Razor Pages、Areas 後台、EF Core DB-First、Cookie 驗證，Python 爬取字典資料。
+
+    [ASP.NET Core](backend/aspnet-core/index.md)
+
+-   __chinese_artwork_angular__
+
+    ---
+
+    同主題的 Angular 21 前端：standalone 元件、懶加載路由、SSR + 預渲染、Angular Material + Tailwind。
+
+    [SSR 與 Hydration](frontend/angular/ssr-ui.md)
+
+-   __fu-clan-management-system__
+
+    ---
+
+    傅氏宗親會管理系統：Electron + React 19 + TypeScript + Ant Design，本機 SQLite，三平台自動打包。
+
+    [Electron 桌面應用](frontend/electron/index.md)
+
+-   __AnthonyFu-Learning__
+
+    ---
+
+    Java 後端深度學習筆記的原始專案，也就是本網站的內容來源。
+
+    [Study Notes 首頁](index.md)
+
+</div>
 
 ## 學習方法
 

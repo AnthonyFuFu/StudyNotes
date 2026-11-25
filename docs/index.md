@@ -4,75 +4,94 @@ icon: lucide/book-open
 
 # Study Notes
 
-系統性整理 Java 後端工程師的核心知識體系：從語言與 JVM 底層、資料儲存、架構設計，到網路資安與工程實踐。每個主題都不只停在「會用」，而是深入到「為什麼這樣設計」。
+系統性整理全端工程師的核心知識體系：從 Java 與 JVM 底層、後端與前端框架、資料與訊息，到架構設計、網路資安與工程實踐。每個主題都不只停在「會用」，而是深入到「為什麼這樣設計」，並搭配我在實際專案中的實作。
 
-目前收錄 **6 大分類 · 17 個主題 · 103 個章節**。
+目前收錄 **7 大分類 · 25 個主題 · 120 個章節**。
 
 ## 知識地圖
 
 <div class="grid cards" markdown>
 
--   __[Java 核心](java/index.md)__
+-   :lucide-coffee: __[Java 核心](java/index.md)__
 
     ---
 
-    Java 語言本身與執行環境：從新版語法特性，到 JVM 的記憶體與 GC，再到多執行緒並發的底層實作。
+    語言新特性、JVM 記憶體與 GC、多執行緒並發的底層實作。
 
     [Java 新特性](java/new-features/index.md) · [JVM 深度原理](java/jvm/index.md) · [Java 並發](java/concurrency/index.md)
 
--   __[資料儲存](data/index.md)__
+-   :lucide-server: __[後端框架](backend/index.md)__
 
     ---
 
-    後端系統最常倚賴的三種儲存：關聯式資料庫 MySQL、記憶體快取 Redis、全文搜尋引擎 Elasticsearch。
+    Servlet、反應式、微服務與 .NET 四種後端框架的原理與實戰。
 
-    [MySQL 深度優化](data/mysql/index.md) · [Redis 深度](data/redis/index.md) · [Elasticsearch](data/elasticsearch/index.md)
+    [Spring Boot](backend/spring-boot/index.md) · [WebFlux](backend/webflux/index.md) · [Spring Cloud](backend/spring-cloud/index.md) · [ASP.NET Core](backend/aspnet-core/index.md)
 
--   __[架構設計](architecture/index.md)__
-
-    ---
-
-    從程式碼層級的設計模式，到服務之間的通訊協議、微服務治理，以及整體系統架構的取捨。
-
-    [系統設計](architecture/system-design/index.md) · [設計模式](architecture/design-pattern/index.md) · [Spring Cloud 微服務](architecture/spring-cloud/index.md) · [API 設計與通訊協議](architecture/api-design/index.md)
-
--   __[網路與資安](network-security/index.md)__
+-   :lucide-monitor: __[前端開發](frontend/index.md)__
 
     ---
 
-    網路協議是所有服務溝通的基礎，資安則是每一個對外系統都必須守住的底線。
+    瀏覽器原理、伺服器端模板、三大框架與桌面應用。
+
+    [基礎原理](frontend/fundamentals/index.md) · [伺服器端模板](frontend/templates/index.md) · [Vue](frontend/vue/index.md) · [React](frontend/react/index.md) · [Angular](frontend/angular/index.md) · [Electron](frontend/electron/index.md)
+
+-   :lucide-database: __[資料與訊息](data/index.md)__
+
+    ---
+
+    關聯式資料庫、快取、全文搜尋與訊息佇列。
+
+    [MySQL](data/mysql/index.md) · [Redis](data/redis/index.md) · [Elasticsearch](data/elasticsearch/index.md) · [訊息佇列](data/messaging/index.md)
+
+-   :lucide-blocks: __[架構設計](architecture/index.md)__
+
+    ---
+
+    系統設計、設計模式與服務之間的通訊協議。
+
+    [系統設計](architecture/system-design/index.md) · [設計模式](architecture/design-pattern/index.md) · [API 設計與通訊協議](architecture/api-design/index.md)
+
+-   :lucide-shield: __[網路與資安](network-security/index.md)__
+
+    ---
+
+    TCP / HTTP / TLS 等網路基礎，以及認證授權與攻擊防禦。
 
     [網路基礎](network-security/network/index.md) · [資安](network-security/security/index.md)
 
--   __[工程實踐](engineering/index.md)__
+-   :lucide-wrench: __[工程實踐](engineering/index.md)__
 
     ---
 
-    讓程式碼可靠地交付到生產環境並持續運作：自動化測試、CI/CD 流水線、監控與可觀測性。
+    自動化測試、CI/CD 流水線、監控與可觀測性。
 
     [測試](engineering/testing/index.md) · [CI/CD 與 DevOps](engineering/cicd/index.md) · [監控與可觀測性](engineering/monitoring/index.md)
 
--   __[演算法與前端](fundamentals/index.md)__
-
-    ---
-
-    工程師的基本功與全端視野：演算法與資料結構，以及現代前端框架的運作原理。
-
-    [演算法與資料結構](fundamentals/algorithm/index.md) · [前端深度](fundamentals/frontend/index.md)
-
 </div>
+
+## 我的專案
+
+筆記中的「實戰」章節都來自以下專案，可以直接從這裡跳到對應的說明。
+
+| 專案 | 類型 | 技術 | 筆記 |
+|------|------|------|------|
+| **holidayDessert** | 電商 + 票券系統 | Spring Boot 3.5、Thymeleaf、Redis Lua、Kafka、STOMP、OpenSearch | [高併發搶票](backend/spring-boot/practice-seckill.md) · [Kafka](data/messaging/kafka.md) · [即時通訊](architecture/api-design/realtime-streaming.md) |
+| **holiday_dessert_vue** | 前台 SPA | Vue 3、Vue Router、Vuex、Axios | [Vue 3 前後端分離](frontend/vue/vue3-spa.md) |
+| **stock-observation** | 股票觀測 + 直播平台 | Spring Boot 4、WebFlux、R2DBC、MediaMTX | [直播與影片串流](backend/webflux/practice-streaming.md) |
+| **microservicecloud** | 微服務 | Spring Cloud、Eureka、Resilience4j、RabbitMQ、K8s | [微服務與 K8s](backend/spring-cloud/practice.md) · [RabbitMQ](data/messaging/rabbitmq.md) |
+| **chineseArtwork** | 書畫網站 | ASP.NET Core 8、Razor、EF Core、SQL Server | [ASP.NET Core](backend/aspnet-core/index.md) |
+| **chinese_artwork_angular** | 書畫網站前端 | Angular 21、SSR、Angular Material、Tailwind | [SSR 與 Hydration](frontend/angular/ssr-ui.md) |
+| **fu-clan-management-system** | 桌面應用 | Electron、React 19、TypeScript、Ant Design、sql.js | [React + TypeScript](frontend/react/react-typescript.md) · [Electron](frontend/electron/index.md) |
 
 ## 學習方法
 
 每個主題都依照同一條路徑展開：
 
-| 步驟 | 問題 |
-|------|------|
-| **Why** | 為什麼需要這個技術？解決了什麼問題？ |
-| **What** | 核心概念與架構是什麼？ |
-| **How** | 底層是怎麼實作的？ |
-| **Practice** | 如何在實際專案中正確使用？ |
-| **Pitfalls** | 有哪些常見陷阱和最佳實踐？ |
+``` mermaid
+flowchart LR
+    W["Why<br>解決什麼問題"] --> WT["What<br>核心概念"] --> H["How<br>底層原理"] --> P["Practice<br>專案實作"] --> PF["Pitfalls<br>陷阱與取捨"]
+```
 
 !!! quote ""
 
@@ -82,12 +101,17 @@ icon: lucide/book-open
 
 | 領域 | 技術 |
 |------|------|
-| **語言 & 框架** | Java 17 / 21（Virtual Threads / Record / Sealed Class）<br>Spring Boot 3.x / Spring Cloud / Spring Security<br>MyBatis-Plus / Spring Data JPA / Hibernate |
-| **資料庫 & 快取** | MySQL 8.0（B+樹索引 / MVCC / 主從複製）<br>Redis（快取 / 分散式鎖 / Session / 限流）<br>Elasticsearch 8.x（全文搜索 / ELK 日誌） |
-| **消息佇列** | Apache Kafka（高吞吐量 / 事件驅動）<br>RabbitMQ（可靠消息傳遞 / 死信佇列） |
-| **容器化 & 編排** | Docker（多階段建置 / 最小化 Image）<br>Kubernetes（Deployment / Service / HPA / Helm） |
-| **CI/CD** | GitHub Actions / Jenkins Pipeline<br>SonarQube / Trivy / Harbor Registry |
-| **監控** | Prometheus + Grafana（指標）<br>ELK Stack（日誌）<br>SkyWalking（鏈路追蹤）<br>Spring Boot Actuator（應用健康） |
-| **API 通訊** | RESTful API / gRPC / WebSocket / GraphQL |
-| **測試** | JUnit 5 / Mockito / Testcontainers / TDD / JaCoCo |
-| **---** |  |
+| **語言** | Java 17 / 21、C#（.NET 8）、TypeScript、JavaScript、Python |
+| **後端框架** | Spring Boot 3 / 4（MVC、WebFlux）、Spring Cloud、Spring Security、ASP.NET Core（MVC、Razor Pages） |
+| **前端** | Vue 2 / 3、React 19、Angular 21、Thymeleaf、Razor、jQuery、Ant Design、Angular Material、Tailwind CSS |
+| **桌面** | Electron、electron-builder |
+| **資料存取** | Spring Data JPA、JdbcTemplate、R2DBC、EF Core、sql.js |
+| **資料庫** | MySQL 8 / MariaDB、PostgreSQL、SQL Server、SQLite、H2 |
+| **快取 / 搜尋** | Redis（Lua、分散式鎖）、OpenSearch / Elasticsearch、Logstash |
+| **訊息佇列** | Apache Kafka（Avro、Schema Registry）、RabbitMQ |
+| **即時通訊 / 串流** | WebSocket（STOMP、SockJS）、MediaMTX（RTMP / HLS）、HTTP Range |
+| **雲端 / AI** | AWS S3、Azure OpenAI、Azure AI Vision、Tesseract OCR |
+| **容器 / 編排** | Docker、Docker Compose、Kubernetes（kubeadm、containerd） |
+| **CI/CD** | GitHub Actions、GHCR、GitHub Pages、SonarQube |
+| **監控** | Prometheus、Grafana、Zipkin、Micrometer、Spring Boot Actuator |
+| **測試** | JUnit 5、Mockito、Testcontainers、Reactor Test、Vitest、Testing Library |

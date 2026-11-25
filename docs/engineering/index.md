@@ -22,7 +22,7 @@ icon: lucide/wrench
 
     DevOps 核心概念、Docker 與 Kubernetes 深入、Jenkins / GitHub Actions 流水線，以及 Spring Boot 的完整部署流程。
 
-    `5 章` · Docker / Kubernetes / Jenkins / GitHub Actions / Helm
+    `6 章` · Docker / Kubernetes / Jenkins / GitHub Actions / Helm / GHCR / kubeadm
 
 -   __[監控與可觀測性](monitoring/index.md)__
 

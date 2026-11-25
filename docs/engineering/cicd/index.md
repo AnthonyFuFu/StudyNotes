@@ -6,7 +6,7 @@ icon: lucide/container
 
 DevOps 核心概念、Docker 與 Kubernetes 深入、Jenkins / GitHub Actions 流水線，以及 Spring Boot 的完整部署流程。
 
-**核心技術**：Docker / Kubernetes / Jenkins / GitHub Actions / Helm
+**核心技術**：Docker / Kubernetes / Jenkins / GitHub Actions / Helm / GHCR / kubeadm
 
 ## 學習地圖
 
@@ -34,10 +34,14 @@ flowchart LR
     R --> c4
     p4("・程式碼 → Docker Image<br>・Image → Kubernetes<br>・自動化流水線")
     c4 --- p4
+    c5["06 · 實戰：我的 CI/CD 與 K8s 部署"]
+    R --> c5
+    p5("・GitHub Actions 服務容器測試<br>・GHCR 映像<br>・Electron 三平台 matrix 打包<br>・kubeadm 自建叢集")
+    c5 --- p5
     classDef chapter stroke-width:2px
     classDef points fill:transparent,text-align:left
-    class c0,c1,c2,c3,c4 chapter
-    class p0,p1,p2,p3,p4 points
+    class c0,c1,c2,c3,c4,c5 chapter
+    class p0,p1,p2,p3,p4,p5 points
 ```
 
 ## 章節導覽
@@ -73,6 +77,12 @@ flowchart LR
     ---
 
     Helm Chart · 完整 CI/CD 流程總覽 · 常用 kubectl 指令速查
+
+-   __[06 · 實戰：我的 CI/CD 與 K8s 部署](my-pipelines.md)__
+
+    ---
+
+    各專案的 CI 一覽 · 服務容器整合測試 · 映像與部署 · 自建 Kubernetes
 
 </div>
 

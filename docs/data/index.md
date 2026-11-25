@@ -2,9 +2,9 @@
 icon: lucide/database
 ---
 
-# 資料儲存
+# 資料與訊息
 
-後端系統最常倚賴的三種儲存：關聯式資料庫 MySQL、記憶體快取 Redis、全文搜尋引擎 Elasticsearch。
+後端系統倚賴的資料基礎設施：關聯式資料庫 MySQL、記憶體快取 Redis、全文搜尋 Elasticsearch，以及非同步溝通的訊息佇列 Kafka 與 RabbitMQ。
 
 <div class="grid cards" markdown>
 
@@ -32,4 +32,23 @@ icon: lucide/database
 
     `5 章` · 倒排索引 / DSL 查詢 / 聚合 / ELK Stack
 
+-   __[訊息佇列](messaging/index.md)__
+
+    ---
+
+    削峰填谷、非同步處理、服務解耦。比較 Kafka（分散式日誌）與 RabbitMQ（訊息中介）的原理與適用場景，並整理我在專案中的實作。
+
+    `3 章` · Kafka / RabbitMQ / 投遞語意 / 冪等消費 / 死信佇列 / Spring Kafka / Spring AMQP
+
 </div>
+
+!!! info "我用過的資料庫"
+
+    | 資料庫 | 存取方式 | 專案 |
+    |--------|---------|------|
+    | MySQL 8 / MariaDB | Spring Data JPA、JdbcTemplate | holidayDessert、microservicecloud |
+    | PostgreSQL / H2 | R2DBC（反應式） | stock-observation |
+    | SQL Server | EF Core（DB-First） | chineseArtwork |
+    | SQLite | sql.js（WebAssembly） | fu-clan-management-system |
+    | Redis 7 | Lua Script、分散式鎖 | holidayDessert |
+    | OpenSearch | High Level REST Client + Logstash 同步 | holidayDessert |

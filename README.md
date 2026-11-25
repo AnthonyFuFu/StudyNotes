@@ -1,17 +1,20 @@
 # Study Notes
 
-Java 後端工程師的深度學習筆記網站，以 [zensical](https://zensical.org/) 建立，內容以 Markdown 撰寫。
+全端工程師的深度學習筆記網站，以 [zensical](https://zensical.org/) 建立，內容以 Markdown 撰寫。
 
-筆記系統性整理 Java 後端核心知識體系，共 **6 大分類、17 個主題、100+ 個章節**：
+筆記系統性整理核心知識體系，並搭配實際專案的實作，共 **7 大分類、25 個主題、120 個章節**：
 
 | 分類 | 主題 |
 |------|------|
 | Java 核心 | Java 新特性 / JVM 深度原理 / Java 並發 |
-| 資料儲存 | MySQL 深度優化 / Redis 深度 / Elasticsearch |
-| 架構設計 | 系統設計 / 設計模式 / Spring Cloud 微服務 / API 設計與通訊協議 |
+| 後端框架 | Spring Boot（MVC）/ Spring WebFlux / Spring Cloud 微服務 / ASP.NET Core |
+| 前端開發 | 前端基礎原理 / 伺服器端模板（Thymeleaf、Razor）/ Vue / React / Angular / Electron 桌面應用 |
+| 資料與訊息 | MySQL 深度優化 / Redis 深度 / Elasticsearch / 訊息佇列（Kafka、RabbitMQ） |
+| 架構設計 | 系統設計 / 設計模式 / API 設計與通訊協議 |
 | 網路與資安 | 網路基礎 / 資安 |
 | 工程實踐 | 測試 / CI/CD 與 DevOps / 監控與可觀測性 |
-| 演算法與前端 | 演算法與資料結構 / 前端深度 |
+
+框架類主題都依照「原理 → 優缺點 → 我的實作」撰寫，實作內容來自以下專案：holidayDessert、holiday_dessert_vue、stock-observation、microservicecloud、chineseArtwork、chinese_artwork_angular、fu-clan-management-system。
 
 ## 快速開始
 
@@ -79,9 +82,8 @@ StudyNotes/
 └── docs/
     ├── index.md             # 首頁（知識地圖）
     ├── about.md             # 關於我
-    ├── markdown.md          # 附錄：Markdown 語法速查
     ├── assets/images/       # 圖片
-    └── <分類>/              # java、data、architecture、network-security、engineering、fundamentals
+    └── <分類>/              # java、backend、frontend、data、architecture、network-security、engineering
         ├── index.md         # 分類首頁（主題卡片）
         └── <主題>/
             ├── index.md     # 主題首頁（學習地圖、章節導覽、重點速覽、核心要點總結）

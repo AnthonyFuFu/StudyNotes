@@ -45,7 +45,74 @@ nav = [
       { "CompletableFuture 異步編排" = "java/concurrency/completablefuture.md" },
     ] },
   ] },
-  { "資料儲存" = [
+  { "後端框架" = [
+    "backend/index.md",
+    { "Spring Boot（MVC）" = [
+      "backend/spring-boot/index.md",
+      { "核心原理：IoC 與 AOP" = "backend/spring-boot/core.md" },
+      { "Web MVC 請求處理流程" = "backend/spring-boot/web-mvc.md" },
+      { "資料存取與交易" = "backend/spring-boot/data-access.md" },
+      { "實戰：高併發搶票系統" = "backend/spring-boot/practice-seckill.md" },
+    ] },
+    { "Spring WebFlux" = [
+      "backend/webflux/index.md",
+      { "反應式程式設計原理" = "backend/webflux/reactive.md" },
+      { "WebFlux、R2DBC 與 WebClient" = "backend/webflux/webflux-r2dbc.md" },
+      { "實戰：直播與影片串流" = "backend/webflux/practice-streaming.md" },
+    ] },
+    { "Spring Cloud 微服務" = [
+      "backend/spring-cloud/index.md",
+      { "微服務核心概念" = "backend/spring-cloud/microservices.md" },
+      { "Nacos" = "backend/spring-cloud/nacos.md" },
+      { "OpenFeign" = "backend/spring-cloud/openfeign.md" },
+      { "Spring Cloud Gateway" = "backend/spring-cloud/gateway.md" },
+      { "Sentinel" = "backend/spring-cloud/sentinel.md" },
+      { "元件選型：官方與 Alibaba 對照" = "backend/spring-cloud/ecosystem-comparison.md" },
+      { "實戰：微服務專案與 K8s 部署" = "backend/spring-cloud/practice.md" },
+    ] },
+    { "ASP.NET Core" = [
+      "backend/aspnet-core/index.md",
+      { "請求管線、DI 與設定" = "backend/aspnet-core/pipeline-di.md" },
+      { "MVC、Razor Pages 與 Areas" = "backend/aspnet-core/mvc-razor.md" },
+      { "EF Core 與 Cookie 驗證" = "backend/aspnet-core/efcore-auth.md" },
+    ] },
+  ] },
+  { "前端開發" = [
+    "frontend/index.md",
+    { "前端基礎原理" = [
+      "frontend/fundamentals/index.md",
+      { "瀏覽器渲染原理" = "frontend/fundamentals/browser-rendering.md" },
+      { "JavaScript 核心原理" = "frontend/fundamentals/javascript.md" },
+      { "TypeScript 深度" = "frontend/fundamentals/typescript.md" },
+      { "前端效能優化" = "frontend/fundamentals/performance.md" },
+    ] },
+    { "伺服器端模板" = [
+      "frontend/templates/index.md",
+      { "Thymeleaf" = "frontend/templates/thymeleaf.md" },
+      { "漸進增強：在伺服器頁面上加互動" = "frontend/templates/progressive-enhancement.md" },
+    ] },
+    { "Vue" = [
+      "frontend/vue/index.md",
+      { "Vue 核心原理" = "frontend/vue/principles.md" },
+      { "實戰：Vue 3 前後端分離" = "frontend/vue/vue3-spa.md" },
+    ] },
+    { "React" = [
+      "frontend/react/index.md",
+      { "React 核心原理" = "frontend/react/principles.md" },
+      { "實戰：React 19 + TypeScript" = "frontend/react/react-typescript.md" },
+    ] },
+    { "Angular" = [
+      "frontend/angular/index.md",
+      { "核心概念：DI、RxJS 與 Signals" = "frontend/angular/core.md" },
+      { "實戰：SSR、Hydration 與 UI" = "frontend/angular/ssr-ui.md" },
+    ] },
+    { "Electron 桌面應用" = [
+      "frontend/electron/index.md",
+      { "程序架構與安全" = "frontend/electron/architecture.md" },
+      { "資料儲存、打包與 CI" = "frontend/electron/engineering.md" },
+    ] },
+  ] },
+  { "資料與訊息" = [
     "data/index.md",
     { "MySQL 深度優化" = [
       "data/mysql/index.md",
@@ -75,6 +142,12 @@ nav = [
       { "Spring Boot 整合" = "data/elasticsearch/spring-boot.md" },
       { "生產實戰" = "data/elasticsearch/production.md" },
     ] },
+    { "訊息佇列" = [
+      "data/messaging/index.md",
+      { "核心概念：為什麼需要訊息佇列" = "data/messaging/concepts.md" },
+      { "Kafka" = "data/messaging/kafka.md" },
+      { "RabbitMQ" = "data/messaging/rabbitmq.md" },
+    ] },
   ] },
   { "架構設計" = [
     "architecture/index.md",
@@ -94,20 +167,13 @@ nav = [
       { "結構型模式" = "architecture/design-pattern/structural.md" },
       { "行為型模式" = "architecture/design-pattern/behavioral.md" },
     ] },
-    { "Spring Cloud 微服務" = [
-      "architecture/spring-cloud/index.md",
-      { "微服務核心概念" = "architecture/spring-cloud/microservices.md" },
-      { "Nacos" = "architecture/spring-cloud/nacos.md" },
-      { "OpenFeign" = "architecture/spring-cloud/openfeign.md" },
-      { "Spring Cloud Gateway" = "architecture/spring-cloud/gateway.md" },
-      { "Sentinel" = "architecture/spring-cloud/sentinel.md" },
-    ] },
     { "API 設計與通訊協議" = [
       "architecture/api-design/index.md",
       { "RESTful API 設計最佳實踐" = "architecture/api-design/restful.md" },
       { "gRPC" = "architecture/api-design/grpc.md" },
       { "WebSocket" = "architecture/api-design/websocket.md" },
       { "GraphQL" = "architecture/api-design/graphql.md" },
+      { "即時通訊與串流" = "architecture/api-design/realtime-streaming.md" },
     ] },
   ] },
   { "網路與資安" = [
@@ -150,6 +216,7 @@ nav = [
       { "Kubernetes 深入" = "engineering/cicd/kubernetes.md" },
       { "Jenkins 與 GitHub Actions" = "engineering/cicd/jenkins-github-actions.md" },
       { "實戰：完整部署流程" = "engineering/cicd/deployment.md" },
+      { "實戰：我的 CI/CD 與 K8s" = "engineering/cicd/my-pipelines.md" },
     ] },
     { "監控與可觀測性" = [
       "engineering/monitoring/index.md",
@@ -160,32 +227,6 @@ nav = [
       { "分散式鏈路追蹤" = "engineering/monitoring/tracing.md" },
       { "實戰：可觀測性平台" = "engineering/monitoring/platform.md" },
     ] },
-  ] },
-  { "演算法與前端" = [
-    "fundamentals/index.md",
-    { "演算法與資料結構" = [
-      "fundamentals/algorithm/index.md",
-      { "複雜度分析" = "fundamentals/algorithm/complexity.md" },
-      { "陣列 / 字串" = "fundamentals/algorithm/array-string.md" },
-      { "鏈表" = "fundamentals/algorithm/linked-list.md" },
-      { "二元樹" = "fundamentals/algorithm/binary-tree.md" },
-      { "動態規劃" = "fundamentals/algorithm/dynamic-programming.md" },
-      { "排序演算法" = "fundamentals/algorithm/sorting.md" },
-      { "HashMap 應用題" = "fundamentals/algorithm/hashmap.md" },
-      { "解題思路速查" = "fundamentals/algorithm/cheatsheet.md" },
-    ] },
-    { "前端深度" = [
-      "fundamentals/frontend/index.md",
-      { "瀏覽器渲染原理" = "fundamentals/frontend/browser-rendering.md" },
-      { "JavaScript 核心原理" = "fundamentals/frontend/javascript.md" },
-      { "TypeScript 深度" = "fundamentals/frontend/typescript.md" },
-      { "React 核心原理" = "fundamentals/frontend/react.md" },
-      { "Vue 核心原理" = "fundamentals/frontend/vue.md" },
-      { "前端效能優化" = "fundamentals/frontend/performance.md" },
-    ] },
-  ] },
-  { "附錄" = [
-    { "Markdown 語法速查" = "markdown.md" },
   ] },
   { "關於我" = "about.md" },
 ]

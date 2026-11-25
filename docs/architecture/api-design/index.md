@@ -6,7 +6,7 @@ icon: lucide/plug
 
 RESTful 設計規範，以及 gRPC、WebSocket、GraphQL 各自的適用場景與 Spring Boot 實作。
 
-**核心技術**：RESTful / gRPC / WebSocket / GraphQL
+**核心技術**：RESTful / gRPC / WebSocket / GraphQL / STOMP / SSE / HLS
 
 ## 學習地圖
 
@@ -30,10 +30,14 @@ flowchart LR
     R --> c3
     p3("・核心概念（Query / Mutation / Subscription）<br>・Spring Boot 整合<br>・GraphQL vs REST 比較")
     c3 --- p3
+    c4["05 · 即時通訊與串流"]
+    R --> c4
+    p4("・SSE / WebSocket / HLS / WebRTC<br>・STOMP vs 原生 WebSocket<br>・客服聊天室設計<br>・HTTP Range 與 HLS")
+    c4 --- p4
     classDef chapter stroke-width:2px
     classDef points fill:transparent,text-align:left
-    class c0,c1,c2,c3 chapter
-    class p0,p1,p2,p3 points
+    class c0,c1,c2,c3,c4 chapter
+    class p0,p1,p2,p3,p4 points
 ```
 
 ## 章節導覽
@@ -63,6 +67,12 @@ flowchart LR
     ---
 
     核心概念 · Spring Boot 整合 GraphQL · GraphQL vs REST 比較
+
+-   __[05 · 即時通訊與串流](realtime-streaming.md)__
+
+    ---
+
+    推送技術比較 · WebSocket 握手 · STOMP 與原生 WebSocket · 影音串流
 
 </div>
 
