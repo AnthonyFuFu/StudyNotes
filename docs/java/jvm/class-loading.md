@@ -27,47 +27,45 @@ public class Demo {
 }
 ```
 
-```
-① 載入（Loading）：
-   ✅ 根據類的全限定名找到 .class 文件
-   ✅ 將二進制字節流加載到記憶體
-   ✅ 在方法區建立類的元資訊
-   ✅ 在堆中建立 java.lang.Class 對象
+- ① 載入（Loading）：
+    - ✅ 根據類的全限定名找到 .class 文件
+    - ✅ 將二進制字節流加載到記憶體
+    - ✅ 在方法區建立類的元資訊
+    - ✅ 在堆中建立 java.lang.Class 對象
 
-② 驗證（Verification）：
-   ✅ 文件格式驗證（魔數 CAFEBABE 開頭？）
-   ✅ 元數據驗證（是否繼承了 final 類？）
-   ✅ 字節碼驗證（指令是否合法？）
-   ✅ 符號引用驗證（引用的類/方法存在嗎？）
+- ② 驗證（Verification）：
+    - ✅ 文件格式驗證（魔數 CAFEBABE 開頭？）
+    - ✅ 元數據驗證（是否繼承了 final 類？）
+    - ✅ 字節碼驗證（指令是否合法？）
+    - ✅ 符號引用驗證（引用的類/方法存在嗎？）
 
-③ 準備（Preparation）：
-   ✅ 為靜態變數分配記憶體，設置「零值」（不是初始值！）
+- ③ 準備（Preparation）：
+    - ✅ 為靜態變數分配記憶體，設置「零值」（不是初始值！）
 
-   value = 0    ← 零值（不是 100！）
-   NAME = null  ← 零值（但 final 常量例外！）
+- value = 0    ← 零值（不是 100！）
+- NAME = null  ← 零值（但 final 常量例外！）
 
-   ⚠️ 例外：static final 基本類型/字串常量 → 直接賦值
-   NAME = "Java" ← final 常量直接賦值（編譯期常量）
+- ⚠️ 例外：static final 基本類型/字串常量 → 直接賦值
+- NAME = "Java" ← final 常量直接賦值（編譯期常量）
 
-④ 解析（Resolution）：
-   ✅ 將常量池中的符號引用替換為直接引用
-   符號引用：com/example/Demo（字串符號）
-   直接引用：記憶體地址（真實指針）
+- ④ 解析（Resolution）：
+    - ✅ 將常量池中的符號引用替換為直接引用
+    - 符號引用：com/example/Demo（字串符號）
+    - 直接引用：記憶體地址（真實指針）
 
-⑤ 初始化（Initialization）：
-   ✅ 執行類的靜態代碼（<clinit> 方法）
-   ✅ 按照代碼順序執行靜態賦值和靜態代碼塊
+- ⑤ 初始化（Initialization）：
+    - ✅ 執行類的靜態代碼（&lt;clinit> 方法）
+    - ✅ 按照代碼順序執行靜態賦值和靜態代碼塊
 
-   value = 100  ← 靜態賦值
-   System.out.println("靜態初始化塊執行！") ← 靜態代碼塊
-   value = 200  ← 靜態代碼塊中的賦值
+- value = 100  ← 靜態賦值
+- System.out.println("靜態初始化塊執行！") ← 靜態代碼塊
+- value = 200  ← 靜態代碼塊中的賦值
 
-   最終 value = 200
+- 最終 value = 200
 
-⑥ 使用（Using）：正常使用類和對象
+- ⑥ 使用（Using）：正常使用類和對象
 
-⑦ 卸載（Unloading）：類不再使用，GC 回收
-```
+- ⑦ 卸載（Unloading）：類不再使用，GC 回收
 
 ### 初始化的觸發條件（主動引用）：
 

@@ -2,40 +2,44 @@
 
 ## 核心概念
 
-```
-Sentinel 三大功能：
+**Sentinel 三大功能**
 
-限流（Flow Control）：
-  控制請求速率，超過閾值拒絕請求
-  目的：保護服務不被流量壓垮
+**限流（Flow Control）**
 
-熔斷（Circuit Breaker）：
-  當下游服務錯誤率/慢響應率過高時，自動切斷請求
-  目的：防止錯誤擴散（雪崩效應）
+- 控制請求速率，超過閾值拒絕請求
+- 目的：保護服務不被流量壓垮
 
-降級（Degrade）：
-  服務不可用時，返回預設值（Fallback）
-  目的：保證核心功能可用
+**熔斷（Circuit Breaker）**
 
-熔斷器三種狀態：
+- 當下游服務錯誤率/慢響應率過高時，自動切斷請求
+- 目的：防止錯誤擴散（雪崩效應）
+
+**降級（Degrade）**
+
+- 服務不可用時，返回預設值（Fallback）
+- 目的：保證核心功能可用
+
+**熔斷器三種狀態**
 
 CLOSED（關閉）
-  → 正常通過請求，統計錯誤率
 
-  錯誤率 / 慢響應率 超過閾值
-  ↓
+- → 正常通過請求，統計錯誤率
+
+- 錯誤率 / 慢響應率 超過閾值
+- ↓
 
 OPEN（打開）
-  → 直接拒絕所有請求（快速失敗）
 
-  等待 timeWindow 秒後
-  ↓
+- → 直接拒絕所有請求（快速失敗）
+
+- 等待 timeWindow 秒後
+- ↓
 
 HALF_OPEN（半開）
-  → 放入一個探測請求
-  → 成功 → 回到 CLOSED
-  → 失敗 → 回到 OPEN
-```
+
+- → 放入一個探測請求
+- → 成功 → 回到 CLOSED
+- → 失敗 → 回到 OPEN
 
 ```xml
 <!-- pom.xml -->
@@ -131,3 +135,9 @@ public interface UserServiceClient {
     UserDTO getUser(@PathVariable Long id);
 }
 ```
+
+!!! example "我的實作：我實作的是 Resilience4j"
+
+    microservicecloud 以 Resilience4j 實作 OpenFeign 呼叫的熔斷（失敗率 50% 熔斷、10 秒後半開探測）與 3 秒逾時，搭配 `fallbackFactory` 降級。
+
+    👉 [元件選型：Spring Cloud 與 Alibaba 對照](ecosystem-comparison.md)

@@ -152,3 +152,9 @@ flowchart LR
 - 服務 P99 延遲 > 2s → 告警
 - 服務錯誤率 > 5% → 告警
 - 服務不可用 → 告警
+
+!!! example "我的實作：microservicecloud 的鏈路追蹤"
+
+    以 **Micrometer Tracing + Zipkin** 實作：HTTP 與 OpenFeign 呼叫自動傳遞 `traceId`，開發環境取樣率 100%。
+
+    👉 [實戰：微服務專案與 K8s 部署](../../backend/spring-cloud/practice.md)

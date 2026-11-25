@@ -89,20 +89,20 @@ flowchart LR
 ## 重點速覽
 
 ### 認證與授權架構
-```
 用戶登入 → Spring Security Filter Chain
-    → AuthenticationManager
-    → DaoAuthenticationProvider
-    → UserDetailsService（查 DB）
-    → BCryptPasswordEncoder（驗密碼）
-    → 生成 JWT（Access Token + Refresh Token）
-    → 返回 Token 給客戶端
+
+- → AuthenticationManager
+- → DaoAuthenticationProvider
+- → UserDetailsService（查 DB）
+- → BCryptPasswordEncoder（驗密碼）
+- → 生成 JWT（Access Token + Refresh Token）
+- → 返回 Token 給客戶端
 
 後續請求 → JwtAuthenticationFilter
-    → 驗證 JWT 簽名 / 過期時間
-    → 設定 SecurityContextHolder
-    → @PreAuthorize 方法級授權
-```
+
+- → 驗證 JWT 簽名 / 過期時間
+- → 設定 SecurityContextHolder
+- → @PreAuthorize 方法級授權
 
 ### JWT 安全設計
 

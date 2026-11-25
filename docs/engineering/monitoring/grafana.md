@@ -112,24 +112,23 @@
 
 ## Grafana 變數（Variables）
 
-```
-使用變數讓儀表板可以動態切換環境/服務：
+**使用變數讓儀表板可以動態切換環境/服務**
 
-① namespace 變數（從 Prometheus 標籤取得）
-   Type:  Query
-   Query: label_values(up, namespace)
-   → 自動列出所有 namespace，可以在頂部下拉選擇
+- ① namespace 變數（從 Prometheus 標籤取得）
+    - Type:  Query
+    - Query: label_values(up, namespace)
+    - → 自動列出所有 namespace，可以在頂部下拉選擇
 
-② app 變數（依賴 namespace 變數）
-   Type:  Query
-   Query: label_values(up{namespace="$namespace"}, app)
-   → 選擇 namespace 後，自動更新 app 列表
+- ② app 變數（依賴 namespace 變數）
+    - Type:  Query
+    - Query: label_values(up{namespace="$namespace"}, app)
+    - → 選擇 namespace 後，自動更新 app 列表
 
-③ interval 變數（時間間隔）
-   Type:   Interval
-   Values: 1m, 5m, 15m, 30m, 1h
-   → 讓使用者選擇聚合粒度
+- ③ interval 變數（時間間隔）
+    - Type:   Interval
+    - Values: 1m, 5m, 15m, 30m, 1h
+    - → 讓使用者選擇聚合粒度
 
-在 PromQL 中使用：
-  rate(http_requests_total{namespace="$namespace", app="$app"}[$interval])
-```
+**在 PromQL 中使用**
+
+- rate(http_requests_total{namespace="$namespace", app="$app"}[$interval])

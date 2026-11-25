@@ -2,14 +2,14 @@
 
 ## 兩大保證
 
-```
-volatile 保證：
-  ① 可見性：一個線程修改，其他線程立即可見
-  ② 有序性：禁止指令重排序（保證 happens-before）
+**volatile 保證**
 
-volatile 不保證：
-  ❌ 原子性（i++ 非原子操作）
-```
+- ① 可見性：一個線程修改，其他線程立即可見
+- ② 有序性：禁止指令重排序（保證 happens-before）
+
+**volatile 不保證**
+
+- ❌ 原子性（i++ 非原子操作）
 
 ```java
 // ❌ 沒有 volatile，可能出現可見性問題
@@ -31,33 +31,37 @@ private volatile boolean running = true;
 
 ## 記憶體屏障（Memory Barrier）
 
-```
-JMM（Java Memory Model）定義四種屏障：
+**JMM（Java Memory Model）定義四種屏障**
 
 LoadLoad   屏障：前面的 Load 先於後面的 Load
+
 StoreStore 屏障：前面的 Store 先於後面的 Store
+
 LoadStore  屏障：前面的 Load 先於後面的 Store
+
 StoreLoad  屏障：前面的 Store 先於後面的 Load（最強）
 
-volatile 寫的屏障：
-  ... 普通操作
-  [StoreStore 屏障]
-  volatile 寫
-  [StoreLoad 屏障]
-  ... 後續操作
+**volatile 寫的屏障**
 
-volatile 讀的屏障：
-  ... 前面操作
-  volatile 讀
-  [LoadLoad 屏障]
-  [LoadStore 屏障]
-  ... 後續操作
+- ... 普通操作
+- [StoreStore 屏障]
+- volatile 寫
+- [StoreLoad 屏障]
+- ... 後續操作
 
-效果：
-  volatile 寫之前的所有操作 → 都在 volatile 寫之前完成
-  volatile 讀之後的所有操作 → 都在 volatile 讀之後完成
-  → 保證有序性！
-```
+**volatile 讀的屏障**
+
+- ... 前面操作
+- volatile 讀
+- [LoadLoad 屏障]
+- [LoadStore 屏障]
+- ... 後續操作
+
+**效果**
+
+- volatile 寫之前的所有操作 → 都在 volatile 寫之前完成
+- volatile 讀之後的所有操作 → 都在 volatile 讀之後完成
+- → 保證有序性！
 
 ```java
 // 雙重檢查鎖定（DCL）為什麼需要 volatile？

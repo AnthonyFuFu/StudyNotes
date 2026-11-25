@@ -2,17 +2,17 @@
 
 ## OAuth2 核心概念
 
-```
-OAuth2 解決的問題：
-  你想用「用 Google 帳號登入」某個網站
-  但不想讓那個網站直接拿到你的 Google 密碼！
+**OAuth2 解決的問題**
 
-四個角色：
-  Resource Owner  = 用戶（你）
-  Client          = 第三方應用（你要登入的網站）
-  Authorization Server = 授權服務器（Google 的登入頁面）
-  Resource Server = 資源服務器（Google API，如用戶資料）
-```
+- 你想用「用 Google 帳號登入」某個網站
+- 但不想讓那個網站直接拿到你的 Google 密碼！
+
+**四個角色**
+
+- Resource Owner  = 用戶（你）
+- Client          = 第三方應用（你要登入的網站）
+- Authorization Server = 授權服務器（Google 的登入頁面）
+- Resource Server = 資源服務器（Google API，如用戶資料）
 
 ## 四種授權模式
 
@@ -58,42 +58,44 @@ sequenceDiagram
 
 ### 模式三：隱式模式（Implicit）⚠️ 已不推薦
 
-```
 直接返回 Access Token（不經過 Code 交換）
+
 → Token 在 URL 中暴露，不安全！
+
 → 建議改用 Authorization Code + PKCE
-```
 
 ### 模式四：密碼模式（Resource Owner Password）⚠️ 不推薦
 
-```
 用戶直接把帳密給 Client，Client 再去換 Token
+
 → Client 知道用戶密碼，安全性差！
+
 → OAuth2.1 已移除此模式
-```
 
 ## PKCE（Proof Key for Code Exchange）⭐ 現代標準
 
-```
 問題：純前端 SPA 沒有 client_secret，Authorization Code 可能被截獲
 
-PKCE 解決方案：
+**PKCE 解決方案**
 
-前端生成：
-  code_verifier  = 隨機字串（43-128字元）
-  code_challenge = BASE64URL(SHA256(code_verifier))
+**前端生成**
 
-授權請求加入：
-  code_challenge=xxxxxx
-  code_challenge_method=S256
+- code_verifier  = 隨機字串（43-128字元）
+- code_challenge = BASE64URL(SHA256(code_verifier))
 
-換 Token 時帶上：
-  code_verifier=原始隨機字串
-  → 驗證：SHA256(code_verifier) == code_challenge
+**授權請求加入**
+
+- code_challenge=xxxxxx
+- code_challenge_method=S256
+
+**換 Token 時帶上**
+
+- code_verifier=原始隨機字串
+- → 驗證：SHA256(code_verifier) \=\= code_challenge
 
 即使 Authorization Code 被截獲，
+
 攻擊者沒有 code_verifier 也無法換取 Token！
-```
 
 ## Spring Boot 整合 OAuth2 第三方登入
 
@@ -235,3 +237,9 @@ public class OAuth2AuthenticationSuccessHandler
     }
 }
 ```
+
+!!! example "我的實作：holidayDessert 的 Google 登入"
+
+    使用 `spring-boot-starter-oauth2-client` 實作 **Google 第三方登入**（授權碼流程），並以 Filter 記錄 OAuth2 登入來源；登入後再簽發自己系統的 JWT。
+
+    👉 [Web MVC 請求處理流程](../../backend/spring-boot/web-mvc.md)

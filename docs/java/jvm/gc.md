@@ -126,22 +126,24 @@ block-beta
 
 ### 算法四：分代收集（Generational Collection）
 
-```
-理論依據（弱分代假說）：
-✅ 大多數對象朝生夕死（新生代）
-✅ 少數對象長期存活（老年代）
+**理論依據（弱分代假說）**
+
+- ✅ 大多數對象朝生夕死（新生代）
+- ✅ 少數對象長期存活（老年代）
 
 新生代（Young Gen）→ 複製算法
-  原因：存活率低（10%~20%），複製的對象少，速度快
+
+- 原因：存活率低（10%\~20%），複製的對象少，速度快
 
 老年代（Old Gen）→ 標記-清除 或 標記-整理
-  原因：存活率高，複製算法太浪費空間
 
-觸發 GC 的條件：
-  Minor GC：Eden 區滿時觸發（回收新生代）
-  Major GC：老年代空間不足時觸發（回收老年代）
-  Full GC：Minor + Major，整個堆都回收（速度最慢！盡量避免）
-```
+- 原因：存活率高，複製算法太浪費空間
+
+**觸發 GC 的條件**
+
+- Minor GC：Eden 區滿時觸發（回收新生代）
+- Major GC：老年代空間不足時觸發（回收老年代）
+- Full GC：Minor + Major，整個堆都回收（速度最慢！盡量避免）
 
 ## 六大 GC 收集器
 
@@ -180,26 +182,30 @@ GC 期間所有業務線程都要停下來等待（Stop The World）。
 
 ### 收集器二：ParNew GC（並行）
 
-```
 特點：Serial 的多線程版，GC 時仍 STW，但多個 GC 線程同時工作
+
 Young Gen：複製算法
+
 Old Gen：配合 CMS 使用
 
 JVM 參數：-XX:+UseParNewGC
-```
 
 ### 收集器三：Parallel Scavenge GC（吞吐量優先）
 
-```
 目標：最大化吞吐量（Throughput = 運行用戶代碼時間 / 總時間）
+
 適用：後台計算型應用（批次處理、科學計算）
 
-JVM 參數：
+**JVM 參數**
+
 -XX:+UseParallelGC
+
+``` text
 -XX:MaxGCPauseMillis=200    最大停頓時間目標
 -XX:GCTimeRatio=99          吞吐量目標（99% 時間用在業務）
--XX:+UseAdaptiveSizePolicy  自動調整各區大小
 ```
+
+-XX:+UseAdaptiveSizePolicy  自動調整各區大小
 
 ### 收集器四：CMS GC（低延遲，已廢棄）
 

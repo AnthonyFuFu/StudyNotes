@@ -2,42 +2,49 @@
 
 ## 索引設計最佳實踐
 
-```
-Index 命名規範：
-  ❌ products（不要用單一索引名）
-  ✅ products_v1（帶版本號）
-     products_v2（升級 Mapping 時建立新版本）
+**Index 命名規範**
 
-  使用別名（Alias）：
-  products → 指向 products_v1
+- ❌ products（不要用單一索引名）
+- ✅ products_v1（帶版本號）
+    - products_v2（升級 Mapping 時建立新版本）
 
-  重建索引時：
-  ① 建立新的 products_v2
-  ② 將數據從 v1 複製到 v2（reindex API）
-  ③ 將別名 products 指向 v2（零停機！）
-  ④ 刪除 products_v1
+**使用別名（Alias）**
 
-Index 別名操作：
+- products → 指向 products_v1
+
+**重建索引時**
+
+- ① 建立新的 products_v2
+- ② 將數據從 v1 複製到 v2（reindex API）
+- ③ 將別名 products 指向 v2（零停機！）
+- ④ 刪除 products_v1
+
+**Index 別名操作**
+
 POST /_aliases
+
 {
-  "actions": [
-    { "add":    { "index": "products_v2", "alias": "products" }},
-    { "remove": { "index": "products_v1", "alias": "products" }}
-  ]
+
+- "actions": [
+    - { "add":    { "index": "products_v2", "alias": "products" }},
+    - { "remove": { "index": "products_v1", "alias": "products" }}
+- ]
+
 }
 
-分片設計：
-  根據數據量估算：每個分片 10GB~50GB
-  1億商品 × 約1KB/文件 = 約100GB
-  → 3~5 個主分片
-  → 副本數：1（生產）或 2（高可用）
+**分片設計**
 
-冷熱數據分離（ILM 索引生命週期管理）：
-  Hot（最近7天）：SSD 磁碟，3副本
-  Warm（7天~30天）：HDD 磁碟，1副本，只讀
-  Cold（30天以上）：壓縮，1副本
-  Delete（90天後）：自動刪除
-```
+- 根據數據量估算：每個分片 10GB\~50GB
+- 1億商品 × 約1KB/文件 = 約100GB
+- → 3\~5 個主分片
+- → 副本數：1（生產）或 2（高可用）
+
+**冷熱數據分離（ILM 索引生命週期管理）**
+
+- Hot（最近7天）：SSD 磁碟，3副本
+- Warm（7天\~30天）：HDD 磁碟，1副本，只讀
+- Cold（30天以上）：壓縮，1副本
+- Delete（90天後）：自動刪除
 
 ## 效能調優
 
@@ -119,36 +126,45 @@ GET /products/_search
 
 ## ELK Stack 日誌系統建置
 
-```
-完整 ELK 日誌流程回顧：
+**完整 ELK 日誌流程回顧**
 
 Spring Boot（JSON 日誌）
-    ↓ stdout / 文件
+
+- ↓ stdout / 文件
+
 Filebeat（輕量日誌採集）
-    ↓ beats 協議
+
+- ↓ beats 協議
+
 Logstash（解析、過濾、轉換）
-    ↓ HTTP / 客戶端
+
+- ↓ HTTP / 客戶端
+
 Elasticsearch（儲存、索引）
-    ↓
+
+- ↓
+
 Kibana（搜索、視覺化、告警）
 
-日誌 Index 命名規範：
-  {service}-logs-{date}
-  order-service-logs-2024.01.15
-  user-service-logs-2024.01.15
+**日誌 Index 命名規範**
 
-常用 Kibana KQL 查詢：
-  log_level: "ERROR"
-  trace_id: "abc123"
-  service: "order-service" AND duration_ms > 1000
-  log_message: *OutOfMemoryError*
+- {service}-logs-{date}
+- order-service-logs-2024.01.15
+- user-service-logs-2024.01.15
 
-ILM（Index Lifecycle Management）：
-  Hot  → 7天，SSD，可讀寫
-  Warm → 30天，HDD，只讀（forceMerge 到 1 個 Segment）
-  Cold → 90天，壓縮
-  Delete → 自動刪除
-```
+**常用 Kibana KQL 查詢**
+
+- log_level: "ERROR"
+- trace_id: "abc123"
+- service: "order-service" AND duration_ms > 1000
+- log_message: \*OutOfMemoryError\*
+
+**ILM（Index Lifecycle Management）**
+
+- Hot  → 7天，SSD，可讀寫
+- Warm → 30天，HDD，只讀（forceMerge 到 1 個 Segment）
+- Cold → 90天，壓縮
+- Delete → 自動刪除
 
 ```json
 // 建立日誌 ILM Policy

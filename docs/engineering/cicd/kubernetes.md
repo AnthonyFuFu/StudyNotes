@@ -449,19 +449,19 @@ kubectl annotate deployment/myapp-deployment \
   -n production
 ```
 
-```
 滾動更新流程（maxSurge=1, maxUnavailable=0, replicas=3）：
 
-初始狀態：  [v1] [v1] [v1]
-步驟 1：    [v1] [v1] [v1] [v2]     ← 新增 v2（surge）
-步驟 2：    [v1] [v1]      [v2]     ← 移除一個 v1
-步驟 3：    [v1] [v1] [v2] [v2]     ← 新增 v2
-步驟 4：    [v1]      [v2] [v2]     ← 移除一個 v1
-步驟 5：    [v1] [v2] [v2] [v2]     ← 新增 v2
-步驟 6：         [v2] [v2] [v2]     ← 移除最後一個 v1
+| 項目 | 說明 |
+|------|------|
+| 初始狀態 | [v1] [v1] [v1] |
+| 步驟 1 | [v1] [v1] [v1] [v2]     ← 新增 v2（surge） |
+| 步驟 2 | [v1] [v1]      [v2]     ← 移除一個 v1 |
+| 步驟 3 | [v1] [v1] [v2] [v2]     ← 新增 v2 |
+| 步驟 4 | [v1]      [v2] [v2]     ← 移除一個 v1 |
+| 步驟 5 | [v1] [v2] [v2] [v2]     ← 新增 v2 |
+| 步驟 6 | [v2] [v2] [v2]     ← 移除最後一個 v1 |
 
-✅ 全程保持 3 個可用 Pod（0 停機！）
-```
+- ✅ 全程保持 3 個可用 Pod（0 停機！）
 
 ## StatefulSet（有狀態應用）
 
@@ -514,3 +514,9 @@ spec:
 # 刪除重建後，名字和 PVC 不變！
 # 適合：主從 MySQL、Kafka、ZooKeeper、Redis Cluster
 ```
+
+!!! example "我的實作：自建 Kubernetes 叢集"
+
+    microservicecloud 以 **kubeadm + containerd** 在三台 VM 上建立 1 master + 2 worker 的叢集，並把整套微服務部署上去。
+
+    👉 [實戰：我的 CI/CD 與 K8s 部署](my-pipelines.md)

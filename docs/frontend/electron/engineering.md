@@ -85,3 +85,7 @@ flowchart LR
 | 原生模組跨平台編譯失敗 | 改用 WebAssembly 版的 sql.js |
 | 主程序錯誤看不到 | `ipc.ts` 統一捕捉錯誤寫進 `logs/main.log`，畫面只顯示整理過的訊息 |
 | 畫面與主程序型別不一致 | `shared/` 共用型別，`tsconfig` 的 path alias（`@shared/*`）兩邊都能 import |
+
+!!! tip "延伸閱讀"
+
+    打包與 CI 屬於交付流程，跨專案的流水線設計整理在 [實戰：我的 CI/CD 與 K8s 部署](../../engineering/cicd/my-pipelines.md)。

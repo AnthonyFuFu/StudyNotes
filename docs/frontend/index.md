@@ -2,9 +2,9 @@
 icon: lucide/monitor
 ---
 
-# 前端開發
+# 前端與桌面
 
-從瀏覽器與 JavaScript 的底層原理，到我實作過的各種前端做法：伺服器端模板、Vue、React、Angular，以及用 Electron 做桌面程式。
+用 Web 技術打造使用者介面：從瀏覽器與 JavaScript 的底層原理，到伺服器端模板、Vue、React、Angular，再延伸到以 Electron 把同一套技術包成跨平台桌面程式。
 
 <div class="grid cards" markdown>
 

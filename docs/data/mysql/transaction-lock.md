@@ -2,31 +2,35 @@
 
 ## 事務隔離級別
 
-```
-SQL 標準定義的四種隔離級別（由低到高）：
+**SQL 標準定義的四種隔離級別（由低到高）**
 
+``` text
 隔離級別              臟讀   不可重複讀   幻讀
 ────────────────────────────────────────────────
 READ UNCOMMITTED      ✅     ✅          ✅
 READ COMMITTED        ❌     ✅          ✅
 REPEATABLE READ（預設）❌     ❌          ✅（InnoDB 用 Gap Lock 解決）
 SERIALIZABLE          ❌     ❌          ❌
+```
 
-問題定義：
-  臟讀（Dirty Read）：
-    讀到其他事務未提交的修改
-    事務 A 修改了一行但未提交 → 事務 B 讀到了 → A 回滾 → B 讀到的是無效數據！
+**問題定義**
 
-  不可重複讀（Non-Repeatable Read）：
-    同一事務中，兩次讀取同一行，結果不同
-    事務 A 讀取 name='John' → 事務 B 修改 name='Jane' 並提交 → 事務 A 再讀取 → 'Jane'
+**臟讀（Dirty Read）**
 
-  幻讀（Phantom Read）：
-    同一事務中，兩次查詢返回的行數不同
-    事務 A 查詢 age>20 的用戶有 5 個 → 事務 B 插入一個 age=25 的用戶 → 事務 A 再查詢 → 6 個！
+- 讀到其他事務未提交的修改
+- 事務 A 修改了一行但未提交 → 事務 B 讀到了 → A 回滾 → B 讀到的是無效數據！
+
+**不可重複讀（Non-Repeatable Read）**
+
+- 同一事務中，兩次讀取同一行，結果不同
+- 事務 A 讀取 name='John' → 事務 B 修改 name='Jane' 並提交 → 事務 A 再讀取 → 'Jane'
+
+**幻讀（Phantom Read）**
+
+- 同一事務中，兩次查詢返回的行數不同
+- 事務 A 查詢 age>20 的用戶有 5 個 → 事務 B 插入一個 age=25 的用戶 → 事務 A 再查詢 → 6 個！
 
 MySQL 預設隔離級別：REPEATABLE READ
-```
 
 ```sql
 -- 查看隔離級別
@@ -85,38 +89,39 @@ flowchart LR
 
 ### 表鎖 vs 行鎖：
 
-```
-表鎖（Table Lock）：
-  鎖定整張表，粒度大，並發低
-  MyISAM 使用表鎖
-  InnoDB 的 LOCK TABLES 命令
+**表鎖（Table Lock）**
 
-行鎖（Row Lock）：
-  InnoDB 預設，鎖定具體的行，並發高
-  只有使用到索引才能用行鎖！
-  沒有索引 → 升級為表鎖！❌
+- 鎖定整張表，粒度大，並發低
+- MyISAM 使用表鎖
+- InnoDB 的 LOCK TABLES 命令
 
-⚠️ 重要：InnoDB 行鎖是加在索引上的，不是行本身！
-```
+**行鎖（Row Lock）**
+
+- InnoDB 預設，鎖定具體的行，並發高
+- 只有使用到索引才能用行鎖！
+- 沒有索引 → 升級為表鎖！❌
+
+- ⚠️ 重要：InnoDB 行鎖是加在索引上的，不是行本身！
 
 ### 三種行鎖：
 
-```
-Record Lock（記錄鎖）：
-  鎖定一條具體的索引記錄
-  WHERE id = 5 → 鎖定 id=5 這條記錄
+**Record Lock（記錄鎖）**
 
-Gap Lock（間隙鎖）：
-  鎖定索引記錄之間的間隙（不包含記錄本身）
-  WHERE id BETWEEN 5 AND 10 → 鎖定 (5, 10) 之間的空隙
-  防止其他事務在這個間隙插入新行！→ 解決幻讀！
+- 鎖定一條具體的索引記錄
+- WHERE id = 5 → 鎖定 id=5 這條記錄
 
-Next-Key Lock（臨鍵鎖）：
-  = Record Lock + Gap Lock
-  鎖定一條記錄及其之前的間隙
-  InnoDB 預設使用 Next-Key Lock
-  WHERE id = 5 → 鎖定 (-∞, 5] 的 Next-Key Lock
-```
+**Gap Lock（間隙鎖）**
+
+- 鎖定索引記錄之間的間隙（不包含記錄本身）
+- WHERE id BETWEEN 5 AND 10 → 鎖定 (5, 10) 之間的空隙
+- 防止其他事務在這個間隙插入新行！→ 解決幻讀！
+
+**Next-Key Lock（臨鍵鎖）**
+
+- = Record Lock + Gap Lock
+- 鎖定一條記錄及其之前的間隙
+- InnoDB 預設使用 Next-Key Lock
+- WHERE id = 5 → 鎖定 (-∞, 5] 的 Next-Key Lock
 
 ```sql
 -- 死鎖範例：

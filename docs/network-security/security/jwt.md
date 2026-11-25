@@ -2,54 +2,71 @@
 
 ## JWT 結構詳解
 
-```
 JWT = Header.Payload.Signature
 
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+
 .
+
 eyJzdWIiOiIxMjMiLCJ1c2VybmFtZSI6IkpvaG4iLCJyb2xlcyI6WyJVU0VSIl19
+
 .
+
 SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
 
 ─────── Base64URL 解碼 ────────
 
-Header（頭部）：
+**Header（頭部）**
+
 {
-  "alg": "HS256",    ← 簽名算法（HS256 或 RS256）
-  "typ": "JWT"       ← Token 類型
+
+``` text
+"alg": "HS256",    ← 簽名算法（HS256 或 RS256）
+"typ": "JWT"       ← Token 類型
+```
+
 }
 
-Payload（載荷）：
+**Payload（載荷）**
+
 {
-  "sub":      "123",           ← subject（用戶 ID）
-  "username": "John",          ← 自定義聲明
-  "roles":    ["USER"],        ← 角色
-  "iat":      1700000000,      ← issued at（簽發時間）
-  "exp":      1700086400       ← expiration（過期時間）
+
+``` text
+"sub":      "123",           ← subject（用戶 ID）
+"username": "John",          ← 自定義聲明
+"roles":    ["USER"],        ← 角色
+"iat":      1700000000,      ← issued at（簽發時間）
+"exp":      1700086400       ← expiration（過期時間）
+```
+
 }
 
-Signature（簽名）：
+**Signature（簽名）**
+
 HMACSHA256(
-  base64UrlEncode(header) + "." + base64UrlEncode(payload),
-  secret_key
+
+- base64UrlEncode(header) + "." + base64UrlEncode(payload),
+- secret_key
+
 )
 
-JWT 驗證原理：
-  ① 用 . 分割為三段
-  ② 取出 header + payload
-  ③ 用相同密鑰重新計算簽名
-  ④ 比對計算結果與收到的 Signature
-  ⑤ 相同 → 驗證通過（沒有被篡改）
-  ⑥ 驗證 exp（過期時間）
+**JWT 驗證原理**
 
-⚠️ 注意：JWT 的 Payload 只是 Base64 編碼，不是加密！
-  任何人都可以解碼看到內容！
-  → 不要在 Payload 放敏感信息（密碼、信用卡號等）
+- ① 用 . 分割為三段
+- ② 取出 header + payload
+- ③ 用相同密鑰重新計算簽名
+- ④ 比對計算結果與收到的 Signature
+- ⑤ 相同 → 驗證通過（沒有被篡改）
+- ⑥ 驗證 exp（過期時間）
 
-HS256 vs RS256：
-  HS256：對稱，同一個 secret 簽名和驗證 → 適合單服務
-  RS256：非對稱，私鑰簽名，公鑰驗證   → 適合微服務
-```
+- ⚠️ 注意：JWT 的 Payload 只是 Base64 編碼，不是加密！
+    - 任何人都可以解碼看到內容！
+    - → 不要在 Payload 放敏感信息（密碼、信用卡號等）
+
+**HS256 vs RS256**
+
+- HS256：對稱，同一個 secret 簽名和驗證 → 適合單服務
+- RS256：非對稱，私鑰簽名，公鑰驗證   → 適合微服務
 
 ## JWT 完整實作
 
@@ -328,26 +345,24 @@ public class RefreshTokenService {
 
 ## JWT 安全問題與防禦
 
-```
-常見 JWT 攻擊：
+**常見 JWT 攻擊**
 
-1. Algorithm None 攻擊（alg: none）
-   攻擊者篡改 header 中的 alg 為 none → 繞過簽名驗證！
-   防禦：✅ 使用嚴格的 JWT 庫，明確指定允許的算法
+- 1\. Algorithm None 攻擊（alg: none）
+    - 攻擊者篡改 header 中的 alg 為 none → 繞過簽名驗證！
+    - 防禦：✅ 使用嚴格的 JWT 庫，明確指定允許的算法
 
-2. 算法混淆攻擊（RS256 → HS256）
-   服務器用 RS256，攻擊者用公鑰當 HS256 的 secret 偽造
-   防禦：✅ 明確指定算法，不動態信任 header 中的 alg
+- 2\. 算法混淆攻擊（RS256 → HS256）
+    - 服務器用 RS256，攻擊者用公鑰當 HS256 的 secret 偽造
+    - 防禦：✅ 明確指定算法，不動態信任 header 中的 alg
 
-3. 爆破弱密鑰
-   HS256 使用弱 secret → 可以暴力破解！
-   防禦：✅ 使用足夠長的隨機 secret（至少 256 bits）
-         ✅ 使用 RS256 非對稱加密
+- 3\. 爆破弱密鑰
+    - HS256 使用弱 secret → 可以暴力破解！
+    - 防禦：✅ 使用足夠長的隨機 secret（至少 256 bits）
+        - ✅ 使用 RS256 非對稱加密
 
-4. Token 洩漏（XSS 攻擊竊取 localStorage 中的 JWT）
-   防禦：✅ Access Token 存 Memory（不存 localStorage）
-         ✅ Refresh Token 存 HttpOnly Cookie（JS 無法讀取！）
-```
+- 4\. Token 洩漏（XSS 攻擊竊取 localStorage 中的 JWT）
+    - 防禦：✅ Access Token 存 Memory（不存 localStorage）
+        - ✅ Refresh Token 存 HttpOnly Cookie（JS 無法讀取！）
 
 ```java
 // ✅ Refresh Token 存 HttpOnly Cookie
@@ -383,22 +398,29 @@ public ResponseEntity<TokenResponse> refresh(
 }
 ```
 
-```
-Token 設計最佳實踐：
+**Token 設計最佳實踐**
 
-Access Token：
-  ✅ 短效（15 分鐘）
-  ✅ 存在前端 Memory 變數（不存 localStorage）
-  ✅ 頁面關閉後自動消失
+**Access Token**
 
-Refresh Token：
-  ✅ 長效（7 天）
-  ✅ 存在 HttpOnly Cookie（防 XSS）
-  ✅ 存在 Redis（可以主動吊銷）
-  ✅ Refresh Token 輪換（每次刷新換一個新的）
+- ✅ 短效（15 分鐘）
+- ✅ 存在前端 Memory 變數（不存 localStorage）
+- ✅ 頁面關閉後自動消失
 
-Token 吊銷策略：
-  ① 等待自然過期（簡單，但有延遲）
-  ② Redis 黑名單（存已登出的 Token 的 jti）
-  ③ 縮短 Access Token 有效期 + Refresh Token 存 Redis（推薦）
-```
+**Refresh Token**
+
+- ✅ 長效（7 天）
+- ✅ 存在 HttpOnly Cookie（防 XSS）
+- ✅ 存在 Redis（可以主動吊銷）
+- ✅ Refresh Token 輪換（每次刷新換一個新的）
+
+**Token 吊銷策略**
+
+- ① 等待自然過期（簡單，但有延遲）
+- ② Redis 黑名單（存已登出的 Token 的 jti）
+- ③ 縮短 Access Token 有效期 + Refresh Token 存 Redis（推薦）
+
+!!! example "我的實作：holidayDessert 的 JWT"
+
+    以 `jjwt` 簽發與驗證 Token，並在 Spring Security 之前加一層 **JWT 驗證 Filter**；前台另提供 Google OAuth2 登入。Filter / Interceptor / AOP 的分工見 Web MVC 章節。
+
+    👉 [Web MVC 請求處理流程](../../backend/spring-boot/web-mvc.md)

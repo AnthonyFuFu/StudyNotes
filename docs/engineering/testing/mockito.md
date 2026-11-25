@@ -2,26 +2,28 @@
 
 ## Mock / Stub / Spy 的區別
 
-```
-Mock（模擬）：
-  完全虛假的對象，所有方法都返回預設值（null / 0 / false）
-  用來隔離測試對象的依賴
-  Mockito.mock(OrderRepository.class)
+**Mock（模擬）**
 
-Stub（存根）：
-  為 Mock 對象的方法設定返回值
-  when(mock.method()).thenReturn(value)
+- 完全虛假的對象，所有方法都返回預設值（null / 0 / false）
+- 用來隔離測試對象的依賴
+- Mockito.mock(OrderRepository.class)
 
-Spy（間諜）：
-  包裝真實對象，默認調用真實方法
-  可以選擇性 Stub 部分方法
-  Mockito.spy(new OrderService())
-  用途：測試遺留代碼，只 Mock 部分方法
+**Stub（存根）**
 
-Fake（偽造）：
-  一個有真實邏輯但簡化的實作
-  如：H2 記憶體資料庫（代替真實 MySQL）
-```
+- 為 Mock 對象的方法設定返回值
+- when(mock.method()).thenReturn(value)
+
+**Spy（間諜）**
+
+- 包裝真實對象，默認調用真實方法
+- 可以選擇性 Stub 部分方法
+- Mockito.spy(new OrderService())
+- 用途：測試遺留代碼，只 Mock 部分方法
+
+**Fake（偽造）**
+
+- 一個有真實邏輯但簡化的實作
+- 如：H2 記憶體資料庫（代替真實 MySQL）
 
 ## Mockito 完整 API
 

@@ -66,7 +66,7 @@ flowchart TB
 
 ## DevOps 工具鏈全覽
 
-```
+``` text
 階段                工具
 ──────────────────────────────────────────────
 計劃（Plan）        Jira、Trello、GitHub Issues

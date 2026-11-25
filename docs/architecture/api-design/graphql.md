@@ -2,29 +2,30 @@
 
 ## 核心概念
 
-```
-GraphQL 解決的問題：
+**GraphQL 解決的問題**
 
-REST 的問題：
-  ❌ Over-fetching：返回太多不需要的欄位
-     GET /users/123 → 返回 50 個欄位，但我只需要 name 和 email
+**REST 的問題**
 
-  ❌ Under-fetching：一個頁面需要多次請求
-     GET /users/123       → 取用戶資料
-     GET /orders?userId=123 → 取訂單列表
-     GET /products/xxx    → 取商品詳情
-     需要 3 次請求！
+- ❌ Over-fetching：返回太多不需要的欄位
+    - GET /users/123 → 返回 50 個欄位，但我只需要 name 和 email
 
-GraphQL 的解決方式：
-  客戶端精確描述「我需要什麼」
-  服務器只返回需要的欄位
-  一次請求可以取多個資源
+- ❌ Under-fetching：一個頁面需要多次請求
+    - GET /users/123       → 取用戶資料
+    - GET /orders?userId=123 → 取訂單列表
+    - GET /products/xxx    → 取商品詳情
+    - 需要 3 次請求！
 
-三個核心操作：
-  Query（查詢）：讀取數據，類似 GET
-  Mutation（變更）：寫入/修改/刪除，類似 POST/PUT/DELETE
-  Subscription（訂閱）：實時數據推送，類似 WebSocket
-```
+**GraphQL 的解決方式**
+
+- 客戶端精確描述「我需要什麼」
+- 服務器只返回需要的欄位
+- 一次請求可以取多個資源
+
+**三個核心操作**
+
+- Query（查詢）：讀取數據，類似 GET
+- Mutation（變更）：寫入/修改/刪除，類似 POST/PUT/DELETE
+- Subscription（訂閱）：實時數據推送，類似 WebSocket
 
 ## Spring Boot 整合 GraphQL
 

@@ -90,15 +90,14 @@ flowchart LR
 | **PACELC 模型** | CAP 的延伸，考慮正常情況下延遲與一致性的取捨 |
 
 ### 高可用架構設計
-```
 用戶請求 → DNS 解析 → CDN 加速
-    → Load Balancer（Nginx / HAProxy）
-    → API Gateway（限流 / 認證 / 路由）
-    → 微服務集群（Spring Cloud）
-    → 快取層（Redis Cluster）
-    → 資料庫（MySQL 主從 / 分庫分表）
-    → 消息佇列（Kafka / RabbitMQ）
-```
+
+- → Load Balancer（Nginx / HAProxy）
+- → API Gateway（限流 / 認證 / 路由）
+- → 微服務集群（Spring Cloud）
+- → 快取層（Redis Cluster）
+- → 資料庫（MySQL 主從 / 分庫分表）
+- → 消息佇列（Kafka / RabbitMQ）
 
 ### 掌握重點
 - ✅ **分散式事務**：2PC / TCC / SAGA / 本地消息表

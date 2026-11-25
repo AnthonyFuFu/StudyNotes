@@ -103,7 +103,7 @@ flowchart LR
 
 ??? question "TCP 和 UDP 的區別？"
 
-    ```text
+    ``` text
     TCP                        UDP
     ─────────────────────────────────────────
     連接導向（三次握手）         無連接
@@ -116,27 +116,30 @@ flowchart LR
 
 ??? question "TCP 如何處理半連接攻擊（SYN Flood）？"
 
-    ```text
     攻擊：大量偽造 IP 的 SYN 請求
+
     → 服務器發 SYN+ACK 但永遠等不到第三次 ACK
+
     → 半連接佇列被塞滿 → 正常連接無法建立
 
-    防禦：
+    **防禦**
+
     SYN Cookie：不存儲半連接狀態，用 Hash 驗證第三次 ACK
+
     縮短 SYN 超時時間
+
     限制同一 IP 的 SYN 速率
-    ```
 
 ??? question "Keep-Alive 是什麼？"
 
-    ```text
-    TCP Keep-Alive：
-      長時間沒有數據傳輸時，定期發探測包
-      確認對方還存活
-      linux 預設 7200 秒才開始探測
+    **TCP Keep-Alive**
 
-    HTTP Keep-Alive：
-      複用同一個 TCP 連接處理多個 HTTP 請求
-      避免每次 HTTP 請求都三次握手
-      HTTP 1.1 預設開啟
-    ```
+    - 長時間沒有數據傳輸時，定期發探測包
+    - 確認對方還存活
+    - linux 預設 7200 秒才開始探測
+
+    **HTTP Keep-Alive**
+
+    - 複用同一個 TCP 連接處理多個 HTTP 請求
+    - 避免每次 HTTP 請求都三次握手
+    - HTTP 1.1 預設開啟

@@ -77,7 +77,7 @@ nav = [
       { "EF Core 與 Cookie 驗證" = "backend/aspnet-core/efcore-auth.md" },
     ] },
   ] },
-  { "前端開發" = [
+  { "前端與桌面" = [
     "frontend/index.md",
     { "前端基礎原理" = [
       "frontend/fundamentals/index.md",
@@ -216,7 +216,16 @@ nav = [
       { "Kubernetes 深入" = "engineering/cicd/kubernetes.md" },
       { "Jenkins 與 GitHub Actions" = "engineering/cicd/jenkins-github-actions.md" },
       { "實戰：完整部署流程" = "engineering/cicd/deployment.md" },
+      { "Harbor 私有映像倉庫" = "engineering/cicd/harbor.md" },
+      { "Argo CD 與 GitOps" = "engineering/cicd/argocd.md" },
       { "實戰：我的 CI/CD 與 K8s" = "engineering/cicd/my-pipelines.md" },
+    ] },
+    { "AWS 雲端服務" = [
+      "engineering/aws/index.md",
+      { "基礎架構：IAM 與 VPC" = "engineering/aws/foundation.md" },
+      { "運算與部署" = "engineering/aws/compute.md" },
+      { "儲存與資料庫" = "engineering/aws/storage-database.md" },
+      { "維運、安全與成本" = "engineering/aws/operations-security.md" },
     ] },
     { "監控與可觀測性" = [
       "engineering/monitoring/index.md",

@@ -320,3 +320,9 @@ docker run --network my-network --name app myapp
 docker run --network my-network --name mysql mysql:8.0
 # app 容器中可以直接用 mysql:3306 訪問 MySQL ✅
 ```
+
+!!! example "我的實作：Docker Compose 一鍵啟動"
+
+    holidayDessert 以 Docker Compose 同時啟動應用程式、MySQL 8.0、Redis 7；映像由 GitHub Actions 建置並推送到 GHCR。公司則使用 Harbor 作為私有映像倉庫。
+
+    👉 [Harbor 私有映像倉庫](harbor.md)

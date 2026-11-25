@@ -87,24 +87,25 @@ public class Singleton {
 }
 ```
 
-```
-volatile 底層原理（兩個機制）：
+**volatile 底層原理（兩個機制）**
 
 機制 1：記憶體屏障（Memory Barrier）
-  在 volatile 寫操作後插入 StoreStore + StoreLoad 屏障
-  在 volatile 讀操作前插入 LoadLoad + LoadStore 屏障
-  → 禁止指令重排序！
+
+- 在 volatile 寫操作後插入 StoreStore + StoreLoad 屏障
+- 在 volatile 讀操作前插入 LoadLoad + LoadStore 屏障
+- → 禁止指令重排序！
 
 機制 2：MESI 緩存一致性協議
-  volatile 變數寫入時，強制刷新到主記憶體
-  其他 CPU 核心的快取行標記為無效
-  → 其他線程讀取時，必須從主記憶體重新載入
 
-volatile 能做什麼：
-  ✅ 保證可見性（修改後立即對其他線程可見）
-  ✅ 保證有序性（禁止指令重排序）
-  ❌ 不保證原子性！（count++ 仍然不安全）
-```
+- volatile 變數寫入時，強制刷新到主記憶體
+- 其他 CPU 核心的快取行標記為無效
+- → 其他線程讀取時，必須從主記憶體重新載入
+
+**volatile 能做什麼**
+
+- ✅ 保證可見性（修改後立即對其他線程可見）
+- ✅ 保證有序性（禁止指令重排序）
+- ❌ 不保證原子性！（count++ 仍然不安全）
 
 ```java
 // volatile 的正確使用場景：
@@ -134,39 +135,38 @@ count++; // ❌ 不安全！需要 AtomicInteger.incrementAndGet()
 
 ## happens-before 原則
 
-```
 happens-before 是 JMM 保證可見性和有序性的核心規則！
 
 定義：如果操作 A happens-before 操作 B，
-     則 A 的結果對 B 可見，且 A 在 B 之前執行
 
-Java 中的 8 條 happens-before 規則：
+- 則 A 的結果對 B 可見，且 A 在 B 之前執行
 
-1. 程序順序規則（Program Order Rule）
-   同一個線程中，按代碼順序，前面的操作 HB 後面的操作
+**Java 中的 8 條 happens-before 規則**
 
-2. 監視器鎖規則（Monitor Lock Rule）
-   unlock 操作 HB 後續的 lock 操作
-   synchronized 解鎖後，其他線程加鎖能看到解鎖前的修改
+- 1\. 程序順序規則（Program Order Rule）
+    - 同一個線程中，按代碼順序，前面的操作 HB 後面的操作
 
-3. volatile 規則（Volatile Variable Rule）
-   volatile 寫 HB 後續對該變數的 volatile 讀
+- 2\. 監視器鎖規則（Monitor Lock Rule）
+    - unlock 操作 HB 後續的 lock 操作
+    - synchronized 解鎖後，其他線程加鎖能看到解鎖前的修改
 
-4. 線程啟動規則（Thread Start Rule）
-   Thread.start() HB 新線程的任何操作
+- 3\. volatile 規則（Volatile Variable Rule）
+    - volatile 寫 HB 後續對該變數的 volatile 讀
 
-5. 線程終止規則（Thread Termination Rule）
-   線程的任何操作 HB Thread.join() 返回
+- 4\. 線程啟動規則（Thread Start Rule）
+    - Thread.start() HB 新線程的任何操作
 
-6. 線程中斷規則（Thread Interruption Rule）
-   Thread.interrupt() HB 被中斷線程檢測到中斷
+- 5\. 線程終止規則（Thread Termination Rule）
+    - 線程的任何操作 HB Thread.join() 返回
 
-7. 對象終結規則（Finalizer Rule）
-   對象初始化 HB finalize() 方法
+- 6\. 線程中斷規則（Thread Interruption Rule）
+    - Thread.interrupt() HB 被中斷線程檢測到中斷
 
-8. 傳遞性規則（Transitivity）
-   A HB B，B HB C → A HB C
-```
+- 7\. 對象終結規則（Finalizer Rule）
+    - 對象初始化 HB finalize() 方法
+
+- 8\. 傳遞性規則（Transitivity）
+    - A HB B，B HB C → A HB C
 
 ```java
 // happens-before 實際範例

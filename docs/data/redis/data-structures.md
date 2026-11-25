@@ -2,18 +2,20 @@
 
 ## 為什麼要了解底層編碼？
 
-```
 Redis 的每種資料結構，會根據「元素數量」和「元素大小」
+
 自動選擇不同的底層編碼（encoding）
+
 → 小數據用壓縮結構（省記憶體）
+
 → 大數據用效能結構（速度快）
 
-面試常問：
-  "ZSet 底層是什麼？"
-  → 少量用 ZipList，大量用 SkipList + Dict
+**面試常問**
+
+- "ZSet 底層是什麼？"
+- → 少量用 ZipList，大量用 SkipList + Dict
 
 了解底層 → 才能解釋為什麼 Redis 這麼快、這麼省記憶體
-```
 
 ## String（字串）
 
@@ -69,22 +71,26 @@ if (!Boolean.TRUE.equals(isNew)) {
 
 ## List（列表）
 
-```
-底層編碼：
+**底層編碼**
 
-listpack（JDK 7.0+ 替代 ZipList）：
-  元素數量 ≤ 128 個 且 每個元素 ≤ 64 bytes
-  緊湊的連續記憶體結構
+**listpack（JDK 7.0+ 替代 ZipList）**
 
-quicklist（預設）：
-  雙向鏈表，每個節點是一個 listpack
-  兼顧記憶體和效能
+- 元素數量 ≤ 128 個 且 每個元素 ≤ 64 bytes
+- 緊湊的連續記憶體結構
 
-操作複雜度：
-  LPUSH / RPUSH：O(1)  → 頭尾插入
-  LPOP / RPOP：  O(1)  → 頭尾刪除
-  LINDEX：       O(n)  → 按索引查詢（需遍歷）
-  LRANGE：       O(n)  → 範圍查詢
+**quicklist（預設）**
+
+- 雙向鏈表，每個節點是一個 listpack
+- 兼顧記憶體和效能
+
+**操作複雜度**
+
+- LPUSH / RPUSH：O(1)  → 頭尾插入
+- LPOP / RPOP：  O(1)  → 頭尾刪除
+
+``` text
+LINDEX：       O(n)  → 按索引查詢（需遍歷）
+LRANGE：       O(n)  → 範圍查詢
 ```
 
 ```java
@@ -111,23 +117,24 @@ List<String> history = redisTemplate.opsForList().range("user:1:history", 0, -1)
 
 ## Hash（雜湊）
 
-```
-底層編碼：
+**底層編碼**
 
-listpack：
-  元素數量 ≤ 128 個 且 每個 field/value ≤ 64 bytes
+**listpack**
 
-hashtable：
-  超過閾值自動轉換
-  拉鏈法解決 Hash 衝突（和 Java HashMap 類似）
-  負載因子 > 1 時觸發 rehash（漸進式，不阻塞）
+- 元素數量 ≤ 128 個 且 每個 field/value ≤ 64 bytes
 
-漸進式 rehash：
-  同時維護 ht[0]（舊）和 ht[1]（新）
-  每次讀寫操作，順便遷移一個桶
-  遷移完成後，ht[0] = ht[1]
-  → 避免一次性 rehash 導致服務卡頓！
-```
+**hashtable**
+
+- 超過閾值自動轉換
+- 拉鏈法解決 Hash 衝突（和 Java HashMap 類似）
+- 負載因子 > 1 時觸發 rehash（漸進式，不阻塞）
+
+**漸進式 rehash**
+
+- 同時維護 ht[0]（舊）和 ht[1]（新）
+- 每次讀寫操作，順便遷移一個桶
+- 遷移完成後，ht[0] = ht[1]
+- → 避免一次性 rehash 導致服務卡頓！
 
 ```java
 // Hash 常用場景
@@ -160,22 +167,23 @@ redisTemplate.opsForHash().increment("article:100:stats", "comments",1);
 
 ## Set（集合）
 
-```
-底層編碼：
+**底層編碼**
 
-intset：
-  所有元素都是整數 且 元素數量 ≤ 512
-  有序整數陣列，二分搜尋
+**intset**
 
-hashtable：
-  超過閾值自動轉換
-  value 都為 null
+- 所有元素都是整數 且 元素數量 ≤ 512
+- 有序整數陣列，二分搜尋
 
-特點：
-  元素不重複
-  支援集合運算（交集 / 並集 / 差集）
-  時間複雜度 O(1) 查詢
-```
+**hashtable**
+
+- 超過閾值自動轉換
+- value 都為 null
+
+**特點**
+
+- 元素不重複
+- 支援集合運算（交集 / 並集 / 差集）
+- 時間複雜度 O(1) 查詢
 
 ```java
 // Set 常用場景
@@ -207,33 +215,39 @@ Long uv = redisTemplate.opsForHyperLogLog().size("page:home:uv");
 
 ## ZSet（有序集合）⭐ 最重要
 
-```
-底層編碼：
+**底層編碼**
 
-listpack：
-  元素數量 ≤ 128 個 且 每個元素 ≤ 64 bytes
+**listpack**
 
-skiplist + dict（跳表 + 字典）：
-  超過閾值自動轉換
+- 元素數量 ≤ 128 個 且 每個元素 ≤ 64 bytes
 
-為什麼要兩個結構？
-  dict：   member → score（O(1) 查詢某個 member 的 score）
-  skiplist：按 score 排序（O(log n) 範圍查詢）
+**skiplist + dict（跳表 + 字典）**
 
-跳表（SkipList）結構：
+- 超過閾值自動轉換
 
+**為什麼要兩個結構？**
+
+- dict：   member → score（O(1) 查詢某個 member 的 score）
+- skiplist：按 score 排序（O(log n) 範圍查詢）
+
+**跳表（SkipList）結構**
+
+``` text
 level 3: 1 ──────────────────────────────→ 9
 level 2: 1 ──────────→ 5 ──────────────→ 9
+```
+
 level 1: 1 → 2 → 3 → 5 → 6 → 7 → 8 → 9
 
 查詢從最高層開始，快速跳過不需要的節點
+
 時間複雜度：O(log n)
 
-為什麼用跳表而不是紅黑樹？
-  ✅ 範圍查詢更簡單（跳表葉節點連結）
-  ✅ 實作更簡單（紅黑樹複雜）
-  ✅ 並發友好（跳表局部修改，紅黑樹旋轉影響範圍大）
-```
+**為什麼用跳表而不是紅黑樹？**
+
+- ✅ 範圍查詢更簡單（跳表葉節點連結）
+- ✅ 實作更簡單（紅黑樹複雜）
+- ✅ 並發友好（跳表局部修改，紅黑樹旋轉影響範圍大）
 
 ```java
 // ZSet 常用場景

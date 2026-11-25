@@ -6,7 +6,7 @@ icon: lucide/book-open
 
 系統性整理全端工程師的核心知識體系：從 Java 與 JVM 底層、後端與前端框架、資料與訊息，到架構設計、網路資安與工程實踐。每個主題都不只停在「會用」，而是深入到「為什麼這樣設計」，並搭配我在實際專案中的實作。
 
-目前收錄 **7 大分類 · 25 個主題 · 120 個章節**。
+目前收錄 **7 大分類 · 26 個主題 · 126 個章節**。
 
 ## 知識地圖
 
@@ -28,7 +28,7 @@ icon: lucide/book-open
 
     [Spring Boot](backend/spring-boot/index.md) · [WebFlux](backend/webflux/index.md) · [Spring Cloud](backend/spring-cloud/index.md) · [ASP.NET Core](backend/aspnet-core/index.md)
 
--   :lucide-monitor: __[前端開發](frontend/index.md)__
+-   :lucide-monitor: __[前端與桌面](frontend/index.md)__
 
     ---
 
@@ -64,9 +64,9 @@ icon: lucide/book-open
 
     ---
 
-    自動化測試、CI/CD 流水線、監控與可觀測性。
+    自動化測試、CI/CD 與 GitOps、AWS 雲端、監控與可觀測性。
 
-    [測試](engineering/testing/index.md) · [CI/CD 與 DevOps](engineering/cicd/index.md) · [監控與可觀測性](engineering/monitoring/index.md)
+    [測試](engineering/testing/index.md) · [CI/CD 與 DevOps](engineering/cicd/index.md) · [AWS](engineering/aws/index.md) · [監控與可觀測性](engineering/monitoring/index.md)
 
 </div>
 
@@ -110,8 +110,9 @@ flowchart LR
 | **快取 / 搜尋** | Redis（Lua、分散式鎖）、OpenSearch / Elasticsearch、Logstash |
 | **訊息佇列** | Apache Kafka（Avro、Schema Registry）、RabbitMQ |
 | **即時通訊 / 串流** | WebSocket（STOMP、SockJS）、MediaMTX（RTMP / HLS）、HTTP Range |
-| **雲端 / AI** | AWS S3、Azure OpenAI、Azure AI Vision、Tesseract OCR |
-| **容器 / 編排** | Docker、Docker Compose、Kubernetes（kubeadm、containerd） |
-| **CI/CD** | GitHub Actions、GHCR、GitHub Pages、SonarQube |
+| **雲端** | **AWS**（S3、EC2、EKS、RDS…）、Azure OpenAI、Azure AI Vision |
+| **影像 / 文件** | Tesseract OCR、iText PDF、Apache POI、SheetJS |
+| **容器 / 編排** | Docker、Docker Compose、Kubernetes（kubeadm、containerd）、Helm |
+| **CI/CD** | GitHub Actions、Jenkins、**Harbor**、**Argo CD**、GHCR、GitHub Pages、SonarQube |
 | **監控** | Prometheus、Grafana、Zipkin、Micrometer、Spring Boot Actuator |
 | **測試** | JUnit 5、Mockito、Testcontainers、Reactor Test、Vitest、Testing Library |

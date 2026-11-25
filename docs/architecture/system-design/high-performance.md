@@ -28,11 +28,11 @@
 
 ### 常見分片策略：
 
-```
 Hash 取模：  userId % 4 → 均勻分布，但擴容難
-Range 範圍：  id 1~100萬 → shard0，101~200萬 → shard1
+
+Range 範圍：  id 1\~100萬 → shard0，101\~200萬 → shard1
+
 一致性 Hash：  擴容方便，但實作複雜
-```
 
 ### ShardingSphere 配置範例：
 
@@ -69,13 +69,12 @@ spring:
 
 ### 問題一：緩存穿透（Cache Penetration）
 
-```
 惡意請求不存在的 ID → Redis 沒有 → MySQL 也沒有 → 每次都打到 DB
 
-解決方案：
-1. 緩存空值（存 null，設短過期時間）
-2. 布隆過濾器（Bloom Filter）← 推薦
-```
+**解決方案**
+
+- 1\. 緩存空值（存 null，設短過期時間）
+- 2\. 布隆過濾器（Bloom Filter）← 推薦
 
 ```java
 RBloomFilter<Long> bloomFilter = redisson.getBloomFilter("product:ids");
@@ -92,15 +91,14 @@ public Product getProduct(Long id) {
 
 ### 問題二：緩存雪崩（Cache Avalanche）
 
-```
 大量緩存同時過期 → 所有請求打到 DB → DB 崩潰
 
-解決方案：
-1. 過期時間加隨機數（30分鐘 + Random(0~5分鐘)）
-2. 熱點數據設為永不過期（邏輯過期）
-3. Redis 叢集，避免單點
-4. 熔斷降級保護 DB
-```
+**解決方案**
+
+- 1\. 過期時間加隨機數（30分鐘 + Random(0\~5分鐘)）
+- 2\. 熱點數據設為永不過期（邏輯過期）
+- 3\. Redis 叢集，避免單點
+- 4\. 熔斷降級保護 DB
 
 ```java
 long expireTime = 1800 + new Random().nextInt(300);
@@ -109,13 +107,12 @@ redisTemplate.opsForValue().set(key, value, expireTime, TimeUnit.SECONDS);
 
 ### 問題三：緩存擊穿（Cache Breakdown）
 
-```
 熱點 Key 過期的瞬間，大量並發請求同時湧入 DB
 
-解決方案：
-1. 互斥鎖（同一時間只有一個請求重建緩存）
-2. 邏輯過期（不設 TTL，在 value 中存過期時間）
-```
+**解決方案**
+
+- 1\. 互斥鎖（同一時間只有一個請求重建緩存）
+- 2\. 邏輯過期（不設 TTL，在 value 中存過期時間）
 
 ```java
 public Product getProductWithMutex(Long id) {

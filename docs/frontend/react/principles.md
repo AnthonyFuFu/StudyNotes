@@ -47,37 +47,39 @@ Diff 算法三大策略：
 
 ## Fiber 架構（React 16+）
 
-```
-Fiber 解決的問題：
-  React 15 的 Stack Reconciler：
-  → 遞迴同步更新 DOM，一旦開始無法中斷
-  → 大量更新時，主線程被長時間佔用
-  → 動畫卡頓 / 用戶輸入無響應
+**Fiber 解決的問題**
 
-Fiber 的解決方式：
-  將渲染工作拆成小單元（Fiber Node）
-  每個 Fiber Node 對應一個 React 元素
-  利用 requestIdleCallback 在瀏覽器空閒時執行
-  可以中斷、恢復、重用工作
+**React 15 的 Stack Reconciler**
 
-Fiber 兩個階段：
+- → 遞迴同步更新 DOM，一旦開始無法中斷
+- → 大量更新時，主線程被長時間佔用
+- → 動畫卡頓 / 用戶輸入無響應
 
-① Reconciliation（協調，可中斷）：
-  遍歷 Fiber Tree，找出需要更新的節點
-  標記副作用（新增 / 更新 / 刪除）
-  可以被更高優先級的工作中斷
+**Fiber 的解決方式**
 
-② Commit（提交，不可中斷）：
-  將 Reconciliation 的結果一次性應用到真實 DOM
-  執行 useEffect / useLayoutEffect
+- 將渲染工作拆成小單元（Fiber Node）
+- 每個 Fiber Node 對應一個 React 元素
+- 利用 requestIdleCallback 在瀏覽器空閒時執行
+- 可以中斷、恢復、重用工作
 
-優先級調度（Concurrent Mode）：
-  不同類型的更新有不同優先級
-  用戶輸入（最高優先級）→ 立即響應
-  動畫 → 高優先級
-  數據加載 → 低優先級
-  → 高優先級任務可以打斷低優先級任務
-```
+**Fiber 兩個階段**
+
+- ① Reconciliation（協調，可中斷）：
+    - 遍歷 Fiber Tree，找出需要更新的節點
+    - 標記副作用（新增 / 更新 / 刪除）
+    - 可以被更高優先級的工作中斷
+
+- ② Commit（提交，不可中斷）：
+    - 將 Reconciliation 的結果一次性應用到真實 DOM
+    - 執行 useEffect / useLayoutEffect
+
+**優先級調度（Concurrent Mode）**
+
+- 不同類型的更新有不同優先級
+- 用戶輸入（最高優先級）→ 立即響應
+- 動畫 → 高優先級
+- 數據加載 → 低優先級
+- → 高優先級任務可以打斷低優先級任務
 
 ## Hooks 深度
 

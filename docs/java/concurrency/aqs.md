@@ -2,28 +2,30 @@
 
 ## AQS 架構
 
-```
 AQS（AbstractQueuedSynchronizer）是 Java 並發的骨幹！
 
-基於 AQS 實作的類：
-  ReentrantLock
-  ReentrantReadWriteLock
-  Semaphore
-  CountDownLatch
-  CyclicBarrier
+**基於 AQS 實作的類**
 
-AQS 核心：
-  state    - int 型的同步狀態（volatile）
-  CLH 佇列 - 雙向鏈表，存放等待線程的 Node
+- ReentrantLock
+- ReentrantReadWriteLock
+- Semaphore
+- CountDownLatch
+- CyclicBarrier
 
-獨佔模式（ReentrantLock）：
-  state = 0  → 未鎖定
-  state = 1  → 已鎖定
-  state = N  → 重入 N 次
+**AQS 核心**
 
-共享模式（Semaphore / CountDownLatch）：
-  state = N  → 允許 N 個線程同時訪問
-```
+- state    - int 型的同步狀態（volatile）
+- CLH 佇列 - 雙向鏈表，存放等待線程的 Node
+
+**獨佔模式（ReentrantLock）**
+
+- state = 0  → 未鎖定
+- state = 1  → 已鎖定
+- state = N  → 重入 N 次
+
+**共享模式（Semaphore / CountDownLatch）**
+
+- state = N  → 允許 N 個線程同時訪問
 
 **CLH 佇列（等待佇列）**
 

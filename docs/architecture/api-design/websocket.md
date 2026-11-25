@@ -2,42 +2,46 @@
 
 ## WebSocket 原理
 
-```
-HTTP 請求/響應模式的問題：
-  客戶端必須主動發請求才能獲得數據
-  服務器無法主動推送！
+**HTTP 請求/響應模式的問題**
 
-解決方案的演進：
-  輪詢（Polling）：
-    客戶端每秒發一次請求：「有新消息嗎？」
-    ❌ 浪費頻寬，延遲高
+- 客戶端必須主動發請求才能獲得數據
+- 服務器無法主動推送！
 
-  長輪詢（Long Polling）：
-    客戶端發請求，服務器掛起直到有數據才返回
-    ❌ 連接數多，資源浪費
+**解決方案的演進**
 
-  WebSocket：
-    ✅ 一次握手，建立持久雙向連接
-    ✅ 服務器可以主動推送
-    ✅ 低延遲，低開銷
+**輪詢（Polling）**
 
-WebSocket 握手過程：
-  ① 客戶端發 HTTP 請求（帶特殊頭）
-     GET /ws HTTP/1.1
-     Upgrade: websocket
-     Connection: Upgrade
-     Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==
+- 客戶端每秒發一次請求：「有新消息嗎？」
+- ❌ 浪費頻寬，延遲高
 
-  ② 服務器返回 101 Switching Protocols
-     HTTP/1.1 101 Switching Protocols
-     Upgrade: websocket
-     Connection: Upgrade
-     Sec-WebSocket-Accept: s3pPLMBiTxaQ9kYGzzhZRbK+xOo=
+**長輪詢（Long Polling）**
 
-  ③ 連接建立，雙方可以互相發送數據幀
-     ws://  → 非加密
-     wss:// → 加密（生產環境必須用！）
-```
+- 客戶端發請求，服務器掛起直到有數據才返回
+- ❌ 連接數多，資源浪費
+
+**WebSocket**
+
+- ✅ 一次握手，建立持久雙向連接
+- ✅ 服務器可以主動推送
+- ✅ 低延遲，低開銷
+
+**WebSocket 握手過程**
+
+- ① 客戶端發 HTTP 請求（帶特殊頭）
+    - GET /ws HTTP/1.1
+    - Upgrade: websocket
+    - Connection: Upgrade
+    - Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ\=\=
+
+- ② 服務器返回 101 Switching Protocols
+    - HTTP/1.1 101 Switching Protocols
+    - Upgrade: websocket
+    - Connection: Upgrade
+    - Sec-WebSocket-Accept: s3pPLMBiTxaQ9kYGzzhZRbK+xOo=
+
+- ③ 連接建立，雙方可以互相發送數據幀
+    - ws://  → 非加密
+    - wss:// → 加密（生產環境必須用！）
 
 ## Spring Boot 整合（STOMP over WebSocket）
 
@@ -302,3 +306,9 @@ function disconnect() {
     }
 }
 ```
+
+!!! example "我的實作：兩種 WebSocket 實作"
+
+    holidayDessert 的客服聊天室用 **STOMP over WebSocket**，stock-observation 的直播聊天室用 **WebFlux 原生 WebSocket + Reactor Sinks**，兩者的比較整理在即時通訊章節。
+
+    👉 [即時通訊與串流](realtime-streaming.md)

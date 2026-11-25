@@ -52,8 +52,10 @@ icon: lucide/user-round
 
 === "DevOps & 監控"
 
-    - Docker / Docker Compose、Kubernetes（kubeadm 自建叢集）
-    - GitHub Actions、GHCR、GitHub Pages、SonarQube
+    - Docker / Docker Compose、Kubernetes（kubeadm 自建叢集）、Helm
+    - GitHub Actions、Jenkins、GHCR、GitHub Pages、SonarQube
+    - **Harbor** 私有映像倉庫、**Argo CD** GitOps 部署（公司使用）
+    - **AWS**：S3、EC2、EKS、RDS 等（公司使用）
     - Prometheus + Grafana、Zipkin、Micrometer
 
 === "整合 & 其他"

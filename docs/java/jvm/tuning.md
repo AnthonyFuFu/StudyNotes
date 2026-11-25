@@ -53,27 +53,25 @@
 
 ## OOM 排查完整流程
 
-```
-OOM 類型診斷：
+**OOM 類型診斷**
 
-1. java.lang.OutOfMemoryError: Java heap space
-   → 堆記憶體不足
+- 1\. java.lang.OutOfMemoryError: Java heap space
+    - → 堆記憶體不足
 
-2. java.lang.OutOfMemoryError: GC overhead limit exceeded
-   → GC 時間佔比超過 98%，但回收不到 2%
+- 2\. java.lang.OutOfMemoryError: GC overhead limit exceeded
+    - → GC 時間佔比超過 98%，但回收不到 2%
 
-3. java.lang.OutOfMemoryError: Metaspace
-   → 方法區不足（類太多、動態生成類）
+- 3\. java.lang.OutOfMemoryError: Metaspace
+    - → 方法區不足（類太多、動態生成類）
 
-4. java.lang.OutOfMemoryError: Direct buffer memory
-   → NIO 直接記憶體不足（Netty、NIO 框架）
+- 4\. java.lang.OutOfMemoryError: Direct buffer memory
+    - → NIO 直接記憶體不足（Netty、NIO 框架）
 
-5. java.lang.StackOverflowError
-   → 棧溢出（遞迴過深）
+- 5\. java.lang.StackOverflowError
+    - → 棧溢出（遞迴過深）
 
-6. java.lang.OutOfMemoryError: unable to create new native thread
-   → 線程數超過 OS 限制
-```
+- 6\. java.lang.OutOfMemoryError: unable to create new native thread
+    - → 線程數超過 OS 限制
 
 ```bash
 # 排查工具
@@ -147,37 +145,43 @@ static class Inner { ... }
 
 ### OOM 排查實戰案例：
 
-```
 案例：電商系統 Full GC 頻繁，每隔 30 分鐘一次
 
-症狀：
-  - Full GC 停頓 3~5 秒
-  - GC 後老年代記憶體沒有明顯下降
+**症狀**
 
-排查過程：
+- Full GC 停頓 3\~5 秒
+- GC 後老年代記憶體沒有明顯下降
+
+**排查過程**
 
 Step 1：觀察 GC 情況
-  jstat -gcutil <pid> 5000
-  發現：Old 區使用率緩慢上升，最終觸發 Full GC
+
+- jstat -gcutil &lt;pid> 5000
+- 發現：Old 區使用率緩慢上升，最終觸發 Full GC
 
 Step 2：生成 Heap Dump
-  jmap -dump:format=b,file=heap.hprof <pid>
+
+- jmap -dump:format=b,file=heap.hprof &lt;pid>
 
 Step 3：MAT 分析
-  發現：一個 HashMap 持有大量 Session 對象（每個 1KB）
-  總計：50 萬個 Session 對象，500MB！
+
+- 發現：一個 HashMap 持有大量 Session 對象（每個 1KB）
+- 總計：50 萬個 Session 對象，500MB！
 
 Step 4：定位程式碼
-  發現：Session 管理器使用靜態 HashMap 儲存 Session
-  但 Session 過期後只是標記 expired=true，沒有從 Map 中移除！
+
+- 發現：Session 管理器使用靜態 HashMap 儲存 Session
+- 但 Session 過期後只是標記 expired=true，沒有從 Map 中移除！
 
 Step 5：修復
-  改用 Caffeine Cache（有過期自動移除）：
-  Cache<String, Session> sessionCache = Caffeine.newBuilder()
-      .expireAfterAccess(30, TimeUnit.MINUTES)
-      .maximumSize(100_000)
-      .build();
+
+**改用 Caffeine Cache（有過期自動移除）**
+
+- Cache&lt;String, Session> sessionCache = Caffeine.newBuilder()
+    - .expireAfterAccess(30, TimeUnit.MINUTES)
+    - .maximumSize(100_000)
+    - .build();
 
 Step 6：效果
-  Full GC 消失，老年代穩定在 30% 以下
-```
+
+- Full GC 消失，老年代穩定在 30% 以下

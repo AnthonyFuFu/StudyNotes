@@ -117,25 +117,25 @@ block-beta
 
 ## 文件寫入流程
 
-```
-寫入流程（PUT /index/_doc/1）：
+**寫入流程（PUT /index/_doc/1）**
 
-① 請求到達任意 Node（協調節點）
-② 計算文件應該寫入哪個 Shard：
-   shard = hash(document_id) % primary_shard_count
-③ 協調節點將請求轉發到對應的主分片所在的 Node
-④ 主分片寫入數據
-⑤ 並行複製到所有副本分片
-⑥ 所有副本確認寫入成功後，返回客戶端成功
+- ① 請求到達任意 Node（協調節點）
+- ② 計算文件應該寫入哪個 Shard：
+    - shard = hash(document_id) % primary_shard_count
+- ③ 協調節點將請求轉發到對應的主分片所在的 Node
+- ④ 主分片寫入數據
+- ⑤ 並行複製到所有副本分片
+- ⑥ 所有副本確認寫入成功後，返回客戶端成功
 
-寫入過程（主分片）：
-  ① 寫入 Memory Buffer（記憶體緩衝）
-  ② 每 1 秒 Refresh 一次（將 Buffer 寫入 Segment 文件）
-     → 寫入後 1 秒內可以被搜索（準實時 Near Real-Time，NRT）
-  ③ 每 30 分鐘或 Translog 過大 → Flush（Segment 落盤）
-  ④ 定期 Merge（合併小 Segment 為大 Segment，提升查詢性能）
+**寫入過程（主分片）**
 
-Translog（事務日誌）：
-  每次寫入都會寫 Translog（WAL 機制，防止數據丟失）
-  即使 Node 宕機，重啟後可以從 Translog 恢復
-```
+- ① 寫入 Memory Buffer（記憶體緩衝）
+- ② 每 1 秒 Refresh 一次（將 Buffer 寫入 Segment 文件）
+    - → 寫入後 1 秒內可以被搜索（準實時 Near Real-Time，NRT）
+- ③ 每 30 分鐘或 Translog 過大 → Flush（Segment 落盤）
+- ④ 定期 Merge（合併小 Segment 為大 Segment，提升查詢性能）
+
+**Translog（事務日誌）**
+
+- 每次寫入都會寫 Translog（WAL 機制，防止數據丟失）
+- 即使 Node 宕機，重啟後可以從 Translog 恢復

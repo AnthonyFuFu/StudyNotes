@@ -285,32 +285,37 @@ output {
 
 ## Kibana 使用技巧
 
-```
-KQL（Kibana Query Language）常用查詢：
+**KQL（Kibana Query Language）常用查詢**
 
-# 查找特定服務的錯誤日誌
+\# 查找特定服務的錯誤日誌
+
 service: "order-service" AND log_level: "ERROR"
 
-# 查找特定 traceId 的所有日誌（排查問題！）
+\# 查找特定 traceId 的所有日誌（排查問題！）
+
 trace_id: "abc123def456"
 
-# 查找慢請求
+\# 查找慢請求
+
 duration_ms > 1000 AND service: "order-service"
 
-# 查找包含特定錯誤訊息
+\# 查找包含特定錯誤訊息
+
 log_message: "OutOfMemoryError" OR log_message: "connection refused"
 
-# 查找特定時間段
-@timestamp >= "2024-01-01T00:00:00" AND @timestamp <= "2024-01-01T01:00:00"
+\# 查找特定時間段
 
-# 正則查詢
-log_message: /.*timeout.*/
+@timestamp >= "2024-01-01T00:00:00" AND @timestamp &lt;= "2024-01-01T01:00:00"
 
-重要功能：
-① Discover：實時搜索日誌
-② Dashboard：視覺化日誌分析
-③ Alerts：基於日誌的告警（如錯誤日誌突增）
-④ Index Lifecycle Management（ILM）：
-   Hot（7天）→ Warm（30天）→ Cold（90天）→ Delete
-   自動管理索引，節省儲存空間
-```
+\# 正則查詢
+
+log_message: /.\*timeout.\*/
+
+**重要功能**
+
+- ① Discover：實時搜索日誌
+- ② Dashboard：視覺化日誌分析
+- ③ Alerts：基於日誌的告警（如錯誤日誌突增）
+- ④ Index Lifecycle Management（ILM）：
+    - Hot（7天）→ Warm（30天）→ Cold（90天）→ Delete
+    - 自動管理索引，節省儲存空間

@@ -113,3 +113,9 @@ public void monitorThreadPool() {
     );
 }
 ```
+
+!!! example "我的實作：@Async 執行緒池降級"
+
+    holidayDessert 沒有啟用 Kafka 時，搶票訂單改由 `@Async` 執行緒池寫入資料庫，執行緒池參數與拒絕策略的選擇就是本章的內容。
+
+    👉 [實戰：高併發搶票系統](../../backend/spring-boot/practice-seckill.md)

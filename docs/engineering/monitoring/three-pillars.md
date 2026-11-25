@@ -54,28 +54,27 @@ flowchart LR
 
 ## 黃金指標（The Four Golden Signals）
 
-```
-Google SRE 提出的四個最重要的監控指標：
+**Google SRE 提出的四個最重要的監控指標**
 
-① 延遲（Latency）
-   請求需要多長時間？
-   關注 P99（99th percentile），而不只是平均值！
+- ① 延遲（Latency）
+    - 請求需要多長時間？
+    - 關注 P99（99th percentile），而不只是平均值！
 
-   平均值的陷阱：
-   [1ms, 1ms, 1ms, 1ms, 1ms, 1ms, 1ms, 1ms, 1ms, 10000ms]
-   平均 = 1001ms
-   P50 = 1ms    → 50% 用戶體驗很好
-   P99 = 10000ms → 1% 用戶體驗極差！
+**平均值的陷阱**
 
-② 流量（Traffic）
-   系統有多忙？
-   QPS（每秒請求數）、TPS（每秒事務數）
+- [1ms, 1ms, 1ms, 1ms, 1ms, 1ms, 1ms, 1ms, 1ms, 10000ms]
+- 平均 = 1001ms
+- P50 = 1ms    → 50% 用戶體驗很好
+- P99 = 10000ms → 1% 用戶體驗極差！
 
-③ 錯誤率（Errors）
-   請求失敗的比例？
-   HTTP 5xx 錯誤率、業務錯誤率
+- ② 流量（Traffic）
+    - 系統有多忙？
+    - QPS（每秒請求數）、TPS（每秒事務數）
 
-④ 飽和度（Saturation）
-   系統資源使用了多少？
-   CPU 使用率、記憶體使用率、連線池使用率
-```
+- ③ 錯誤率（Errors）
+    - 請求失敗的比例？
+    - HTTP 5xx 錯誤率、業務錯誤率
+
+- ④ 飽和度（Saturation）
+    - 系統資源使用了多少？
+    - CPU 使用率、記憶體使用率、連線池使用率

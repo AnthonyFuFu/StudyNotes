@@ -2,20 +2,21 @@
 
 ## 核心原理
 
-```
-問題：
-  @DataJpaTest 使用 H2 記憶體資料庫
-  但 H2 語法和 MySQL 不完全兼容！
-  在 H2 通過的測試，在真實 MySQL 可能失敗！
+**問題**
 
-Testcontainers 的解決方式：
-  在測試執行時，自動啟動 Docker 容器（真實的 MySQL）
-  測試完成後自動銷毀容器
-  → 測試環境和生產環境完全一致！
+- @DataJpaTest 使用 H2 記憶體資料庫
+- 但 H2 語法和 MySQL 不完全兼容！
+- 在 H2 通過的測試，在真實 MySQL 可能失敗！
 
-前提：
-  本地/CI 環境需要有 Docker
-```
+**Testcontainers 的解決方式**
+
+- 在測試執行時，自動啟動 Docker 容器（真實的 MySQL）
+- 測試完成後自動銷毀容器
+- → 測試環境和生產環境完全一致！
+
+**前提**
+
+- 本地/CI 環境需要有 Docker
 
 ## 整合 MySQL + Redis
 
@@ -217,3 +218,9 @@ VALUES (1, 1, 'PAID',    500.00, '2024-01-01 10:00:00'),
        (3, 1, 'PAID',    200.00, '2024-01-03 10:00:00'),
        (4, 2, 'PAID',    150.00, '2024-01-04 10:00:00');
 ```
+
+!!! example "我的實作：CI 中的真實環境測試"
+
+    holidayDessert 在 GitHub Actions 中以 `services` 啟動 MySQL 8 與 Redis 7 容器執行測試，與 Testcontainers 的目的相同：用真實的資料庫行為驗證程式。
+
+    👉 [實戰：我的 CI/CD 與 K8s 部署](../cicd/my-pipelines.md)

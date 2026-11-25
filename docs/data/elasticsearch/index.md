@@ -80,19 +80,22 @@ flowchart LR
 
 ### 倒排索引原理
 
-```
 文件內容 → 分詞 → 建立倒排索引
 
 詞（Term） → 文件列表（Posting List）
+
+``` text
 "Java"     → [Doc1, Doc2, Doc3]
 "Spring"   → [Doc1, Doc3]
+```
 
 搜索 "Java" → 直接查倒排索引 → 毫秒級返回
+
 （無需掃描任何文件內容！）
 
-相關性評分（BM25）：
-  TF（詞頻）× IDF（稀有度）→ 越稀有的詞越重要
-```
+**相關性評分（BM25）**
+
+- TF（詞頻）× IDF（稀有度）→ 越稀有的詞越重要
 
 ### DSL 查詢核心
 
@@ -133,3 +136,9 @@ flowchart LR
 | **分頁** | 深度分頁用 search_after，避免 from > 10000 |
 | **批量寫入** | Bulk API，每批 1000 條，暫時關閉副本和 refresh |
 | **ILM** | Hot → Warm → Cold → Delete，自動管理日誌索引 |
+
+!!! example "我的實作：holidayDessert 的 OpenSearch"
+
+    holidayDessert 使用 **OpenSearch**（Elasticsearch 7.10 分支出來的開源版本，API 大致相容）做會員全文搜尋，並以 **Logstash** 依 `index_member.conf` 從 MySQL 同步資料到索引。
+
+    👉 [AWS OpenSearch Service](../../engineering/aws/storage-database.md)

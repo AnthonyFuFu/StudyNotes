@@ -75,63 +75,69 @@ PUT /products
 }
 ```
 
-```
-常用欄位類型：
+**常用欄位類型**
 
 text：    全文搜索（會分詞）
-          name: "iPhone 15 Pro"
-          → 分詞 → ["iPhone", "15", "Pro"]
-          → 可以搜 "iPhone" 找到此文件
+
+- name: "iPhone 15 Pro"
+- → 分詞 → ["iPhone", "15", "Pro"]
+- → 可以搜 "iPhone" 找到此文件
 
 keyword： 精確匹配（不分詞）
-          category: "手機"
-          → 必須搜 "手機" 才能找到，搜 "手" 找不到
-          → 適合排序、聚合、精確過濾
 
-text + keyword 雙類型（fields）：
-  name 欄位同時支援全文搜索和精確匹配
-  name        → text  → 全文搜索（"iPhone"）
-  name.keyword → keyword → 排序、聚合（精確匹配）
+- category: "手機"
+- → 必須搜 "手機" 才能找到，搜 "手" 找不到
+- → 適合排序、聚合、精確過濾
+
+**text + keyword 雙類型（fields）**
+
+- name 欄位同時支援全文搜索和精確匹配
+- name        → text  → 全文搜索（"iPhone"）
+- name.keyword → keyword → 排序、聚合（精確匹配）
 
 nested：  嵌套對象（保持對象內欄位的關聯）
-          vs object 類型：
-          object 的數組會被扁平化（失去關聯）
-          nested 保持每個對象的獨立性
+
+**vs object 類型**
+
+- object 的數組會被扁平化（失去關聯）
+- nested 保持每個對象的獨立性
 
 index: false  不建立索引（不能被搜索，但可以取回）
-              適合：大圖片 URL、不需要搜索的欄位
-```
+
+- 適合：大圖片 URL、不需要搜索的欄位
 
 ## 分析器（Analyzer）
 
-```
-分析器流程：
+**分析器流程**
+
 原始文本 → Character Filter → Tokenizer → Token Filter → Token 列表
 
-範例：
+**範例**
+
 原始文本："I LOVE Java Programming!"
 
-① Character Filter（字符過濾）：去除 HTML 標籤等
-   → "I LOVE Java Programming!"
+- ① Character Filter（字符過濾）：去除 HTML 標籤等
+    - → "I LOVE Java Programming!"
 
-② Tokenizer（分詞）：按空格、標點切分
-   → ["I", "LOVE", "Java", "Programming"]
+- ② Tokenizer（分詞）：按空格、標點切分
+    - → ["I", "LOVE", "Java", "Programming"]
 
-③ Token Filter（詞語過濾）：
-   lowercase → ["i", "love", "java", "programming"]
-   stop word → 去除停用詞（"i"）→ ["love", "java", "programming"]
-   stemmer   → 詞幹提取 → ["love", "java", "program"]
+- ③ Token Filter（詞語過濾）：
+    - lowercase → ["i", "love", "java", "programming"]
+    - stop word → 去除停用詞（"i"）→ ["love", "java", "programming"]
+    - stemmer   → 詞幹提取 → ["love", "java", "program"]
 
-中文分詞（IK Analyzer 插件）：
-  ik_smart：智能模式，較少分詞（粗粒度）
-    "中華人民共和國" → ["中華人民共和國"]
-  ik_max_word：最細粒度，盡量多分詞
-    "中華人民共和國" → ["中華人民共和國", "中華人民", "中華", "人民共和國", ...]
+**中文分詞（IK Analyzer 插件）**
 
-建議：
-  index（建立索引）時 → ik_max_word（盡量多分詞，增加召回率）
-  search（搜索時）   → ik_smart（智能分詞，提高精確度）
-```
+- ik_smart：智能模式，較少分詞（粗粒度）
+    - "中華人民共和國" → ["中華人民共和國"]
+- ik_max_word：最細粒度，盡量多分詞
+    - "中華人民共和國" → ["中華人民共和國", "中華人民", "中華", "人民共和國", ...]
+
+**建議**
+
+- index（建立索引）時 → ik_max_word（盡量多分詞，增加召回率）
+- search（搜索時）   → ik_smart（智能分詞，提高精確度）
 
 ```bash
 # 測試分析器

@@ -2,74 +2,81 @@
 
 ## REST 設計六大原則
 
-```
 REST（Representational State Transfer）架構風格：
 
-① 統一介面（Uniform Interface）
-   資源用名詞表示，不用動詞
-   ✅ GET /orders/123
-   ❌ GET /getOrder?id=123
+- ① 統一介面（Uniform Interface）
+    - 資源用名詞表示，不用動詞
+    - ✅ GET /orders/123
+    - ❌ GET /getOrder?id=123
 
-② 無狀態（Stateless）
-   每個請求都包含完整資訊，服務器不儲存 Session
-   ✅ 每次請求帶上 JWT Token
-   ❌ 依賴服務器端 Session
+- ② 無狀態（Stateless）
+    - 每個請求都包含完整資訊，服務器不儲存 Session
+    - ✅ 每次請求帶上 JWT Token
+    - ❌ 依賴服務器端 Session
 
-③ 可快取（Cacheable）
-   GET 請求應該支援快取
-   使用 Cache-Control、ETag、Last-Modified 頭
+- ③ 可快取（Cacheable）
+    - GET 請求應該支援快取
+    - 使用 Cache-Control、ETag、Last-Modified 頭
 
-④ 客戶端/服務器分離（Client-Server）
-   前後端分離，各自獨立演化
+- ④ 客戶端/服務器分離（Client-Server）
+    - 前後端分離，各自獨立演化
 
-⑤ 分層系統（Layered System）
-   客戶端不需要知道是直接連服務器，
-   還是通過 Load Balancer / API Gateway
+- ⑤ 分層系統（Layered System）
+    - 客戶端不需要知道是直接連服務器，
+    - 還是通過 Load Balancer / API Gateway
 
-⑥ 按需程式碼（Code on Demand，可選）
-   服務器可以返回可執行的程式碼（如 JavaScript）
-```
+- ⑥ 按需程式碼（Code on Demand，可選）
+    - 服務器可以返回可執行的程式碼（如 JavaScript）
 
 ## URI 設計規範
 
-```
-資源命名規則：
+**資源命名規則**
 
+``` text
 ✅ 使用名詞（複數）
    /users          用戶列表
    /users/123      特定用戶
    /orders         訂單列表
    /orders/456     特定訂單
+```
 
+``` text
 ✅ 層次關係用路徑表示
    /users/123/orders        用戶 123 的所有訂單
    /users/123/orders/456    用戶 123 的訂單 456
+```
 
-✅ 過濾、排序、分頁用查詢參數
-   GET /orders?status=PAID&sort=created_at&order=desc&page=1&size=20
+- ✅ 過濾、排序、分頁用查詢參數
+    - GET /orders?status=PAID&sort=created_at&order=desc&page=1&size=20
 
-✅ 搜索
-   GET /products/search?keyword=iPhone&category=手機
+- ✅ 搜索
+    - GET /products/search?keyword=iPhone&category=手機
 
+``` text
 ❌ 不要用動詞
    /getUsers     ❌  → GET /users        ✅
    /createOrder  ❌  → POST /orders       ✅
    /deleteUser   ❌  → DELETE /users/123  ✅
    /updateOrder  ❌  → PUT /orders/456    ✅
+```
 
+``` text
 ❌ 不要用大寫和底線
    /UserOrders   ❌  → /user-orders       ✅
    /user_orders  ❌  → /user-orders       ✅
+```
 
-特殊操作（非 CRUD）：
-   POST /orders/456/cancel    取消訂單（動作）
-   POST /orders/456/pay       付款
-   POST /users/123/activate   啟用帳號
+**特殊操作（非 CRUD）**
+
+``` text
+POST /orders/456/cancel    取消訂單（動作）
+POST /orders/456/pay       付款
+POST /users/123/activate   啟用帳號
 ```
 
 ## HTTP 方法與冪等性
 
-```
+``` text
 HTTP 方法     語義          安全性  冪等性
 ──────────────────────────────────────────────
 GET          查詢           ✅      ✅
@@ -79,43 +86,59 @@ POST         新增/提交      ❌      ❌
 PUT          完整更新       ❌      ✅
 PATCH        部分更新       ❌      ❌
 DELETE       刪除           ❌      ✅
-
-安全性（Safe）：不修改服務器狀態
-冪等性（Idempotent）：多次執行結果相同
-
-重點：
-  GET /orders/123     → 每次都返回相同訂單（安全 + 冪等）
-  POST /orders        → 每次呼叫可能建立新訂單（非冪等！）
-  PUT /orders/123     → 多次更新結果相同（冪等）
-  DELETE /orders/123  → 第一次刪除，之後呼叫返回 404（冪等）
-
-POST 的冪等性設計（防重複提交）：
-  客戶端生成唯一的 Idempotency-Key
-  服務器用此 Key 判斷是否重複請求
-
-  POST /payments
-  Idempotency-Key: uuid-abc-123
-  → 第一次：建立支付，存 Redis key=uuid-abc-123, value=result
-  → 重複請求：直接返回 Redis 中的結果
 ```
+
+| 項目 | 說明 |
+|------|------|
+| 安全性（Safe） | 不修改服務器狀態 |
+| 冪等性（Idempotent） | 多次執行結果相同 |
+
+**重點**
+
+| 項目 | 說明 |
+|------|------|
+| GET /orders/123 | 每次都返回相同訂單（安全 + 冪等） |
+| POST /orders | 每次呼叫可能建立新訂單（非冪等！） |
+| PUT /orders/123 | 多次更新結果相同（冪等） |
+| DELETE /orders/123 | 第一次刪除，之後呼叫返回 404（冪等） |
+
+**POST 的冪等性設計（防重複提交）**
+
+客戶端生成唯一的 Idempotency-Key
+
+服務器用此 Key 判斷是否重複請求
+
+POST /payments
+
+Idempotency-Key: uuid-abc-123
+
+→ 第一次：建立支付，存 Redis key=uuid-abc-123, value=result
+
+→ 重複請求：直接返回 Redis 中的結果
 
 ## HTTP Status Code 完整規範
 
-```
+``` text
 1xx - 資訊性
   100 Continue         → 繼續發送請求體
+```
 
+``` text
 2xx - 成功
   200 OK               → 查詢成功（GET / PUT / PATCH）
   201 Created          → 建立成功（POST），響應頭帶 Location
   202 Accepted         → 已接受，非同步處理（如：提交任務）
   204 No Content       → 成功但無返回內容（DELETE）
+```
 
+``` text
 3xx - 重定向
   301 Moved Permanently → 永久重定向（更新書籤）
   302 Found            → 臨時重定向
   304 Not Modified     → 緩存未過期，使用本地緩存
+```
 
+``` text
 4xx - 客戶端錯誤
   400 Bad Request      → 請求格式錯誤、參數非法
   401 Unauthorized     → 未認證（沒有 Token）
@@ -126,7 +149,9 @@ POST 的冪等性設計（防重複提交）：
   410 Gone             → 資源已永久刪除（和 404 的區別）
   422 Unprocessable Entity → 格式正確但業務驗證失敗
   429 Too Many Requests → 超過限流閾值
+```
 
+``` text
 5xx - 服務器錯誤
   500 Internal Server Error → 服務器未預期的錯誤
   502 Bad Gateway           → 上游服務返回無效響應
@@ -419,27 +444,28 @@ public class DeprecationInterceptor implements HandlerInterceptor {
 
 ## API 設計最佳實踐清單
 
-```
-請求設計：
-✅ 使用 HTTPS，禁止 HTTP
-✅ 請求體用 JSON，Content-Type: application/json
-✅ 使用 @Valid 驗證請求參數
-✅ 敏感資訊不放 URL（如密碼、Token）
-✅ 分頁參數統一：page（從0開始）, size, sort, order
-✅ 時間統一用 ISO 8601（2024-01-15T10:30:00Z）
-✅ 金額用字串或 Long（避免浮點數精度問題）
+**請求設計**
 
-響應設計：
-✅ 統一響應格式 ApiResponse<T>
-✅ 正確使用 HTTP Status Code
-✅ 錯誤響應帶業務錯誤碼和描述
-✅ 響應帶 traceId（方便客戶端提供排查信息）
-✅ 敏感欄位不返回（如密碼 hash、內部 ID）
+- ✅ 使用 HTTPS，禁止 HTTP
+- ✅ 請求體用 JSON，Content-Type: application/json
+- ✅ 使用 @Valid 驗證請求參數
+- ✅ 敏感資訊不放 URL（如密碼、Token）
+- ✅ 分頁參數統一：page（從0開始）, size, sort, order
+- ✅ 時間統一用 ISO 8601（2024-01-15T10:30:00Z）
+- ✅ 金額用字串或 Long（避免浮點數精度問題）
 
-安全設計：
-✅ 所有接口需要認證（除了登入、公開接口）
-✅ 使用 JWT 或 OAuth2
-✅ 限流保護（防暴力破解、防刷接口）
-✅ 冪等性設計（防重複提交）
-✅ 接口日誌審計（誰、什麼時間、做了什麼）
-```
+**響應設計**
+
+- ✅ 統一響應格式 ApiResponse&lt;T>
+- ✅ 正確使用 HTTP Status Code
+- ✅ 錯誤響應帶業務錯誤碼和描述
+- ✅ 響應帶 traceId（方便客戶端提供排查信息）
+- ✅ 敏感欄位不返回（如密碼 hash、內部 ID）
+
+**安全設計**
+
+- ✅ 所有接口需要認證（除了登入、公開接口）
+- ✅ 使用 JWT 或 OAuth2
+- ✅ 限流保護（防暴力破解、防刷接口）
+- ✅ 冪等性設計（防重複提交）
+- ✅ 接口日誌審計（誰、什麼時間、做了什麼）

@@ -2,17 +2,17 @@
 
 全端工程師的深度學習筆記網站，以 [zensical](https://zensical.org/) 建立，內容以 Markdown 撰寫。
 
-筆記系統性整理核心知識體系，並搭配實際專案的實作，共 **7 大分類、25 個主題、120 個章節**：
+筆記系統性整理核心知識體系，並搭配實際專案的實作，共 **7 大分類、26 個主題、126 個章節**：
 
 | 分類 | 主題 |
 |------|------|
 | Java 核心 | Java 新特性 / JVM 深度原理 / Java 並發 |
 | 後端框架 | Spring Boot（MVC）/ Spring WebFlux / Spring Cloud 微服務 / ASP.NET Core |
-| 前端開發 | 前端基礎原理 / 伺服器端模板（Thymeleaf、Razor）/ Vue / React / Angular / Electron 桌面應用 |
+| 前端與桌面 | 前端基礎原理 / 伺服器端模板（Thymeleaf、Razor）/ Vue / React / Angular / Electron 桌面應用 |
 | 資料與訊息 | MySQL 深度優化 / Redis 深度 / Elasticsearch / 訊息佇列（Kafka、RabbitMQ） |
 | 架構設計 | 系統設計 / 設計模式 / API 設計與通訊協議 |
 | 網路與資安 | 網路基礎 / 資安 |
-| 工程實踐 | 測試 / CI/CD 與 DevOps / 監控與可觀測性 |
+| 工程實踐 | 測試 / CI/CD 與 DevOps（含 Harbor、Argo CD）/ AWS 雲端服務 / 監控與可觀測性 |
 
 框架類主題都依照「原理 → 優缺點 → 我的實作」撰寫，實作內容來自以下專案：holidayDessert、holiday_dessert_vue、stock-observation、microservicecloud、chineseArtwork、chinese_artwork_angular、fu-clan-management-system。
 
@@ -209,6 +209,8 @@ flowchart LR
 - **配色**：不要自訂一般節點的背景色。需要強調時，用 `classDef` 只改外框（`stroke-width`、`stroke-dasharray`）或用透明背景；`block-beta` 的外層區塊請加 `style 區塊名稱 fill:transparent`，否則深色模式下會變成低對比的底色。
 - **不要使用**：`mindmap`（節點會重疊、部分文字在這個主題下看不清楚，學習地圖請改用上述的樹狀圖）、`gantt`（文字太小，任務名稱含冒號會整張無法繪製）、`packet-beta`（64 位會被切成兩列）。
 - Mermaid 放在 `???` 折疊區塊內可能無法正確繪製，請放在一般內文中。
+- `block-beta` 的根層不要只放一個橫跨整列的方塊，高度會異常；把它包進子區塊（`block:xxx:3 … end`）。
+- 7 個以上參與者的 `sequenceDiagram` 會太寬，改成分階段的 `flowchart` 加說明表格。
 - 純表格資料（例如兩種技術的比較、判斷規則）用 Markdown 表格，不要畫成圖。
 - 新增或修改圖之後，請在本機用 `python -m zensical serve` 實際看過淺色與深色兩種模式。
 

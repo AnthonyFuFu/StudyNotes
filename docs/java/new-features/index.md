@@ -96,15 +96,17 @@ flowchart LR
 | **Structured Concurrency** | Java 21 | 子任務跟著 Scope 走，生命週期管理更安全 |
 
 ### Virtual Threads 核心原理
-```
-傳統平台線程：Java Thread ──1:1──→ OS Thread（~1MB/線程）
-虛擬線程：    Virtual Thread ──M:N──→ Carrier Thread（= CPU 核心數）
+| 項目 | 說明 |
+|------|------|
+| 傳統平台線程 | Java Thread ──1:1──→ OS Thread（\~1MB/線程） |
+| 虛擬線程 | Virtual Thread ──M:N──→ Carrier Thread（= CPU 核心數） |
 
-等待 IO 時 → 自動讓出 Carrier Thread → Carrier Thread 處理其他虛擬線程
-IO 完成時 → 重新掛載繼續執行
+| 項目 | 說明 |
+|------|------|
+| 等待 IO 時 | 自動讓出 Carrier Thread → Carrier Thread 處理其他虛擬線程 |
+| IO 完成時 | 重新掛載繼續執行 |
 
 Spring Boot 3.2 開啟：spring.threads.virtual.enabled: true
-```
 
 ## 核心要點總結
 

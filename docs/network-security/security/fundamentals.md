@@ -2,22 +2,23 @@
 
 ## 認證（Authentication）vs 授權（Authorization）
 
-```
-認證（Authentication）= 你是誰？
-  → 驗證身份：帳號密碼、指紋、Token
+**認證（Authentication）= 你是誰？**
 
-授權（Authorization）= 你能做什麼？
-  → 驗證權限：能不能訪問這個資源
+- → 驗證身份：帳號密碼、指紋、Token
 
-流程：
-  用戶輸入帳密
-       ↓
-  [認證] 你是 John？✅
-       ↓
-  [授權] John 能訪問 /admin？❌（沒有 ADMIN 角色）
-       ↓
-  返回 403 Forbidden
-```
+**授權（Authorization）= 你能做什麼？**
+
+- → 驗證權限：能不能訪問這個資源
+
+**流程**
+
+- 用戶輸入帳密
+    - ↓
+- [認證] 你是 John？✅
+    - ↓
+- [授權] John 能訪問 /admin？❌（沒有 ADMIN 角色）
+    - ↓
+- 返回 403 Forbidden
 
 ## 加密基礎
 
@@ -116,3 +117,9 @@ sequenceDiagram
 1. 非對稱加密用於握手（交換密鑰）
 2. 對稱加密用於實際數據傳輸（速度快）
 3. CA（證書頒發機構）保證公鑰真實性
+
+!!! example "我的實作：密碼雜湊"
+
+    chineseArtwork（ASP.NET Core）使用 **PBKDF2-HMAC-SHA256 + 隨機鹽**儲存密碼，原理與 BCrypt 相同：故意算很慢、每個使用者的鹽不同。
+
+    👉 [EF Core 與 Cookie 驗證](../../backend/aspnet-core/efcore-auth.md)

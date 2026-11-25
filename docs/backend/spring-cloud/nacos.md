@@ -2,26 +2,29 @@
 
 ## 服務發現（Service Registry）
 
-```
-服務發現核心流程：
+**服務發現核心流程**
 
 訂單服務啟動
-    → 向 Nacos 註冊（ip:port + 服務名 + 健康狀態）
-    ↓
+
+- → 向 Nacos 註冊（ip:port + 服務名 + 健康狀態）
+- ↓
+
 用戶服務要呼叫訂單服務
-    → 問 Nacos：「order-service 在哪？」
-    → Nacos 返回所有健康的 order-service 實例列表
-    → 用戶服務根據負載均衡策略選一個呼叫
 
-Nacos 健康檢查：
-  客戶端主動心跳（預設 5 秒一次）
-  超過 15 秒未收到心跳 → 標記為不健康
-  超過 30 秒未收到心跳 → 從服務列表移除
+- → 問 Nacos：「order-service 在哪？」
+- → Nacos 返回所有健康的 order-service 實例列表
+- → 用戶服務根據負載均衡策略選一個呼叫
 
-臨時實例 vs 永久實例：
-  臨時實例（預設）：客戶端心跳，服務下線自動移除
-  永久實例：Nacos 主動探測，服務下線標記不健康但不移除
-```
+**Nacos 健康檢查**
+
+- 客戶端主動心跳（預設 5 秒一次）
+- 超過 15 秒未收到心跳 → 標記為不健康
+- 超過 30 秒未收到心跳 → 從服務列表移除
+
+**臨時實例 vs 永久實例**
+
+- 臨時實例（預設）：客戶端心跳，服務下線自動移除
+- 永久實例：Nacos 主動探測，服務下線標記不健康但不移除
 
 ```xml
 <!-- pom.xml -->
@@ -74,24 +77,23 @@ public void printInstances() {
 
 ## 配置中心（Config Center）
 
-```
-為什麼需要配置中心？
+**為什麼需要配置中心？**
 
-❌ 傳統方式：配置寫在 application.yml
-  → 修改配置需要重新打包部署
-  → 多個服務的配置散落各處，難以管理
-  → 生產環境密碼暴露在程式碼中
+- ❌ 傳統方式：配置寫在 application.yml
+    - → 修改配置需要重新打包部署
+    - → 多個服務的配置散落各處，難以管理
+    - → 生產環境密碼暴露在程式碼中
 
-✅ 配置中心：
-  → 統一管理所有服務的配置
-  → 修改配置即時生效（不需要重啟）
-  → 配置版本管理（可以回滾）
-  → 環境隔離（dev / staging / prod）
+- ✅ 配置中心：
+    - → 統一管理所有服務的配置
+    - → 修改配置即時生效（不需要重啟）
+    - → 配置版本管理（可以回滾）
+    - → 環境隔離（dev / staging / prod）
 
-Nacos 配置 DataId 命名規則：
-  ${spring.application.name}-${spring.profiles.active}.${file-extension}
-  例：order-service-dev.yaml
-```
+**Nacos 配置 DataId 命名規則**
+
+- ${spring.application.name}-${spring.profiles.active}.${file-extension}
+- 例：order-service-dev.yaml
 
 ```xml
 <!-- pom.xml -->
@@ -171,3 +173,9 @@ public class ConfigChangeListener {
     }
 }
 ```
+
+!!! example "我的實作：我實作的是 Eureka"
+
+    microservicecloud 使用 Eureka 雙節點叢集作為註冊中心、Config Server 作為設定中心；與 Nacos 的差異整理在元件選型章節。
+
+    👉 [元件選型：Spring Cloud 與 Alibaba 對照](ecosystem-comparison.md)

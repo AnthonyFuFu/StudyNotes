@@ -82,28 +82,30 @@ public class InputSanitizer {
 
 ## CSRF（跨站請求偽造）
 
-```
-攻擊原理：
-  用戶登入了銀行網站（有 Cookie Session）
-  同時訪問了惡意網站，惡意網站有：
-  <img src="http://bank.com/transfer?to=hacker&amount=10000">
-  瀏覽器自動帶上銀行的 Cookie，請求成功！
+**攻擊原理**
 
-防禦方式：
+- 用戶登入了銀行網站（有 Cookie Session）
+- 同時訪問了惡意網站，惡意網站有：
+- &lt;img src="http://bank.com/transfer?to=hacker&amount=10000">
+- 瀏覽器自動帶上銀行的 Cookie，請求成功！
+
+**防禦方式**
 
 方式 1：CSRF Token（傳統表單）
-  服務器生成隨機 Token，放入表單隱藏字段
-  每次請求都驗證 Token，惡意網站無法知道這個 Token！
+
+- 服務器生成隨機 Token，放入表單隱藏字段
+- 每次請求都驗證 Token，惡意網站無法知道這個 Token！
 
 方式 2：SameSite Cookie（現代方案）
-  Set-Cookie: session=xxx; SameSite=Strict
-  Strict：Cookie 只在同源請求中發送（跨站完全不發）
+
+- Set-Cookie: session=xxx; SameSite=Strict
+- Strict：Cookie 只在同源請求中發送（跨站完全不發）
 
 方式 3：JWT + 無 Cookie（前後端分離）
-  Token 放 Authorization Header，不用 Cookie
-  惡意網站無法設定 Authorization Header！
-  → 天然防 CSRF，可以關閉 CSRF 保護
-```
+
+- Token 放 Authorization Header，不用 Cookie
+- 惡意網站無法設定 Authorization Header！
+- → 天然防 CSRF，可以關閉 CSRF 保護
 
 ```java
 // 前後端分離 + JWT：直接關閉 CSRF

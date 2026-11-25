@@ -2,46 +2,46 @@
 
 ## 關鍵渲染路徑（Critical Rendering Path）
 
-```
-瀏覽器收到 HTML 後的渲染流程：
+**瀏覽器收到 HTML 後的渲染流程**
 
-① 解析 HTML → 建構 DOM Tree
-   <html>
-     <body>
-       <div id="app">Hello</div>
-     </body>
-   </html>
-   → DOM Tree（節點樹）
+- ① 解析 HTML → 建構 DOM Tree
+    - &lt;html>
+        - &lt;body>
+            - &lt;div id="app">Hello&lt;/div>
+        - &lt;/body>
+    - &lt;/html>
+    - → DOM Tree（節點樹）
 
-② 解析 CSS → 建構 CSSOM Tree
-   div { color: red; font-size: 16px; }
-   → CSSOM Tree（樣式規則樹）
+- ② 解析 CSS → 建構 CSSOM Tree
+    - div { color: red; font-size: 16px; }
+    - → CSSOM Tree（樣式規則樹）
 
-③ DOM + CSSOM → 合成 Render Tree
-   只包含可見節點（display:none 不在其中）
-   每個節點帶有對應的樣式
+- ③ DOM + CSSOM → 合成 Render Tree
+    - 只包含可見節點（display:none 不在其中）
+    - 每個節點帶有對應的樣式
 
-④ Layout（佈局 / 重排）
-   計算每個節點的幾何位置和大小
-   → 輸出：每個元素的盒子模型（x, y, width, height）
+- ④ Layout（佈局 / 重排）
+    - 計算每個節點的幾何位置和大小
+    - → 輸出：每個元素的盒子模型（x, y, width, height）
 
-⑤ Paint（繪製 / 重繪）
-   按照 Render Tree 和 Layout 結果
-   將像素繪製到圖層（Layer）上
+- ⑤ Paint（繪製 / 重繪）
+    - 按照 Render Tree 和 Layout 結果
+    - 將像素繪製到圖層（Layer）上
 
-⑥ Composite（合成）
-   將多個圖層合成到螢幕上
-   GPU 加速層（transform / opacity）→ 只需 Composite，跳過 Layout + Paint
+- ⑥ Composite（合成）
+    - 將多個圖層合成到螢幕上
+    - GPU 加速層（transform / opacity）→ 只需 Composite，跳過 Layout + Paint
 
-渲染阻塞資源：
-  CSS：阻塞渲染（需要等 CSSOM 建構完成）
-  JS（沒有 defer/async）：阻塞 DOM 解析 + 渲染
+**渲染阻塞資源**
 
-最佳化：
-  ✅ CSS 放 <head>（越早建構 CSSOM 越好）
-  ✅ JS 放 <body> 底部 或使用 defer / async
-  ✅ 關鍵 CSS 內嵌（Critical CSS），非關鍵 CSS 異步加載
-```
+- CSS：阻塞渲染（需要等 CSSOM 建構完成）
+- JS（沒有 defer/async）：阻塞 DOM 解析 + 渲染
+
+**最佳化**
+
+- ✅ CSS 放 &lt;head>（越早建構 CSSOM 越好）
+- ✅ JS 放 &lt;body> 底部 或使用 defer / async
+- ✅ 關鍵 CSS 內嵌（Critical CSS），非關鍵 CSS 異步加載
 
 ## 重排（Reflow）vs 重繪（Repaint）
 

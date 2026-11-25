@@ -330,3 +330,9 @@ public class OrderService {
     }
 }
 ```
+
+!!! example "我的實作：虛擬執行緒與框架選擇"
+
+    虛擬執行緒讓 Spring MVC 用同步寫法也能撐住大量 I/O 等待，因此「一般業務系統用 MVC + 虛擬執行緒，真正需要串流與背壓才用 WebFlux」。
+
+    👉 [反應式程式設計原理](../../backend/webflux/reactive.md)

@@ -21,40 +21,45 @@ LIMIT 10;
 
 ### type 欄位（效能由好到差）：
 
-```
 system  > const > eq_ref > ref > range > index > ALL
 
 system：表中只有一行
+
 const： 主鍵或唯一索引等值查詢（最多一行）
-        WHERE id = 1
+
+- WHERE id = 1
 
 eq_ref：JOIN 時，被驅動表用主鍵/唯一索引等值查詢
-        JOIN users u ON o.user_id = u.id
+
+- JOIN users u ON o.user_id = u.id
 
 ref：   非唯一索引等值查詢（可能多行）
-        WHERE status = 'ACTIVE'
+
+- WHERE status = 'ACTIVE'
 
 range： 索引範圍查詢
-        WHERE age BETWEEN 20 AND 30
-        WHERE id IN (1,2,3)
+
+- WHERE age BETWEEN 20 AND 30
+- WHERE id IN (1,2,3)
 
 index： 全索引掃描（比 ALL 好，因為索引比表小）
-        只查詢索引中的欄位
+
+- 只查詢索引中的欄位
 
 ALL：   全表掃描 ← 最差！必須優化！
-        沒有使用任何索引
-```
+
+- 沒有使用任何索引
 
 ### Extra 欄位常見值：
 
-```
-Using index         → ✅ 覆蓋索引，不需要回表
-Using where         → Server 層過濾，索引不能完全過濾
-Using index condition → ✅ 索引下推（ICP）
-Using filesort      → ⚠️ 需要額外排序（沒有用到索引排序）
-Using temporary     → ⚠️ 使用臨時表（GROUP BY / DISTINCT 效能差）
-Using join buffer   → ⚠️ JOIN 沒有用到索引
-```
+| 項目 | 說明 |
+|------|------|
+| Using index | ✅ 覆蓋索引，不需要回表 |
+| Using where | Server 層過濾，索引不能完全過濾 |
+| Using index condition | ✅ 索引下推（ICP） |
+| Using filesort | ⚠️ 需要額外排序（沒有用到索引排序） |
+| Using temporary | ⚠️ 使用臨時表（GROUP BY / DISTINCT 效能差） |
+| Using join buffer | ⚠️ JOIN 沒有用到索引 |
 
 ## 慢查詢日誌
 
