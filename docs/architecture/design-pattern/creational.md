@@ -28,7 +28,9 @@ classDiagram
     // ── Singleton.java ──
     public class Singleton {
         // 私有靜態實例
-        private static volatile Singleton instance;   // ⚠️ 原始碼缺少 volatile，已補上
+        // volatile：禁止「配置記憶體 → 呼叫建構子 → 指派給 instance」的指令重排序，
+        // 避免其他執行緒在雙重檢查時拿到尚未初始化完成的物件
+        private static volatile Singleton instance;
 
         // 私有構造器，防止外部實例化
         private Singleton() {}
@@ -173,7 +175,7 @@ classDiagram
 
 !!! warning "雙重檢查鎖定一定要加 volatile"
 
-    AnthonyFu-Learning 的原始碼中 `instance` 沒有宣告 `volatile`。`new Singleton()` 實際上分成「配置記憶體 → 呼叫建構子 → 把位址指給 instance」三步，JIT 可能把後兩步**重排序**；另一條執行緒在外層 `if (instance == null)` 看到非 null，就會拿到**還沒初始化完成**的物件。加上 `volatile` 可以禁止這個重排序（見 [Java 記憶體模型](../../java/jvm/jmm.md)）。
+    `new Singleton()` 實際上分成「配置記憶體 → 呼叫建構子 → 把位址指給 instance」三步，JIT 可能把後兩步**重排序**；另一條執行緒在外層 `if (instance == null)` 看到非 null，就會拿到**還沒初始化完成**的物件。加上 `volatile` 可以禁止這個重排序（見 [Java 記憶體模型](../../java/jvm/jmm.md)）。
 
 **在 Spring 與實務中**：Spring 容器中的 Bean 預設就是 singleton，由容器保證只建立一個；實務上很少需要自己寫單例類別。
 
