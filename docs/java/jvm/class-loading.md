@@ -3,15 +3,15 @@
 ## 類加載的完整流程（7 個步驟）
 
 ``` mermaid
-flowchart LR
-    F[/".class 文件"/] --> A["載入<br>Loading"]
-    subgraph LINK ["連接 Linking"]
-        direction LR
-        B["驗證<br>Verify"] --> C["準備<br>Prepare"] --> D["解析<br>Resolve"]
-    end
-    A --> B
-    D --> E["初始化<br>Init"] --> U["使用<br>Use"] --> X["卸載<br>Unload"]
+block-beta
+    columns 6
+    space:1 lk["連接 Linking"]:3 space:2
+    load["載入<br>Loading"] verify["驗證<br>Verify"] prepare["準備<br>Prepare"] resolve["解析<br>Resolve"] init["初始化<br>Init"] use["使用 → 卸載<br>Use / Unload"]
+    classDef title fill:transparent,stroke-dasharray:4 4
+    class lk title
 ```
+
+`.class` 文件依序經過：載入 → **連接（驗證 → 準備 → 解析）** → 初始化 → 使用 → 卸載。
 
 ### 每個階段詳解：
 
@@ -89,13 +89,16 @@ Demo[] arr = new Demo[10];       // 建立陣列 → 不觸發
 **類加載器層次結構**
 
 ``` mermaid
-flowchart BT
-    CUS["Custom ClassLoader<br>自定義類加載器"]
-    APP["Application ClassLoader<br>應用程序類加載器<br>路徑：classpath（你寫的類）"]
-    EXT["Extension ClassLoader<br>擴展類加載器<br>路徑：jre/lib/ext/*.jar"]
-    BOOT["Bootstrap ClassLoader<br>啟動類加載器（C++ 實現，Java 看不到）<br>路徑：jre/lib/rt.jar（String、Object …）"]
-    CUS -- parent --> APP -- parent --> EXT -- parent --> BOOT
+flowchart LR
+    CUS["Custom"] -- parent --> APP["Application"] -- parent --> EXT["Extension"] -- parent --> BOOT["Bootstrap"]
 ```
+
+| 類加載器 | 實現 | 載入路徑 | 載入內容 |
+|---------|------|---------|---------|
+| **Bootstrap ClassLoader**（啟動類加載器） | C++，Java 看不到 | `jre/lib/rt.jar` | JDK 核心類（`String`、`Object` …） |
+| **Extension ClassLoader**（擴展類加載器） | Java | `jre/lib/ext/*.jar` | JDK 擴展類 |
+| **Application ClassLoader**（應用程序類加載器） | Java | classpath | 你寫的類 |
+| **Custom ClassLoader**（自定義類加載器） | Java | 自訂 | 自訂來源（加密、網路等） |
 
 ### 雙親委派流程：
 

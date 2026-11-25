@@ -11,30 +11,33 @@ icon: lucide/search
 ## 學習地圖
 
 ``` mermaid
-mindmap
-  root((Elasticsearch))
-    核心原理
-      倒排索引（Inverted Index）
-      分散式架構（Cluster / Node / Shard）
-      文件讀寫流程
-    資料模型
-      Index / Document / Field
-      Mapping（欄位類型定義）
-      分析器（Analyzer）
-    DSL 查詢語法
-      全文查詢（match / multi_match）
-      精確查詢（term / terms / range）
-      複合查詢（bool）
-      聚合查詢（aggregation）
-      高亮 / 排序 / 分頁
-    Spring Boot 整合
-      Spring Data Elasticsearch
-      ElasticsearchRestTemplate
-      完整電商搜索實戰
-    生產實戰
-      效能調優
-      索引設計最佳實踐
-      ELK Stack 日誌系統
+%%{init: {"flowchart": {"nodeSpacing": 14, "rankSpacing": 36, "wrappingWidth": 420}}}%%
+flowchart LR
+    R(["Elasticsearch"])
+    c0["01 · 核心原理"]
+    R --> c0
+    p0("・倒排索引（Inverted Index）<br>・分散式架構（Cluster / Node / Shard）<br>・文件讀寫流程")
+    c0 --- p0
+    c1["02 · 資料模型"]
+    R --> c1
+    p1("・Index / Document / Field<br>・Mapping（欄位類型定義）<br>・分析器（Analyzer）")
+    c1 --- p1
+    c2["03 · DSL 查詢語法"]
+    R --> c2
+    p2("・全文查詢（match / multi_match）<br>・精確查詢（term / terms / range）<br>・複合查詢（bool）<br>・聚合查詢（aggregation）<br>・高亮 / 排序 / 分頁")
+    c2 --- p2
+    c3["04 · Spring Boot 整合"]
+    R --> c3
+    p3("・Spring Data Elasticsearch<br>・ElasticsearchRestTemplate<br>・完整電商搜索實戰")
+    c3 --- p3
+    c4["05 · 生產實戰"]
+    R --> c4
+    p4("・效能調優<br>・索引設計最佳實踐<br>・ELK Stack 日誌系統")
+    c4 --- p4
+    classDef chapter stroke-width:2px
+    classDef points fill:transparent,text-align:left
+    class c0,c1,c2,c3,c4 chapter
+    class p0,p1,p2,p3,p4 points
 ```
 
 ## 章節導覽

@@ -2,18 +2,16 @@
 
 ## 一致性模型（從強到弱）
 
-``` mermaid
-flowchart TB
-    S["強一致性 Strong Consistency<br>寫入後立即可讀到最新值<br>效能差，常見於 ZooKeeper"]
-    L["線性一致性 Linearizability<br>操作看起來是原子的，有全局排序<br>Etcd 使用此模型"]
-    Q["順序一致性 Sequential Consistency<br>所有節點看到的操作順序相同"]
-    C["因果一致性 Causal Consistency<br>有因果關係的操作保持順序"]
-    E["最終一致性 Eventual Consistency<br>允許暫時不一致，最終一致<br>Redis 主從、Eureka 使用此模型"]
-    W["弱一致性 Weak Consistency<br>讀到的不一定是最新的"]
-    S --> L --> Q --> C --> E --> W
-```
+| 模型 | 說明 | 代表 |
+|------|------|------|
+| **強一致性**（Strong Consistency） | 寫入後立即可讀到最新值，效能差 | ZooKeeper |
+| **線性一致性**（Linearizability） | 操作看起來是原子的，有全局排序 | Etcd |
+| **順序一致性**（Sequential Consistency） | 所有節點看到的操作順序相同 | |
+| **因果一致性**（Causal Consistency） | 有因果關係的操作保持順序 | |
+| **最終一致性**（Eventual Consistency） | 允許暫時不一致，最終一致 | Redis 主從、Eureka |
+| **弱一致性**（Weak Consistency） | 讀到的不一定是最新的 | |
 
-由上到下：一致性越來越弱，可用性與效能越來越好。
+表格由上到下：一致性越來越弱，可用性與效能越來越好。
 
 ## 分散式事務
 

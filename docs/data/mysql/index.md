@@ -11,37 +11,40 @@ icon: lucide/database
 ## 學習地圖
 
 ``` mermaid
-mindmap
-  root((MySQL 深度優化))
-    索引原理
-      B+樹索引結構
-      聚簇索引 vs 非聚簇索引
-      聯合索引與最左前綴原則
-      覆蓋索引、索引下推
-    SQL 執行計劃分析
-      EXPLAIN 詳解
-      慢查詢日誌
-      常見慢查詢優化
-    事務與鎖
-      ACID 原理
-      事務隔離級別
-      MVCC 多版本並發控制
-      鎖機制（表鎖、行鎖、間隙鎖）
-    主從複製與讀寫分離
-      Binlog 複製原理
-      主從配置
-      讀寫分離實作
-    分庫分表
-      垂直切分 vs 水平切分
-      ShardingSphere 實戰
-      分散式主鍵生成
+%%{init: {"flowchart": {"nodeSpacing": 14, "rankSpacing": 36, "wrappingWidth": 420}}}%%
+flowchart LR
+    R(["MySQL 深度優化"])
+    c0["01 · 索引原理"]
+    R --> c0
+    p0("・B+樹索引結構<br>・聚簇索引 vs 非聚簇索引<br>・聯合索引與最左前綴原則<br>・覆蓋索引、索引下推")
+    c0 --- p0
+    c1["02 · SQL 執行計劃分析"]
+    R --> c1
+    p1("・EXPLAIN 詳解<br>・慢查詢日誌<br>・常見慢查詢優化")
+    c1 --- p1
+    c2["03 · 事務與鎖"]
+    R --> c2
+    p2("・ACID 原理<br>・事務隔離級別<br>・MVCC 多版本並發控制<br>・鎖機制（表鎖、行鎖、間隙鎖）")
+    c2 --- p2
+    c3["04 · 主從複製與讀寫分離"]
+    R --> c3
+    p3("・Binlog 複製原理<br>・主從配置<br>・讀寫分離實作")
+    c3 --- p3
+    c4["05 · 分庫分表"]
+    R --> c4
+    p4("・垂直切分 vs 水平切分<br>・ShardingSphere 實戰<br>・分散式主鍵生成")
+    c4 --- p4
+    classDef chapter stroke-width:2px
+    classDef points fill:transparent,text-align:left
+    class c0,c1,c2,c3,c4 chapter
+    class p0,p1,p2,p3,p4 points
 ```
 
 ## 章節導覽
 
 <div class="grid cards" markdown>
 
--   __[01 · 索引原理](index.md)__
+-   __[01 · 索引原理](index-principles.md)__
 
     ---
 

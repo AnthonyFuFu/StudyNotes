@@ -3,24 +3,28 @@
 ## 過濾器鏈架構（最重要！）
 
 ``` mermaid
-flowchart TB
-    REQ(["HTTP 請求進來"]) --> FC
-    subgraph FC ["Spring Security Filter Chain"]
-        direction TB
-        f1["1. DisableEncodeUrlFilter"] --> f2["2. WebAsyncManagerIntegrationFilter"]
-        f2 --> f3["3. SecurityContextHolderFilter ⭐ 核心"]
-        f3 --> f4["4. HeaderWriterFilter"] --> f5["5. CorsFilter"]
-        f5 --> f6["6. CsrfFilter ⭐ CSRF"]
-        f6 --> f7["7. LogoutFilter"]
-        f7 --> f8["8. UsernamePasswordAuthenticationFilter ⭐ 登入"]
-        f8 --> f9["9. DefaultLoginPageGeneratingFilter"] --> f10["10. BasicAuthenticationFilter"]
-        f10 --> f11["11. RequestCacheAwareFilter"]
-        f11 --> f12["12. AnonymousAuthenticationFilter ⭐ 匿名"]
-        f12 --> f13["13. ExceptionTranslationFilter ⭐ 異常"]
-        f13 --> f14["14. AuthorizationFilter ⭐ 授權"]
-    end
-    FC --> DS["DispatcherServlet → Controller"]
+flowchart LR
+    REQ(["HTTP 請求"]) --> FC["Spring Security<br>Filter Chain"] --> DS["DispatcherServlet"] --> C(["Controller"])
 ```
+
+請求依序通過以下過濾器（⭐ 為重點）：
+
+| # | Filter | 作用 |
+|---|--------|------|
+| 1 | `DisableEncodeUrlFilter` | |
+| 2 | `WebAsyncManagerIntegrationFilter` | |
+| 3 | `SecurityContextHolderFilter` | ⭐ 核心：建立 / 清除 SecurityContext |
+| 4 | `HeaderWriterFilter` | |
+| 5 | `CorsFilter` | |
+| 6 | `CsrfFilter` | ⭐ CSRF 防護 |
+| 7 | `LogoutFilter` | |
+| 8 | `UsernamePasswordAuthenticationFilter` | ⭐ 表單登入 |
+| 9 | `DefaultLoginPageGeneratingFilter` | |
+| 10 | `BasicAuthenticationFilter` | |
+| 11 | `RequestCacheAwareFilter` | |
+| 12 | `AnonymousAuthenticationFilter` | ⭐ 匿名身份 |
+| 13 | `ExceptionTranslationFilter` | ⭐ 異常轉換（401 / 403） |
+| 14 | `AuthorizationFilter` | ⭐ 授權檢查 |
 
 ```java
 // 自定義過濾器鏈（Spring Security 6.x 新寫法）

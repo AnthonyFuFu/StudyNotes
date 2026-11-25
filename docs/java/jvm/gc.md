@@ -106,18 +106,18 @@ block-beta
 ### 算法三：複製算法（Copying）
 
 ``` mermaid
-flowchart LR
-    subgraph BEFORE ["執行前"]
-        direction TB
-        F1["From 區：A ✓ ｜ 　 ｜ B ✓ ｜ 　"]
-        T1["To 區：空 ｜ 空 ｜ 空 ｜ 空"]
-    end
-    subgraph AFTER ["執行後"]
-        direction TB
-        F2["From 區：清空"]
-        T2["To 區：A ｜ B ｜ 空 ｜ 空"]
-    end
-    BEFORE -- 複製存活對象 --> AFTER
+block-beta
+    columns 5
+    h1["執行前"]:5
+    lf1["From 區"] a["A ✓"] x1[" "] b["B ✓"] x2[" "]
+    lt1["To 區"] t1["空"] t2["空"] t3["空"] t4["空"]
+    h2["執行後"]:5
+    lf2["From 區"] f1["空"] f2["空"] f3["空"] f4["空"]
+    lt2["To 區"] A["A"] B["B"] t5["空"] t6["空"]
+    classDef label fill:transparent,stroke:transparent,font-weight:bold
+    classDef free fill:transparent,stroke-dasharray:4 4
+    class h1,h2,lf1,lt1,lf2,lt2 label
+    class x1,x2,t1,t2,t3,t4,f1,f2,f3,f4,t5,t6 free
 ```
 
 - **優點**：✅ 沒有碎片、速度快
@@ -163,17 +163,17 @@ Serial → ParNew → Parallel Scavenge
 - **Old Gen**：標記-整理
 
 ``` mermaid
-gantt
-    title GC 期間的線程活動
-    dateFormat x
-    axisFormat %L
-    section 業務線程
-    執行      : 0, 40
-    等待      : crit, 40, 55
-    執行      : 55, 100
-    section GC 線程
-    GC（STW） : active, 40, 55
+block-beta
+    columns 6
+    l1["業務線程"] r1["執行"]:2 w1["等待"] r2["執行"]:2
+    l2["GC 線程"] space:2 g1["GC（STW）"] space:2
+    classDef label fill:transparent,stroke:transparent,font-weight:bold
+    classDef stw fill:#e5484d,color:#fff,stroke:#e5484d
+    class l1,l2 label
+    class w1,g1 stw
 ```
+
+GC 期間所有業務線程都要停下來等待（Stop The World）。
 
 - **適用**：小型應用（Client 模式），記憶體小於 100MB
 - **JVM 參數**：`-XX:+UseSerialGC`
@@ -216,22 +216,17 @@ JVM 參數：
 | **4. 並發清除**（Concurrent Sweep） | ✅ 與業務線程並發 | 清除垃圾對象 |
 
 ``` mermaid
-gantt
-    title CMS 時間軸
-    dateFormat x
-    axisFormat %L
-    section 業務線程
-    執行     : 0, 20
-    停       : crit, 20, 25
-    執行     : 25, 60
-    停       : crit, 60, 68
-    執行     : 68, 100
-    section GC 線程
-    初始標記 : active, 20, 25
-    並發標記 : 25, 60
-    重新標記 : active, 60, 68
-    並發清除 : 68, 100
+block-beta
+    columns 8
+    l1["業務線程"] r1["執行"] s1["停"] r2["執行"]:2 s2["停"] r3["執行"]:2
+    l2["GC 線程"] space g1["初始標記"] g2["並發標記"]:2 g3["重新標記"] g4["並發清除"]:2
+    classDef label fill:transparent,stroke:transparent,font-weight:bold
+    classDef stw fill:#e5484d,color:#fff,stroke:#e5484d
+    class l1,l2 label
+    class s1,s2,g1,g3 stw
 ```
+
+紅色為 STW 階段：只有「初始標記」和「重新標記」需要暫停業務線程，兩個並發階段與業務線程同時執行。
 
 **缺點**
 

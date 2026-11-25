@@ -11,32 +11,35 @@ icon: lucide/cpu
 ## 學習地圖
 
 ``` mermaid
-mindmap
-  root((JVM 深度原理))
-    JVM 整體架構
-    記憶體模型（Runtime Data Areas）
-      程序計數器
-      虛擬機棧
-      本地方法棧
-      堆（Heap）
-      方法區 / Metaspace
-    類加載機制
-      類加載流程（7步驟）
-      雙親委派模型
-      打破雙親委派
-    GC 垃圾回收
-      如何判斷對象死亡
-      四大垃圾回收算法
-      分代收集理論
-      六大 GC 收集器
-    Java 記憶體模型（JMM）
-      happens-before 原則
-      volatile 底層原理
-      三大問題：原子性、可見性、有序性
-    JVM 性能調優
-      常用 JVM 參數
-      GC Log 分析
-      OOM 排查流程
+%%{init: {"flowchart": {"nodeSpacing": 14, "rankSpacing": 36, "wrappingWidth": 420}}}%%
+flowchart LR
+    R(["JVM 深度原理"])
+    c0["01 · JVM 整體架構"]
+    R --> c0
+    c1["02 · 記憶體模型（Runtime Data Areas）"]
+    R --> c1
+    p1("・程序計數器<br>・虛擬機棧<br>・本地方法棧<br>・堆（Heap）<br>・方法區 / Metaspace")
+    c1 --- p1
+    c2["03 · 類加載機制"]
+    R --> c2
+    p2("・類加載流程（7步驟）<br>・雙親委派模型<br>・打破雙親委派")
+    c2 --- p2
+    c3["04 · GC 垃圾回收"]
+    R --> c3
+    p3("・如何判斷對象死亡<br>・四大垃圾回收算法<br>・分代收集理論<br>・六大 GC 收集器")
+    c3 --- p3
+    c4["05 · Java 記憶體模型（JMM）"]
+    R --> c4
+    p4("・happens-before 原則<br>・volatile 底層原理<br>・三大問題：原子性、可見性、有序性")
+    c4 --- p4
+    c5["06 · JVM 性能調優"]
+    R --> c5
+    p5("・常用 JVM 參數<br>・GC Log 分析<br>・OOM 排查流程")
+    c5 --- p5
+    classDef chapter stroke-width:2px
+    classDef points fill:transparent,text-align:left
+    class c0,c1,c2,c3,c4,c5 chapter
+    class p1,p2,p3,p4,p5 points
 ```
 
 ## 章節導覽
@@ -85,23 +88,17 @@ mindmap
 
 ### 記憶體模型架構
 ``` mermaid
-flowchart TB
-    subgraph JVM ["JVM 記憶體"]
-        direction TB
-        subgraph PRIV ["線程私有"]
-            direction LR
-            PC["程序計數器"]
-            VMS["虛擬機棧"]
-            NMS["本地方法棧"]
-        end
-        subgraph HEAP ["堆 Heap（線程共享）"]
-            direction LR
-            YG["新生代 1/3<br>Eden : S0 : S1 = 8 : 1 : 1"]
-            OG["老年代 2/3"]
-        end
-        MS["方法區 / Metaspace<br>類資訊 / 常量池 / 靜態變數 / JIT 緩存"]
-    end
+block-beta
+    columns 3
+    t["JVM 記憶體"]:3
+    pc["程序計數器<br>線程私有"] vms["虛擬機棧<br>線程私有"] nms["本地方法棧<br>線程私有"]
+    yg["新生代 1/3<br>Eden : S0 : S1 = 8 : 1 : 1"]:1 og["老年代 2/3"]:2
+    ms["方法區 / Metaspace<br>類資訊 / 常量池 / 靜態變數 / JIT 緩存"]:3
+    classDef title fill:transparent,stroke:transparent,font-weight:bold
+    class t title
 ```
+
+中間一列為 **堆 Heap**（線程共享）。
 
 ### GC 收集器對比
 

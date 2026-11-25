@@ -11,12 +11,10 @@
 
 **資料封裝過程（從上到下）**
 
-``` mermaid
-flowchart TB
-    A["應用層<br>HTTP Message（應用資料）"]
-    T["傳輸層<br>TCP Segment（加 TCP Header：源 / 目標埠號）"]
-    N["網路層<br>IP Packet（加 IP Header：源 / 目標 IP）"]
-    D["資料鏈路層<br>Ethernet Frame（加 MAC 地址）"]
-    P["實體層<br>0101 二進位位元串"]
-    A --> T --> N --> D --> P
-```
+| 層 | 資料單位 | 封裝時加上 |
+|----|---------|-----------|
+| 應用層 | HTTP Message | 應用資料 |
+| 傳輸層 | TCP Segment | TCP Header（源 / 目標埠號） |
+| 網路層 | IP Packet | IP Header（源 / 目標 IP） |
+| 資料鏈路層 | Ethernet Frame | MAC 地址 |
+| 實體層 | 位元串 | 0101 二進位訊號 |

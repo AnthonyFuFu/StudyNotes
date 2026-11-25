@@ -64,17 +64,17 @@ flowchart LR
 
 **版本可見性判斷**
 
-``` mermaid
-flowchart TB
-    S{"trx_id == creator_trx_id？"} -->|是| Y1["自己修改的 ✅ 可見"]
-    S -->|否| A{"trx_id < min_trx_id？"}
-    A -->|是| Y2["已提交 ✅ 可見"]
-    A -->|否| B{"trx_id >= max_trx_id？"}
-    B -->|是| N1["還沒開始的事務 ❌ 不可見"]
-    B -->|否| C{"在 m_ids 中？"}
-    C -->|是| N2["未提交 ❌ 不可見<br>沿 roll_pointer 找舊版本"]
-    C -->|否| Y3["已提交 ✅ 可見"]
-```
+依序檢查行記錄的 `trx_id`：
+
+| 順序 | 條件 | 結果 |
+|------|------|------|
+| 1 | `trx_id == creator_trx_id` | ✅ 可見（自己修改的） |
+| 2 | `trx_id < min_trx_id` | ✅ 可見（ReadView 建立前已提交） |
+| 3 | `trx_id >= max_trx_id` | ❌ 不可見（ReadView 建立後才開始的事務） |
+| 4 | `min_trx_id <= trx_id < max_trx_id` 且在 `m_ids` 中 | ❌ 不可見（尚未提交） |
+| 5 | `min_trx_id <= trx_id < max_trx_id` 且不在 `m_ids` 中 | ✅ 可見（已提交） |
+
+不可見時，沿著 `roll_pointer` 找 Undo Log 中的上一個版本，再重新判斷，直到找到可見的版本。
 
 | 隔離級別 | ReadView 建立時機 | 效果 |
 |---------|-----------------|------|

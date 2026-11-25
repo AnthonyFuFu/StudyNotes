@@ -11,32 +11,37 @@ icon: lucide/shield-check
 ## 學習地圖
 
 ``` mermaid
-mindmap
-  root((資安))
-    資安基礎概念
-      認證 vs 授權
-      OWASP Top 10 常見漏洞
-      加密基礎（對稱/非對稱）
-    Spring Security 核心原理
-      過濾器鏈架構
-      SecurityContext
-      認證流程
-      授權流程
-    JWT 深入原理與實作
-      JWT 結構
-      完整實作
-      JWT 安全問題
-    OAuth2 完整教學
-      四種授權模式
-      Spring Authorization Server
-      第三方登入（Google / GitHub）
-    SSO 單點登入
-      OAuth2 + JWT 實現 SSO
-    常見攻擊防禦
-      SQL 注入
-      XSS
-      CSRF
-      其他攻擊
+%%{init: {"flowchart": {"nodeSpacing": 14, "rankSpacing": 36, "wrappingWidth": 420}}}%%
+flowchart LR
+    R(["資安"])
+    c0["01 · 資安基礎概念"]
+    R --> c0
+    p0("・認證 vs 授權<br>・OWASP Top 10 常見漏洞<br>・加密基礎（對稱/非對稱）")
+    c0 --- p0
+    c1["02 · Spring Security 核心原理"]
+    R --> c1
+    p1("・過濾器鏈架構<br>・SecurityContext<br>・認證流程<br>・授權流程")
+    c1 --- p1
+    c2["03 · JWT 深入原理與實作"]
+    R --> c2
+    p2("・JWT 結構<br>・完整實作<br>・JWT 安全問題")
+    c2 --- p2
+    c3["04 · OAuth2 完整教學"]
+    R --> c3
+    p3("・四種授權模式<br>・Spring Authorization Server<br>・第三方登入（Google / GitHub）")
+    c3 --- p3
+    c4["05 · SSO 單點登入"]
+    R --> c4
+    p4("・OAuth2 + JWT 實現 SSO")
+    c4 --- p4
+    c5["06 · 常見攻擊防禦"]
+    R --> c5
+    p5("・SQL 注入<br>・XSS<br>・CSRF<br>・其他攻擊")
+    c5 --- p5
+    classDef chapter stroke-width:2px
+    classDef points fill:transparent,text-align:left
+    class c0,c1,c2,c3,c4,c5 chapter
+    class p0,p1,p2,p3,p4,p5 points
 ```
 
 ## 章節導覽

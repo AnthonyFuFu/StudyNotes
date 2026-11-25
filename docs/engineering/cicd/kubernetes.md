@@ -6,27 +6,21 @@
 flowchart TB
     subgraph CP ["Control Plane（主節點）"]
         direction LR
-        API["API Server<br>集群入口，所有操作都經過它"]
-        ETCD[("etcd<br>分散式 KV 存儲<br>集群狀態")]
-        CM["Controller Manager<br>Node / Deployment /<br>ReplicaSet / Service Ctrl"]
-        SCH["Scheduler<br>決定 Pod 運行在哪個 Node"]
-        API <--> ETCD
-        CM <--> API
-        SCH <--> API
+        API["API Server<br>集群入口"] ~~~ ETCD[("etcd<br>集群狀態")] ~~~ CM["Controller<br>Manager"] ~~~ SCH["Scheduler<br>調度器"]
     end
+    CP -- 控制 --> N1 & N2 & N3
     subgraph N1 ["Worker Node 1"]
         direction TB
-        K1["kubelet / kube-proxy"] --> P11["Pod"] & P12["Pod"]
+        K1["kubelet / kube-proxy"] ~~~ P1["Pod ・ Pod"]
     end
     subgraph N2 ["Worker Node 2"]
         direction TB
-        K2["kubelet / kube-proxy"] --> P21["Pod"] & P22["Pod"]
+        K2["kubelet / kube-proxy"] ~~~ P2["Pod ・ Pod"]
     end
     subgraph N3 ["Worker Node 3"]
         direction TB
-        K3["kubelet / kube-proxy"] --> P31["Pod"]
+        K3["kubelet / kube-proxy"] ~~~ P3["Pod"]
     end
-    API -- 控制 --> K1 & K2 & K3
 ```
 
 **核心組件職責**

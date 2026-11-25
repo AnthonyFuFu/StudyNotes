@@ -57,29 +57,33 @@ flowchart LR
 ## 分散式架構
 
 ``` mermaid
-flowchart LR
-    subgraph CLUSTER ["ES Cluster"]
-        direction LR
-        subgraph N1 ["Node 1（Master）"]
-            direction TB
-            a0["Shard 0 主"]
-            a1["Shard 1 副"]
-            a2["Shard 2 副"]
-        end
-        subgraph N2 ["Node 2（Data）"]
-            direction TB
-            b1["Shard 1 主"]
-            b2["Shard 2 副"]
-            b0["Shard 0 副"]
-        end
-        subgraph N3 ["Node 3（Data）"]
-            direction TB
-            c2["Shard 2 主"]
-            c0["Shard 0 副"]
-            c1["Shard 1 副"]
-        end
+block-beta
+    columns 3
+    block:n1
+        columns 1
+        t1["Node 1（Master）"]
+        a0["Shard 0 主"] a1["Shard 1 副"] a2["Shard 2 副"]
     end
+    block:n2
+        columns 1
+        t2["Node 2（Data）"]
+        b1["Shard 1 主"] b2["Shard 2 副"] b0["Shard 0 副"]
+    end
+    block:n3
+        columns 1
+        t3["Node 3（Data）"]
+        c2["Shard 2 主"] c0["Shard 0 副"] c1["Shard 1 副"]
+    end
+    classDef title fill:transparent,stroke:transparent,font-weight:bold
+    classDef primary stroke-width:3px
+    class t1,t2,t3 title
+    class a0,b1,c2 primary
+    style n1 fill:transparent
+    style n2 fill:transparent
+    style n3 fill:transparent
 ```
+
+粗框為主分片（Primary），其餘為副本分片（Replica）。每個主分片的副本都放在其他節點上。
 
 **核心概念**
 

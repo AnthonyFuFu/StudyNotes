@@ -98,7 +98,9 @@ StudyNotes/
 | **sidebar**（左側導覽） | 主題資料夾與章節檔案 | `JVM 深度原理` → `docs/java/jvm/`，其下每個章節一頁 |
 | **main + 右側目錄** | 章節頁內的 `##` / `###` 標題 | `gc.md` 裡的「G1 收集器」、「ZGC」 |
 
-`zensical.toml` 已開啟 `navigation.tabs`（分類顯示在上方分頁）、`navigation.indexes`（資料夾的 `index.md` 作為該區段首頁）與 `toc.follow`（右側目錄跟隨捲動）。
+`zensical.toml` 已開啟 `navigation.tabs`（分類顯示在上方分頁）、`navigation.indexes`（資料夾的 `index.md` 作為該區段首頁）、`navigation.prune`（側欄只展開目前所在的主題，其他主題點了才展開）與 `toc.follow`（右側目錄跟隨捲動）。
+
+搜尋框右邊的 GitHub 連結來自 `repo_url` / `repo_name` 設定。
 
 ## 編輯文件
 
@@ -133,7 +135,7 @@ StudyNotes/
     # 主題名稱
     ```
 
-3. 主題首頁依序放：簡介與核心技術 → `## 學習地圖`（mindmap）→ `## 章節導覽`（卡片）→ `## 重點速覽` → `## 核心要點總結`。
+3. 主題首頁依序放：簡介與核心技術 → `## 學習地圖` → `## 章節導覽`（卡片）→ `## 重點速覽` → `## 核心要點總結`。學習地圖用由左到右的樹狀圖（`flowchart LR`）：主題 → 章節 → 一個條列重點的方框，格式可參考 `docs/java/jvm/index.md`。
 4. 在 `zensical.toml` 的 `nav` 加入主題區塊，並在分類首頁加上主題卡片。
 
 ## 書寫規則
@@ -193,18 +195,20 @@ flowchart LR
 | 架構圖、流程圖 | `flowchart`（用 `subgraph` 分組） | `data/mysql/replication.md` |
 | 兩方來回傳訊息 | `sequenceDiagram` | `network-security/network/tcp.md` |
 | 狀態轉換 | `stateDiagram-v2` | `java/concurrency/thread-lifecycle.md` |
-| 記憶體、分層結構 | `block-beta` | `java/jvm/memory-areas.md` |
-| 時間軸、耗時 | `gantt` | `engineering/monitoring/tracing.md` |
-| 位元欄位 | `packet-beta` | `data/mysql/sharding.md` |
-| 學習路線、分類樹 | `mindmap` | 各主題首頁的「學習地圖」 |
+| 記憶體、分層結構、時間軸 | `block-beta`（用 `columns` 控制格線） | `java/jvm/memory-areas.md`、`java/jvm/gc.md` |
+| 樹狀結構 | `block-beta` 加箭頭 | `data/mysql/index-principles.md` 的 B+樹 |
 
 撰寫 Mermaid 時要注意：
 
 - 節點文字含括號、斜線等符號時，用雙引號包起來：`A["Spring Boot (3.x)"]`。
 - 換行用 `<br>`。
-- 不要自訂背景色，否則深色模式下會看不清楚。
+- **控制寬度**：內容區約 690px，圖比這寬就會整張縮小、文字變小。橫向（`LR`）一排最多放 4 \~ 5 個節點，太多就改成直向（`TB`），或拆成多個 `subgraph` 分列。
+- **群組方向**：`subgraph` 裡的 `direction LR` 只有在節點之間有連線時才會生效。沒有連線的節點要用隱形連線 `A ~~~ B ~~~ C` 才會橫排。
+- **配色**：不要自訂一般節點的背景色。需要強調時，用 `classDef` 只改外框（`stroke-width`、`stroke-dasharray`）或用透明背景；`block-beta` 的外層區塊請加 `style 區塊名稱 fill:transparent`，否則深色模式下會變成低對比的底色。
+- **不要使用**：`mindmap`（節點會重疊、部分文字在這個主題下看不清楚，學習地圖請改用上述的樹狀圖）、`gantt`（文字太小，任務名稱含冒號會整張無法繪製）、`packet-beta`（64 位會被切成兩列）。
 - Mermaid 放在 `???` 折疊區塊內可能無法正確繪製，請放在一般內文中。
-- 純表格資料（例如兩種技術的比較）用 Markdown 表格，不要畫成圖。
+- 純表格資料（例如兩種技術的比較、判斷規則）用 Markdown 表格，不要畫成圖。
+- 新增或修改圖之後，請在本機用 `python -m zensical serve` 實際看過淺色與深色兩種模式。
 
 ## 搜尋
 

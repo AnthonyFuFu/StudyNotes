@@ -11,25 +11,31 @@ icon: lucide/network
 ## 學習地圖
 
 ``` mermaid
-mindmap
-  root((系統設計))
-    基礎理論（CAP / BASE / ACID）
-    分散式系統核心
-      一致性模型
-      分散式事務
-      分散式鎖
-    高可用設計
-      限流（Rate Limiting）
-      熔斷（Circuit Breaker）
-      降級（Fallback）
-    高效能設計
-      分庫分表
-      讀寫分離
-      緩存設計
-    架構設計
-      負載均衡
-      微服務設計原則
-      消息隊列使用場景
+%%{init: {"flowchart": {"nodeSpacing": 14, "rankSpacing": 36, "wrappingWidth": 420}}}%%
+flowchart LR
+    R(["系統設計"])
+    c0["01 · 基礎理論（CAP / BASE / ACID）"]
+    R --> c0
+    c1["02 · 分散式系統核心"]
+    R --> c1
+    p1("・一致性模型<br>・分散式事務<br>・分散式鎖")
+    c1 --- p1
+    c2["03 · 高可用設計"]
+    R --> c2
+    p2("・限流（Rate Limiting）<br>・熔斷（Circuit Breaker）<br>・降級（Fallback）")
+    c2 --- p2
+    c3["04 · 高效能設計"]
+    R --> c3
+    p3("・分庫分表<br>・讀寫分離<br>・緩存設計")
+    c3 --- p3
+    c4["05 · 架構設計"]
+    R --> c4
+    p4("・負載均衡<br>・微服務設計原則<br>・消息隊列使用場景")
+    c4 --- p4
+    classDef chapter stroke-width:2px
+    classDef points fill:transparent,text-align:left
+    class c0,c1,c2,c3,c4 chapter
+    class p1,p2,p3,p4 points
 ```
 
 ## 章節導覽

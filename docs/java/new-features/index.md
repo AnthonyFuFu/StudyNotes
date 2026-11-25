@@ -11,25 +11,29 @@ icon: lucide/sparkles
 ## 學習地圖
 
 ``` mermaid
-mindmap
-  root((Java 新特性))
-    Java 8 核心回顧（基礎，面試常考）
-      Lambda & 函數式接口
-      Stream API 進階
-      Optional
-    Java 9 ~ 16 重要特性
-      var 局部類型推斷
-      Text Block（文字塊）
-      Switch 表達式
-    Java 17 LTS 重點
-      Sealed Classes（封閉類）
-      Pattern Matching for instanceof
-      Record Classes（記錄類）
-    Java 21 LTS 重點 ⭐ 最重要
-      Virtual Threads（虛擬線程）← 革命性
-      Pattern Matching for Switch
-      Sequenced Collections
-      Structured Concurrency
+%%{init: {"flowchart": {"nodeSpacing": 14, "rankSpacing": 36, "wrappingWidth": 420}}}%%
+flowchart LR
+    R(["Java 新特性"])
+    c0["01 · Java 8 核心回顧（基礎，面試常考）"]
+    R --> c0
+    p0("・Lambda & 函數式接口<br>・Stream API 進階<br>・Optional")
+    c0 --- p0
+    c1["02 · Java 9 ~ 16 重要特性"]
+    R --> c1
+    p1("・var 局部類型推斷<br>・Text Block（文字塊）<br>・Switch 表達式")
+    c1 --- p1
+    c2["03 · Java 17 LTS 重點"]
+    R --> c2
+    p2("・Sealed Classes（封閉類）<br>・Pattern Matching for instanceof<br>・Record Classes（記錄類）")
+    c2 --- p2
+    c3["04 · Java 21 LTS 重點 ⭐ 最重要"]
+    R --> c3
+    p3("・Virtual Threads（虛擬線程）← 革命性<br>・Pattern Matching for Switch<br>・Sequenced Collections<br>・Structured Concurrency")
+    c3 --- p3
+    classDef chapter stroke-width:2px
+    classDef points fill:transparent,text-align:left
+    class c0,c1,c2,c3 chapter
+    class p0,p1,p2,p3 points
 ```
 
 ## 章節導覽

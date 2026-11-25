@@ -3,21 +3,17 @@
 ## 架構原理
 
 ``` mermaid
-flowchart LR
+flowchart TB
     subgraph TARGETS ["被監控的服務"]
-        direction TB
-        SB["Spring Boot<br>/actuator/prometheus"]
-        EX["MySQL Exporter<br>Node Exporter<br>Redis Exporter"]
+        direction LR
+        SB["Spring Boot<br>/actuator/prometheus"] ~~~ EX1["MySQL Exporter"] ~~~ EX2["Node Exporter"] ~~~ EX3["Redis Exporter"]
     end
+    TARGETS -. "Scrape：Prometheus 主動拉取（HTTP Pull）" .-> SERVER
     subgraph SERVER ["Prometheus Server"]
-        direction TB
-        RET["Retrieval 拉取引擎<br>每 15 秒拉取"]
-        TSDB[("TSDB 本地時序資料庫<br>高效壓縮，預設保留 15 天")]
-        API["HTTP API"]
-        RET --> TSDB --> API
+        direction LR
+        RET["Retrieval 拉取引擎<br>每 15 秒拉取"] --> TSDB[("TSDB 時序資料庫<br>壓縮儲存，預設保留 15 天")] --> API["HTTP API"]
     end
-    RET -- "Scrape（HTTP Pull）" --> TARGETS
-    API -- "Query（PromQL）" --> CON["Grafana<br>AlertManager"]
+    SERVER -- "Query（PromQL）" --> CON["Grafana / AlertManager"]
 ```
 
 **核心設計：Pull 模式（拉取）**

@@ -62,16 +62,15 @@ Image 是只讀的分層結構，容器運行時在最上面加一個可寫層�
 block-beta
     columns 1
     CL["Container Layer（可寫，容器刪除即消失）"]
-    block:IMG
-        columns 1
-        APP["App Layer（你的應用）"]
-        DEP["Dependencies Layer（依賴）"]
-        JDK["JDK Layer"]
-        BASE["Base OS Layer（ubuntu / alpine）"]
-    end
+    APP["App Layer（你的應用）"]
+    DEP["Dependencies Layer（依賴）"]
+    JDK["JDK Layer"]
+    BASE["Base OS Layer（ubuntu / alpine）"]
+    classDef rw stroke-dasharray:5 5,stroke-width:2px
+    class CL rw
 ```
 
-下方四層為 **Image（只讀分層）**。多個容器可以共享相同的底層，節省空間，例如 ubuntu 層只需要下載一次。
+最上層（虛線框）是容器的可寫層，下方四層為 **Image（只讀分層）**。多個容器可以共享相同的底層，節省空間，例如 ubuntu 層只需要下載一次。
 
 ## Dockerfile 最佳實踐
 

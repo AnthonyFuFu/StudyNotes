@@ -6,8 +6,8 @@ site_description = "Java 後端工程師深度學習筆記"
 
 # copyright = "Copyright &copy; 2026 Your name"
 
-# repo_url = "https://github.com/AnthonyFuFu/StudyNotes.git"
-# repo_name = "user/repo"
+repo_url = "https://github.com/AnthonyFuFu/StudyNotes"
+repo_name = "AnthonyFuFu/StudyNotes"
 # edit_uri = "edit/main/docs/"
 
 nav = [
@@ -49,7 +49,7 @@ nav = [
     "data/index.md",
     { "MySQL 深度優化" = [
       "data/mysql/index.md",
-      { "索引原理" = "data/mysql/index.md" },
+      { "索引原理" = "data/mysql/index-principles.md" },
       { "SQL 執行計劃分析" = "data/mysql/explain.md" },
       { "事務與鎖" = "data/mysql/transaction-lock.md" },
       { "主從複製與讀寫分離" = "data/mysql/replication.md" },
@@ -222,8 +222,8 @@ features = [
   "navigation.instant.prefetch",
   # "navigation.instant.progress",
   "navigation.path",
-  # "navigation.prune",
-  "navigation.sections",
+  "navigation.prune",
+  # "navigation.sections",
   "navigation.tabs",
   # "navigation.tabs.sticky",
   "navigation.top",

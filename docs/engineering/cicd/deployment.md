@@ -105,29 +105,30 @@ helm uninstall myapp -n production
 
 ``` mermaid
 flowchart TB
-    PUSH(["開發者 git push → GitHub"]) --> GA["GitHub Actions 觸發"]
-    GA --> CI
-    subgraph CI ["CI 階段"]
+    PUSH(["開發者 git push → GitHub Actions 觸發"]) --> CI1
+    subgraph CI1 ["CI 階段：建置與測試"]
         direction LR
         c1["① 拉取程式碼"] --> c2["② Maven 建置"] --> c3["③ 單元測試<br>覆蓋率 > 80%"] --> c4["④ SonarQube<br>靜態分析"]
-        c4 --> c5["⑤ OWASP<br>依賴漏洞掃描"] --> c6["⑥ 建置 Docker Image<br>多平台"] --> c7["⑦ Trivy<br>容器安全掃描"] --> c8["⑧ 推送到<br>Harbor Registry"]
     end
-    CI -- "CI 通過" --> STG
-    subgraph STG ["CD - Staging 階段"]
+    CI1 --> CI2
+    subgraph CI2 ["CI 階段：掃描與發佈"]
+        direction LR
+        c5["⑤ OWASP<br>依賴掃描"] --> c6["⑥ 建置<br>Docker Image"] --> c7["⑦ Trivy<br>容器掃描"] --> c8["⑧ 推送到<br>Harbor"]
+    end
+    CI2 -- "CI 通過" --> STG
+    subgraph STG ["CD - Staging"]
         direction LR
         s1["① Helm upgrade"] --> s2["② 等待 Rollout"] --> s3["③ Smoke Test"] --> s4["④ 整合測試"]
     end
-    STG -- "打 Release Tag 或人工審核" --> PRD
-    subgraph PRD ["CD - Production 階段"]
+    STG -- "Release Tag 或人工審核" --> PRD
+    subgraph PRD ["CD - Production"]
         direction LR
-        p1["① Environment 審核"] --> p2["② Helm upgrade<br>滾動更新"] --> p3["③ 等待 Rollout"] --> p4["④ 生產冒煙測試"] --> p5["⑤ 通知 Slack"]
+        p1["① Environment<br>審核"] --> p2["② Helm<br>滾動更新"] --> p3["③ 等待<br>Rollout"] --> p4["④ 生產<br>冒煙測試"] --> p5["⑤ 通知<br>Slack"]
     end
     PRD --> MON
     subgraph MON ["監控告警"]
         direction LR
-        m1["Prometheus → Grafana"]
-        m2["ELK 日誌分析"]
-        m3["PagerDuty 告警"]
+        m1["Prometheus → Grafana"] ~~~ m2["ELK 日誌分析"] ~~~ m3["PagerDuty 告警"]
     end
 ```
 

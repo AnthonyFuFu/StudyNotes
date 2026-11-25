@@ -26,15 +26,21 @@ sequenceDiagram
     participant A as Auth Server
     participant R as Resource Server
     U->>C: 點擊登入
-    C->>A: 重定向到授權頁面 GET /authorize
-    Note right of C: client_id、redirect_uri<br>scope=email,profile<br>state=random_string（防 CSRF）<br>response_type=code
-    U->>A: 用戶登入並授權
-    A->>C: 重定向回 redirect_uri<br>?code=AUTH_CODE&state=random_string
-    C->>A: POST /token<br>grant_type=authorization_code、code、client_secret（後端私密）
+    C->>A: 重定向 GET /authorize
+    U->>A: 登入並授權
+    A->>C: 重定向回 redirect_uri（帶 code）
+    C->>A: POST /token（code + client_secret）
     A->>C: access_token + refresh_token
-    C->>R: GET /userinfo<br>Authorization: Bearer access_token
-    R->>C: 用戶資料（email、name、picture）
+    C->>R: GET /userinfo（Bearer token）
+    R->>C: 用戶資料
 ```
+
+| 步驟 | 關鍵參數 |
+|------|---------|
+| ② `GET /authorize` | `client_id`、`redirect_uri`、`scope=email,profile`、`state=random_string`（防 CSRF）、`response_type=code` |
+| ④ 重定向回 `redirect_uri` | `?code=AUTH_CODE&state=random_string` |
+| ⑤ `POST /token` | `grant_type=authorization_code`、`code`、`client_secret`（只存在後端） |
+| ⑦ `GET /userinfo` | `Authorization: Bearer access_token` |
 
 ### 模式二：客戶端憑證模式（Client Credentials）
 

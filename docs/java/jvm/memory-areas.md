@@ -35,11 +35,7 @@ sequenceDiagram
 ``` mermaid
 block-beta
     columns 1
-    block:top
-        columns 1
-        f3["棧幀 3：method_c() ← 棧頂（當前執行）"]
-        detail["局部變數表 ｜ 運算元棧 ｜ 動態連結 ｜ 方法返回地址"]
-    end
+    f3["棧幀 3：method_c() ← 棧頂（當前執行）<br>局部變數表 ｜ 運算元棧 ｜ 動態連結 ｜ 方法返回地址"]
     f2["棧幀 2：method_b()"]
     f1["棧幀 1：method_a() ← 棧底"]
 ```
@@ -92,17 +88,11 @@ for (int i = 0; i < 100000; i++) {
 
 ``` mermaid
 block-beta
-    columns 3
-    block:young:2
-        columns 4
-        yt["新生代 Young Gen（佔堆 1/3）"]:4
-        eden["Eden 8/10"]:2 s0["S0 1/10"] s1["S1 1/10"]
-    end
-    block:old:1
-        columns 1
-        ot["老年代 Old Gen（佔堆 2/3）"]
-        oc["長期存活的對象<br>大對象（直接進入）"]
-    end
+    columns 12
+    yt["新生代 Young Gen（1/3）"]:4 ot["老年代 Old Gen（2/3）"]:8
+    eden["Eden 8/10"]:2 s0["S0"] s1["S1"] old["長期存活的對象<br>大對象（直接進入）"]:8
+    classDef title fill:transparent,stroke:transparent,font-weight:bold
+    class yt,ot title
 ```
 
 - Eden : S0 : S1 = 8 : 1 : 1

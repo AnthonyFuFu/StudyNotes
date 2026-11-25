@@ -19,15 +19,12 @@ flowchart LR
 **SkyWalking 架構**
 
 ``` mermaid
-flowchart TB
+flowchart LR
     subgraph APPS ["應用層（Agent 自動注入）"]
-        direction LR
-        A1["訂單服務<br>SW Agent"]
-        A2["用戶服務<br>SW Agent"]
-        A3["庫存服務<br>SW Agent"]
+        direction TB
+        A1["訂單服務<br>SW Agent"] ~~~ A2["用戶服務<br>SW Agent"] ~~~ A3["庫存服務<br>SW Agent"]
     end
-    OAP["OAP Server（分析引擎）<br>接收 Span → 分析依賴關係 → 計算指標 → 存儲"]
-    APPS -- "gRPC 上報 Span 數據" --> OAP
+    APPS -- "gRPC 上報 Span" --> OAP["OAP Server<br>分析依賴、計算指標"]
     OAP --> ES[("Elasticsearch<br>存儲鏈路數據")]
     OAP --> UI["SkyWalking UI<br>視覺化展示"]
 ```
@@ -135,17 +132,14 @@ flowchart LR
 
 **② Span 詳情（定位瓶頸）**：點開一條 Trace，看到完整的調用樹與每段耗時。
 
-``` mermaid
-gantt
-    title OrderService.createOrder（總耗時 523ms）
-    dateFormat x
-    axisFormat %Lms
-    section 調用
-    UserService.getUser（20ms）        : 5, 25
-    InventoryService.check（30ms）     : 30, 60
-    MySQL SELECT orders（400ms）瓶頸    : crit, 65, 465
-    Redis SET order:123（5ms）          : 470, 475
-```
+**OrderService.createOrder 的調用樹（總耗時 523ms）**
+
+| Span | 時間區間 | 耗時 | |
+|------|---------|------|---|
+| `UserService.getUser` | 5 \~ 25ms | 20ms | |
+| `InventoryService.check` | 30 \~ 60ms | 30ms | |
+| `MySQL: SELECT * FROM orders` | 65 \~ 465ms | **400ms** | 🚨 瓶頸 |
+| `Redis: SET order:123` | 470 \~ 475ms | 5ms | |
 
 !!! warning "瓶頸分析"
 

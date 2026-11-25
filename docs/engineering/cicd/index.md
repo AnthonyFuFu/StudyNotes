@@ -11,31 +11,33 @@ DevOps 核心概念、Docker 與 Kubernetes 深入、Jenkins / GitHub Actions �
 ## 學習地圖
 
 ``` mermaid
-mindmap
-  root((CI/CD 與 DevOps))
-    DevOps 核心概念
-      什麼是 DevOps
-      CI/CD 流水線
-      DevOps 工具鏈全覽
-    Docker 深入
-      核心原理（Namespace / Cgroups）
-      Dockerfile 最佳實踐
-      Docker Compose
-      Docker 網路與儲存
-    Kubernetes 深入
-      架構原理
-      核心資源對象
-      服務發現與負載均衡
-      配置與密鑰管理
-      滾動更新與回滾
-    Jenkins + GitHub Actions
-      Jenkins Pipeline
-      GitHub Actions Workflow
-      完整 CI/CD 流水線
-    實戰：Spring Boot 完整部署流程
-      程式碼 → Docker Image
-      Image → Kubernetes
-      自動化流水線
+%%{init: {"flowchart": {"nodeSpacing": 14, "rankSpacing": 36, "wrappingWidth": 420}}}%%
+flowchart LR
+    R(["CI/CD 與 DevOps"])
+    c0["01 · DevOps 核心概念"]
+    R --> c0
+    p0("・什麼是 DevOps<br>・CI/CD 流水線<br>・DevOps 工具鏈全覽")
+    c0 --- p0
+    c1["02 · Docker 深入"]
+    R --> c1
+    p1("・核心原理（Namespace / Cgroups）<br>・Dockerfile 最佳實踐<br>・Docker Compose<br>・Docker 網路與儲存")
+    c1 --- p1
+    c2["03 · Kubernetes 深入"]
+    R --> c2
+    p2("・架構原理<br>・核心資源對象<br>・服務發現與負載均衡<br>・配置與密鑰管理<br>・滾動更新與回滾")
+    c2 --- p2
+    c3["04 · Jenkins + GitHub Actions"]
+    R --> c3
+    p3("・Jenkins Pipeline<br>・GitHub Actions Workflow<br>・完整 CI/CD 流水線")
+    c3 --- p3
+    c4["05 · 實戰：Spring Boot 完整部署流程"]
+    R --> c4
+    p4("・程式碼 → Docker Image<br>・Image → Kubernetes<br>・自動化流水線")
+    c4 --- p4
+    classDef chapter stroke-width:2px
+    classDef points fill:transparent,text-align:left
+    class c0,c1,c2,c3,c4 chapter
+    class p0,p1,p2,p3,p4 points
 ```
 
 ## 章節導覽

@@ -11,28 +11,29 @@ RESTful 設計規範，以及 gRPC、WebSocket、GraphQL 各自的適用場景�
 ## 學習地圖
 
 ``` mermaid
-mindmap
-  root((API 設計與通訊協議))
-    RESTful API 設計最佳實踐
-      REST 設計原則
-      HTTP 方法與冪等性
-      HTTP Status Code
-      API 版本管理
-      統一響應格式
-      API 安全設計
-    gRPC（高效能 RPC 框架）
-      核心原理與 Protobuf
-      四種通訊模式
-      Spring Boot 整合
-      gRPC vs REST 比較
-    WebSocket（即時通訊）
-      WebSocket 原理
-      Spring Boot 整合（STOMP）
-      聊天室實戰
-    GraphQL（靈活查詢語言）
-      核心概念（Query / Mutation / Subscription）
-      Spring Boot 整合
-      GraphQL vs REST 比較
+%%{init: {"flowchart": {"nodeSpacing": 14, "rankSpacing": 36, "wrappingWidth": 420}}}%%
+flowchart LR
+    R(["API 設計與通訊協議"])
+    c0["01 · RESTful API 設計最佳實踐"]
+    R --> c0
+    p0("・REST 設計原則<br>・HTTP 方法與冪等性<br>・HTTP Status Code<br>・API 版本管理<br>・統一響應格式<br>・API 安全設計")
+    c0 --- p0
+    c1["02 · gRPC（高效能 RPC 框架）"]
+    R --> c1
+    p1("・核心原理與 Protobuf<br>・四種通訊模式<br>・Spring Boot 整合<br>・gRPC vs REST 比較")
+    c1 --- p1
+    c2["03 · WebSocket（即時通訊）"]
+    R --> c2
+    p2("・WebSocket 原理<br>・Spring Boot 整合（STOMP）<br>・聊天室實戰")
+    c2 --- p2
+    c3["04 · GraphQL（靈活查詢語言）"]
+    R --> c3
+    p3("・核心概念（Query / Mutation / Subscription）<br>・Spring Boot 整合<br>・GraphQL vs REST 比較")
+    c3 --- p3
+    classDef chapter stroke-width:2px
+    classDef points fill:transparent,text-align:left
+    class c0,c1,c2,c3 chapter
+    class p0,p1,p2,p3 points
 ```
 
 ## 章節導覽

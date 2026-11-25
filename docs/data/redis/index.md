@@ -11,30 +11,41 @@ icon: lucide/layers
 ## 學習地圖
 
 ``` mermaid
-mindmap
-  root((Redis 深度))
-    五大資料結構 + 底層編碼
-      String / List / Hash / Set / ZSet
-      ZipList / SkipList / Dict / IntSet
-    持久化機制
-      RDB（快照）
-      AOF（追加日誌）
-      混合模式（推薦）
-    記憶體淘汰策略（8 種）
-    分散式鎖
-      SET NX + Lua Script
-      Redisson（生產推薦）
-    緩存三大問題
-      緩存穿透
-      緩存擊穿
-      緩存雪崩
-    Redis Cluster 架構
-      16384 槽位分配
-      一致性 Hash
-    效能優化
-      Pipeline
-      Lua Script
-    熱 Key / 大 Key 處理
+%%{init: {"flowchart": {"nodeSpacing": 14, "rankSpacing": 36, "wrappingWidth": 420}}}%%
+flowchart LR
+    R(["Redis 深度"])
+    c0["01 · 五大資料結構 + 底層編碼"]
+    R --> c0
+    p0("・String / List / Hash / Set / ZSet<br>・ZipList / SkipList / Dict / IntSet")
+    c0 --- p0
+    c1["02 · 持久化機制"]
+    R --> c1
+    p1("・RDB（快照）<br>・AOF（追加日誌）<br>・混合模式（推薦）")
+    c1 --- p1
+    c2["03 · 記憶體淘汰策略（8 種）"]
+    R --> c2
+    c3["04 · 分散式鎖"]
+    R --> c3
+    p3("・SET NX + Lua Script<br>・Redisson（生產推薦）")
+    c3 --- p3
+    c4["05 · 緩存三大問題"]
+    R --> c4
+    p4("・緩存穿透<br>・緩存擊穿<br>・緩存雪崩")
+    c4 --- p4
+    c5["06 · Redis Cluster 架構"]
+    R --> c5
+    p5("・16384 槽位分配<br>・一致性 Hash")
+    c5 --- p5
+    c6["07 · 效能優化"]
+    R --> c6
+    p6("・Pipeline<br>・Lua Script")
+    c6 --- p6
+    c7["08 · 熱 Key / 大 Key 處理"]
+    R --> c7
+    classDef chapter stroke-width:2px
+    classDef points fill:transparent,text-align:left
+    class c0,c1,c2,c3,c4,c5,c6,c7 chapter
+    class p0,p1,p3,p4,p5,p6 points
 ```
 
 ## 章節導覽

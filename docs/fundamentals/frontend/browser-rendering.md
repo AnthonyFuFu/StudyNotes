@@ -91,14 +91,17 @@
 JavaScript 是單線程的，Event Loop 讓它能處理非同步。
 
 ``` mermaid
-flowchart TB
-    CS["Call Stack（調用棧）<br>執行同步程式碼，LIFO"]
-    MI["Microtask Queue（微任務佇列）<br>Promise.then / MutationObserver / queueMicrotask<br>優先於 Macrotask，全部清空"]
-    MA["Macrotask Queue（宏任務佇列）<br>setTimeout / setInterval / I/O / UI rendering<br>每次只取一個執行"]
-    CS -- "棧空了" --> MI
-    MI -- "微任務佇列清空" --> MA
-    MA -- "執行一個宏任務後" --> CS
+flowchart LR
+    CS["Call Stack<br>調用棧"] -- "棧空了" --> MI["Microtask Queue<br>微任務佇列"]
+    MI -- "全部清空後" --> MA["Macrotask Queue<br>宏任務佇列"]
+    MA -- "取一個執行" --> CS
 ```
+
+| 佇列 | 內容 | 規則 |
+|------|------|------|
+| **Call Stack**（調用棧） | 同步程式碼 | LIFO（後進先出） |
+| **Microtask Queue**（微任務） | `Promise.then` / `MutationObserver` / `queueMicrotask` | 優先於宏任務，每次**全部清空** |
+| **Macrotask Queue**（宏任務） | `setTimeout` / `setInterval` / I/O / UI rendering | 每次**只取一個**執行 |
 
 **執行順序**：同步程式碼 → 清空微任務佇列 → 執行一個宏任務 → 清空微任務佇列 → 執行一個宏任務 → …
 

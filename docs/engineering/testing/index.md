@@ -11,35 +11,37 @@ icon: lucide/flask-conical
 ## 學習地圖
 
 ``` mermaid
-mindmap
-  root((測試))
-    測試基礎概念
-      測試金字塔
-      測試分類
-      好測試的標準（FIRST 原則）
-    JUnit 5 深入
-      核心注解
-      參數化測試
-      條件測試
-      測試生命週期
-    Mockito 深入
-      Mock / Stub / Spy
-      常用 API
-      驗證行為
-      ArgumentCaptor
-    Spring Boot Test
-      @SpringBootTest（整合測試）
-      @WebMvcTest（Controller 層測試）
-      @DataJpaTest（Repository 層測試）
-      @MockBean / @SpyBean
-    Testcontainers（真實環境整合測試）
-      核心原理
-      MySQL / Redis / Kafka 整合
-      與 Spring Boot 整合
-    TDD（測試驅動開發）
-      Red-Green-Refactor 循環
-      TDD 實戰範例
-      測試覆蓋率
+%%{init: {"flowchart": {"nodeSpacing": 14, "rankSpacing": 36, "wrappingWidth": 420}}}%%
+flowchart LR
+    R(["測試"])
+    c0["01 · 測試基礎概念"]
+    R --> c0
+    p0("・測試金字塔<br>・測試分類<br>・好測試的標準（FIRST 原則）")
+    c0 --- p0
+    c1["02 · JUnit 5 深入"]
+    R --> c1
+    p1("・核心注解<br>・參數化測試<br>・條件測試<br>・測試生命週期")
+    c1 --- p1
+    c2["03 · Mockito 深入"]
+    R --> c2
+    p2("・Mock / Stub / Spy<br>・常用 API<br>・驗證行為<br>・ArgumentCaptor")
+    c2 --- p2
+    c3["04 · Spring Boot Test"]
+    R --> c3
+    p3("・@SpringBootTest（整合測試）<br>・@WebMvcTest（Controller 層測試）<br>・@DataJpaTest（Repository 層測試）<br>・@MockBean / @SpyBean")
+    c3 --- p3
+    c4["05 · Testcontainers（真實環境整合測試）"]
+    R --> c4
+    p4("・核心原理<br>・MySQL / Redis / Kafka 整合<br>・與 Spring Boot 整合")
+    c4 --- p4
+    c5["06 · TDD（測試驅動開發）"]
+    R --> c5
+    p5("・Red-Green-Refactor 循環<br>・TDD 實戰範例<br>・測試覆蓋率")
+    c5 --- p5
+    classDef chapter stroke-width:2px
+    classDef points fill:transparent,text-align:left
+    class c0,c1,c2,c3,c4,c5 chapter
+    class p0,p1,p2,p3,p4,p5 points
 ```
 
 ## 章節導覽

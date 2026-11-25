@@ -3,20 +3,19 @@
 ## Binlog 複製原理
 
 ``` mermaid
-flowchart LR
-    W(["寫操作<br>INSERT / UPDATE / DELETE"]) --> M
-    subgraph Master
-        M[("Binlog<br>二進位日誌")]
-    end
-    subgraph Slave1 ["Slave 1"]
-        R1[("Relay Log<br>中繼日誌")] -- SQL Thread --> S1["重放 SQL"]
-    end
-    subgraph Slave2 ["Slave 2"]
-        R2[("Relay Log<br>中繼日誌")] -- SQL Thread --> S2["重放 SQL"]
-    end
+flowchart TB
+    W(["寫操作 INSERT / UPDATE / DELETE"]) --> M[("Master：Binlog")]
     M -- I/O Thread --> R1
     M -- I/O Thread --> R2
-    S1 & S2 --> Q(["讀操作<br>SELECT"])
+    subgraph Slave1 ["Slave 1"]
+        direction LR
+        R1[("Relay Log")] -- SQL Thread --> S1["重放 SQL"]
+    end
+    subgraph Slave2 ["Slave 2"]
+        direction LR
+        R2[("Relay Log")] -- SQL Thread --> S2["重放 SQL"]
+    end
+    Slave1 & Slave2 --> Q(["讀操作 SELECT"])
 ```
 
 **複製流程**

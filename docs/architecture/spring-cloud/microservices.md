@@ -8,9 +8,7 @@
     flowchart TB
         subgraph MONO ["單體應用"]
             direction LR
-            U["用戶模組"]
-            O["訂單模組"]
-            P["商品模組"]
+            U["用戶模組"] ~~~ O["訂單模組"] ~~~ P["商品模組"]
         end
         MONO --> DB[("資料庫（共用）")]
     ```

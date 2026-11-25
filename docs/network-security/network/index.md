@@ -11,25 +11,33 @@ TCP/IP 模型、TCP 握手與可靠傳輸、HTTP 各版本演進、TLS 加密、
 ## 學習地圖
 
 ``` mermaid
-mindmap
-  root((網路基礎))
-    TCP / IP 模型
-      四層 / 七層模型
-      各層協議對應
-    TCP 深度
-      三次握手
-      四次揮手
-      可靠傳輸機制
-      常見面試題
-    HTTP 協議演進
-      HTTP 1.0 / 1.1 / 2.0 / 3.0
-      關鍵差異對比
-    HTTPS 與 TLS
-      TLS 握手流程
-      對稱 vs 非對稱加密
-      憑證體系
-    DNS 解析流程
-    CDN 原理
+%%{init: {"flowchart": {"nodeSpacing": 14, "rankSpacing": 36, "wrappingWidth": 420}}}%%
+flowchart LR
+    R(["網路基礎"])
+    c0["01 · TCP / IP 模型"]
+    R --> c0
+    p0("・四層 / 七層模型<br>・各層協議對應")
+    c0 --- p0
+    c1["02 · TCP 深度"]
+    R --> c1
+    p1("・三次握手<br>・四次揮手<br>・可靠傳輸機制<br>・常見面試題")
+    c1 --- p1
+    c2["03 · HTTP 協議演進"]
+    R --> c2
+    p2("・HTTP 1.0 / 1.1 / 2.0 / 3.0<br>・關鍵差異對比")
+    c2 --- p2
+    c3["04 · HTTPS 與 TLS"]
+    R --> c3
+    p3("・TLS 握手流程<br>・對稱 vs 非對稱加密<br>・憑證體系")
+    c3 --- p3
+    c4["05 · DNS 解析流程"]
+    R --> c4
+    c5["06 · CDN 原理"]
+    R --> c5
+    classDef chapter stroke-width:2px
+    classDef points fill:transparent,text-align:left
+    class c0,c1,c2,c3,c4,c5 chapter
+    class p0,p1,p2,p3 points
 ```
 
 ## 章節導覽

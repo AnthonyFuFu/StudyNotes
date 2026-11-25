@@ -11,32 +11,45 @@ icon: lucide/zap
 ## 學習地圖
 
 ``` mermaid
-mindmap
-  root((Java 並發深度))
-    Thread 生命週期與狀態轉換
-    synchronized 底層原理
-      Monitor 物件鎖
-      鎖升級：偏向 → 輕量 → 重量
-    volatile 原理
-      記憶體屏障
-      MESI 緩存一致性協議
-    AQS 底層原理
-      CLH 等待佇列
-      獨佔 / 共享模式
-    鎖進階
-      ReentrantLock
-      ReadWriteLock
-      StampedLock
-    ThreadLocal
-      底層原理
-      記憶體洩漏問題
-    線程池
-      ThreadPoolExecutor 7 個參數
-      拒絕策略
-      線程池調優
-    ConcurrentHashMap 底層原理
-      JDK 8 CAS + Synchronized
-    CompletableFuture 異步編排
+%%{init: {"flowchart": {"nodeSpacing": 14, "rankSpacing": 36, "wrappingWidth": 420}}}%%
+flowchart LR
+    R(["Java 並發"])
+    c0["01 · Thread 生命週期與狀態轉換"]
+    R --> c0
+    c1["02 · synchronized 底層原理"]
+    R --> c1
+    p1("・Monitor 物件鎖<br>・鎖升級：偏向 → 輕量 → 重量")
+    c1 --- p1
+    c2["03 · volatile 原理"]
+    R --> c2
+    p2("・記憶體屏障<br>・MESI 緩存一致性協議")
+    c2 --- p2
+    c3["04 · AQS 底層原理"]
+    R --> c3
+    p3("・CLH 等待佇列<br>・獨佔 / 共享模式")
+    c3 --- p3
+    c4["05 · 鎖進階"]
+    R --> c4
+    p4("・ReentrantLock<br>・ReadWriteLock<br>・StampedLock")
+    c4 --- p4
+    c5["06 · ThreadLocal"]
+    R --> c5
+    p5("・底層原理<br>・記憶體洩漏問題")
+    c5 --- p5
+    c6["07 · 線程池"]
+    R --> c6
+    p6("・ThreadPoolExecutor 7 個參數<br>・拒絕策略<br>・線程池調優")
+    c6 --- p6
+    c7["08 · ConcurrentHashMap 底層原理"]
+    R --> c7
+    p7("・JDK 8 CAS + Synchronized")
+    c7 --- p7
+    c8["09 · CompletableFuture 異步編排"]
+    R --> c8
+    classDef chapter stroke-width:2px
+    classDef points fill:transparent,text-align:left
+    class c0,c1,c2,c3,c4,c5,c6,c7,c8 chapter
+    class p1,p2,p3,p4,p5,p6,p7 points
 ```
 
 ## 章節導覽

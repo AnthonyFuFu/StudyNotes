@@ -17,9 +17,19 @@ sequenceDiagram
 **DevOps = Development + Operations**：打破開發與運維的隔閡。
 
 ``` mermaid
-flowchart LR
-    Plan --> Code --> Build --> Test --> Release
-    Release --> Deploy --> Operate --> Monitor --> Plan
+block-beta
+    columns 7
+    Plan space Code space Build space Test
+    space:7
+    Monitor space Operate space Deploy space Release
+    Plan --> Code
+    Code --> Build
+    Build --> Test
+    Test --> Release
+    Release --> Deploy
+    Deploy --> Operate
+    Operate --> Monitor
+    Monitor --> Plan
 ```
 
 **目標**

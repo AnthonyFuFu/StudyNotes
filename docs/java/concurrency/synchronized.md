@@ -95,7 +95,6 @@ Thread t2 = new Thread(() -> {
 
 ``` mermaid
 stateDiagram-v2
-    direction LR
     NoLock: 無鎖
     Biased: 偏向鎖
     Light: 輕量級鎖

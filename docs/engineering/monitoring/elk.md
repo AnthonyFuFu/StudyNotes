@@ -4,26 +4,16 @@
 
 ``` mermaid
 flowchart TB
-    subgraph APP ["應用層"]
-        SB["Spring Boot App<br>輸出結構化日誌（JSON）"]
-    end
+    SB["應用層：Spring Boot App<br>輸出 JSON 結構化日誌"] -- "日誌文件 / Console" --> COLLECT
     subgraph COLLECT ["收集層"]
         direction LR
-        FB["Filebeat（輕量）<br>讀取日誌文件並發送"]
-        LS["Logstash（重量級）<br>過濾、轉換、豐富日誌"]
-        FB --> LS
+        FB["Filebeat<br>輕量收集、發送"] --> LS["Logstash<br>過濾、轉換、豐富"]
     end
-    subgraph STORE ["儲存層"]
-        ES[("Elasticsearch<br>分散式全文搜索引擎<br>儲存和索引日誌")]
-    end
-    subgraph VIEW ["展示層"]
-        KB["Kibana<br>日誌搜索、視覺化、儀表板"]
-    end
-    SB -- "日誌文件 / Console" --> FB
-    LS --> ES
-    FB -. "簡單場景可直送" .-> ES
-    ES --> KB
+    COLLECT --> ES[("儲存層：Elasticsearch<br>分散式全文搜索，儲存與索引日誌")]
+    ES --> KB["展示層：Kibana<br>日誌搜索、視覺化、儀表板"]
 ```
+
+簡單場景可以省略 Logstash，由 Filebeat 直接送到 Elasticsearch。
 
 ## Spring Boot 結構化日誌
 

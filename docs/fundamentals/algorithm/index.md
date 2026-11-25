@@ -11,29 +11,39 @@ icon: lucide/binary
 ## 學習地圖
 
 ``` mermaid
-mindmap
-  root((演算法與資料結構))
-    複雜度分析
-      時間複雜度
-      空間複雜度
-    陣列 / 字串
-      雙指針
-      滑動視窗
-    鏈表
-      反轉鏈表
-      環檢測
-      合併鏈表
-    二元樹
-      DFS（前中後序）
-      BFS（層序遍歷）
-      常見題型
-    動態規劃
-      背包問題
-      最長子序列
-    排序演算法
-      快速排序
-      合併排序
-    HashMap 應用題
+%%{init: {"flowchart": {"nodeSpacing": 14, "rankSpacing": 36, "wrappingWidth": 420}}}%%
+flowchart LR
+    R(["演算法與資料結構"])
+    c0["01 · 複雜度分析"]
+    R --> c0
+    p0("・時間複雜度<br>・空間複雜度")
+    c0 --- p0
+    c1["02 · 陣列 / 字串"]
+    R --> c1
+    p1("・雙指針<br>・滑動視窗")
+    c1 --- p1
+    c2["03 · 鏈表"]
+    R --> c2
+    p2("・反轉鏈表<br>・環檢測<br>・合併鏈表")
+    c2 --- p2
+    c3["04 · 二元樹"]
+    R --> c3
+    p3("・DFS（前中後序）<br>・BFS（層序遍歷）<br>・常見題型")
+    c3 --- p3
+    c4["05 · 動態規劃"]
+    R --> c4
+    p4("・背包問題<br>・最長子序列")
+    c4 --- p4
+    c5["06 · 排序演算法"]
+    R --> c5
+    p5("・快速排序<br>・合併排序")
+    c5 --- p5
+    c6["07 · HashMap 應用題"]
+    R --> c6
+    classDef chapter stroke-width:2px
+    classDef points fill:transparent,text-align:left
+    class c0,c1,c2,c3,c4,c5,c6 chapter
+    class p0,p1,p2,p3,p4,p5 points
 ```
 
 ## 章節導覽

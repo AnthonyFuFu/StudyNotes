@@ -11,34 +11,37 @@ icon: lucide/palette
 ## 學習地圖
 
 ``` mermaid
-mindmap
-  root((前端深度))
-    瀏覽器渲染原理
-      關鍵渲染路徑
-      重排（Reflow）vs 重繪（Repaint）
-      事件循環（Event Loop）
-    JavaScript 核心原理
-      原型鏈 / 繼承
-      閉包（Closure）
-      作用域 / 變數提升
-      非同步（Promise / async-await）
-    TypeScript 深度
-      類型系統
-      泛型
-      實用工具類型
-    React 核心原理
-      Virtual DOM / Diff 算法
-      Fiber 架構
-      Hooks 深度
-      狀態管理
-    Vue 核心原理
-      響應式系統（Vue 2 vs Vue 3）
-      虛擬 DOM / Diff
-      Composition API
-    前端效能優化
-      載入效能
-      渲染效能
-      網路效能
+%%{init: {"flowchart": {"nodeSpacing": 14, "rankSpacing": 36, "wrappingWidth": 420}}}%%
+flowchart LR
+    R(["前端深度"])
+    c0["01 · 瀏覽器渲染原理"]
+    R --> c0
+    p0("・關鍵渲染路徑<br>・重排（Reflow）vs 重繪（Repaint）<br>・事件循環（Event Loop）")
+    c0 --- p0
+    c1["02 · JavaScript 核心原理"]
+    R --> c1
+    p1("・原型鏈 / 繼承<br>・閉包（Closure）<br>・作用域 / 變數提升<br>・非同步（Promise / async-await）")
+    c1 --- p1
+    c2["03 · TypeScript 深度"]
+    R --> c2
+    p2("・類型系統<br>・泛型<br>・實用工具類型")
+    c2 --- p2
+    c3["04 · React 核心原理"]
+    R --> c3
+    p3("・Virtual DOM / Diff 算法<br>・Fiber 架構<br>・Hooks 深度<br>・狀態管理")
+    c3 --- p3
+    c4["05 · Vue 核心原理"]
+    R --> c4
+    p4("・響應式系統（Vue 2 vs Vue 3）<br>・虛擬 DOM / Diff<br>・Composition API")
+    c4 --- p4
+    c5["06 · 前端效能優化"]
+    R --> c5
+    p5("・載入效能<br>・渲染效能<br>・網路效能")
+    c5 --- p5
+    classDef chapter stroke-width:2px
+    classDef points fill:transparent,text-align:left
+    class c0,c1,c2,c3,c4,c5 chapter
+    class p0,p1,p2,p3,p4,p5 points
 ```
 
 ## 章節導覽

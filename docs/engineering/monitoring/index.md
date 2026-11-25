@@ -11,35 +11,37 @@ Metrics、Logs、Traces 三大支柱，以及 Prometheus、Grafana、ELK、鏈�
 ## 學習地圖
 
 ``` mermaid
-mindmap
-  root((監控與可觀測性))
-    可觀測性三大支柱
-      Metrics（指標）
-      Logs（日誌）
-      Traces（鏈路追蹤）
-    Prometheus 深入
-      架構原理
-      資料模型與 PromQL
-      Spring Boot 整合
-      告警規則（AlertManager）
-    Grafana 深入
-      儀表板設計原則
-      關鍵面板配置
-      變數（Variables）
-    ELK Stack 深入
-      ELK 架構
-      Spring Boot 結構化日誌
-      Filebeat 配置
-      Logstash Pipeline
-      Kibana 使用技巧
-    分散式鏈路追蹤
-      SkyWalking 架構
-      Spring Boot 整合
-      鏈路分析實戰
-    實戰：完整可觀測性平台
-      整合架構設計
-      Docker Compose 部署
-      生產告警體系
+%%{init: {"flowchart": {"nodeSpacing": 14, "rankSpacing": 36, "wrappingWidth": 420}}}%%
+flowchart LR
+    R(["監控與可觀測性"])
+    c0["01 · 可觀測性三大支柱"]
+    R --> c0
+    p0("・Metrics（指標）<br>・Logs（日誌）<br>・Traces（鏈路追蹤）")
+    c0 --- p0
+    c1["02 · Prometheus 深入"]
+    R --> c1
+    p1("・架構原理<br>・資料模型與 PromQL<br>・Spring Boot 整合<br>・告警規則（AlertManager）")
+    c1 --- p1
+    c2["03 · Grafana 深入"]
+    R --> c2
+    p2("・儀表板設計原則<br>・關鍵面板配置<br>・變數（Variables）")
+    c2 --- p2
+    c3["04 · ELK Stack 深入"]
+    R --> c3
+    p3("・ELK 架構<br>・Spring Boot 結構化日誌<br>・Filebeat 配置<br>・Logstash Pipeline<br>・Kibana 使用技巧")
+    c3 --- p3
+    c4["05 · 分散式鏈路追蹤"]
+    R --> c4
+    p4("・SkyWalking 架構<br>・Spring Boot 整合<br>・鏈路分析實戰")
+    c4 --- p4
+    c5["06 · 實戰：完整可觀測性平台"]
+    R --> c5
+    p5("・整合架構設計<br>・Docker Compose 部署<br>・生產告警體系")
+    c5 --- p5
+    classDef chapter stroke-width:2px
+    classDef points fill:transparent,text-align:left
+    class c0,c1,c2,c3,c4,c5 chapter
+    class p0,p1,p2,p3,p4,p5 points
 ```
 
 ## 章節導覽

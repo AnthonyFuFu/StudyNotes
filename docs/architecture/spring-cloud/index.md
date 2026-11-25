@@ -11,28 +11,33 @@ icon: lucide/cloud
 ## 學習地圖
 
 ``` mermaid
-mindmap
-  root((Spring Cloud 微服務))
-    微服務核心概念
-      單體 vs 微服務
-      Spring Cloud 生態全覽
-    Nacos
-      服務發現（Service Registry）
-      配置中心（Config Center）
-    OpenFeign（聲明式 HTTP 客戶端）
-      基本使用
-      攔截器 / 超時 / 重試
-      整合 Sentinel 熔斷
-    Spring Cloud Gateway
-      路由（Route）
-      斷言（Predicate）
-      過濾器（Filter）
-      限流 / 認證 / 灰度發布
-    Sentinel（限流 / 熔斷 / 降級）
-      核心概念
-      流量控制規則
-      熔斷降級規則
-      Spring Boot 整合
+%%{init: {"flowchart": {"nodeSpacing": 14, "rankSpacing": 36, "wrappingWidth": 420}}}%%
+flowchart LR
+    R(["Spring Cloud 微服務"])
+    c0["01 · 微服務核心概念"]
+    R --> c0
+    p0("・單體 vs 微服務<br>・Spring Cloud 生態全覽")
+    c0 --- p0
+    c1["02 · Nacos"]
+    R --> c1
+    p1("・服務發現（Service Registry）<br>・配置中心（Config Center）")
+    c1 --- p1
+    c2["03 · OpenFeign（聲明式 HTTP 客戶端）"]
+    R --> c2
+    p2("・基本使用<br>・攔截器 / 超時 / 重試<br>・整合 Sentinel 熔斷")
+    c2 --- p2
+    c3["04 · Spring Cloud Gateway"]
+    R --> c3
+    p3("・路由（Route）<br>・斷言（Predicate）<br>・過濾器（Filter）<br>・限流 / 認證 / 灰度發布")
+    c3 --- p3
+    c4["05 · Sentinel（限流 / 熔斷 / 降級）"]
+    R --> c4
+    p4("・核心概念<br>・流量控制規則<br>・熔斷降級規則<br>・Spring Boot 整合")
+    c4 --- p4
+    classDef chapter stroke-width:2px
+    classDef points fill:transparent,text-align:left
+    class c0,c1,c2,c3,c4 chapter
+    class p0,p1,p2,p3,p4 points
 ```
 
 ## 章節導覽
