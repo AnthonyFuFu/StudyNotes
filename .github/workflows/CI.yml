@@ -22,7 +22,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Configure GitHub Pages
+      - name: Configure Pages
         uses: actions/configure-pages@v6
 
       - name: Setup Python
@@ -41,6 +41,6 @@ jobs:
         with:
           path: site
 
-      - name: Deploy to GitHub Pages
+      - name: Deploy Pages
         id: deployment
         uses: actions/deploy-pages@v5
