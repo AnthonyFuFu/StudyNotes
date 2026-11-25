@@ -1,5 +1,9 @@
 # 實戰：React 19 + TypeScript
 
+!!! abstract "本章重點"
+
+    本章以 fu-clan-management-system 說明 React 19 + TypeScript 的實戰寫法：技術選擇的理由、用自訂 Hook 處理讀取狀態與競態條件、React 19 的新功能，以及 Testing Library 的測試原則。
+
 !!! abstract "專案：fu-clan-management-system"
 
     傅氏宗親會管理系統，以 **Electron** 包成桌面程式，畫面用 **React 19 + TypeScript + Vite + Ant Design 6**，資料存在本機 SQLite（sql.js）。這一章聚焦在 React 的寫法；Electron 的架構見 [Electron 桌面應用](../electron/index.md)。

@@ -36,13 +36,13 @@ flowchart LR
 
     ---
 
-    三種程序 · 安全設定 · 型別安全的 IPC · 跟 Web 應用的差別
+    Electron 由 Main、Renderer、Preload 三種程序組成，安全設定一旦錯誤，網頁漏洞就會變成整台電腦的漏洞。
 
 -   __[02 · 資料儲存、打包與 CI](engineering.md)__
 
     ---
 
-    本機資料庫：sql.js · 分層與共用規則 · Excel 匯入匯出 · 打包：electron-builder …
+    桌面程式的資料存在使用者電腦上，還要能在三個作業系統上安裝。
 
 </div>
 

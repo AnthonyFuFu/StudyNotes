@@ -1,5 +1,9 @@
 # 核心原理：IoC、自動配置與 AOP
 
+!!! abstract "本章重點"
+
+    Spring Boot = Spring Framework + 自動配置 + 內嵌伺服器 + Starter。本章說明 IoC 與依賴注入、Bean 的生命週期與作用域、自動配置如何依條件生效，以及 AOP 代理是怎麼產生的。
+
 Spring Boot 本身不是新框架，而是 **Spring Framework + 自動配置 + 內嵌伺服器 + Starter 依賴管理**。要理解它，先理解 Spring 的三個核心：IoC 容器、自動配置、AOP 代理。
 
 ## IoC 與依賴注入

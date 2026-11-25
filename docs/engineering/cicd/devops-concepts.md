@@ -70,19 +70,17 @@ flowchart TB
 
 ## DevOps 工具鏈全覽
 
-``` text
-階段                工具
-──────────────────────────────────────────────
-計劃（Plan）        Jira、Trello、GitHub Issues
-程式碼（Code）      Git、GitHub、GitLab
-建置（Build）       Maven、Gradle、npm
-測試（Test）        JUnit、Mockito、Testcontainers
-掃描（Scan）        SonarQube、Checkstyle、OWASP
-容器（Container）   Docker、Podman
-倉庫（Registry）    Docker Hub、Harbor、ECR
-編排（Orchestrate） Kubernetes、Docker Swarm
-CI/CD（Pipeline）  Jenkins、GitHub Actions、GitLab CI
-配置（Config）      Helm、Kustomize、Ansible
-監控（Monitor）     Prometheus、Grafana、ELK
-服務網格（Mesh）    Istio、Linkerd
-```
+| 階段 | 工具 |
+|------|------|
+| 計劃（Plan） | Jira、Trello、GitHub Issues |
+| 程式碼（Code） | Git、GitHub、GitLab |
+| 建置（Build） | Maven、Gradle、npm |
+| 測試（Test） | JUnit、Mockito、Testcontainers |
+| 掃描（Scan） | SonarQube、Checkstyle、OWASP Dependency-Check、Trivy |
+| 容器（Container） | Docker、Podman |
+| 倉庫（Registry） | Docker Hub、**Harbor**、ECR、GHCR |
+| 編排（Orchestrate） | Kubernetes、Docker Swarm |
+| CI/CD（Pipeline） | Jenkins、GitHub Actions、GitLab CI、**Argo CD** |
+| 設定（Config） | Helm、Kustomize、Ansible、Terraform |
+| 監控（Monitor） | Prometheus、Grafana、ELK |
+| 服務網格（Mesh） | Istio、Linkerd |

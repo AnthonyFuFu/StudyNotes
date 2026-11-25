@@ -147,7 +147,7 @@ public class Outer {
 static class Inner { ... }
 ```
 
-### OOM 排查實戰案例：
+### OOM 排查實戰案例
 
 案例：電商系統 Full GC 頻繁，每隔 30 分鐘一次
 

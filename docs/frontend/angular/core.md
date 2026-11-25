@@ -1,5 +1,9 @@
 # 核心概念：元件、DI、RxJS 與 Signals
 
+!!! abstract "本章重點"
+
+    Angular 是內建 DI、路由、表單與 HTTP 的完整框架，它的 Service + DI 思維與 Spring 非常接近。本章介紹 standalone 元件、依賴注入、用 RxJS 處理非同步串流、用 Signals 管理狀態，以及懶加載路由。
+
 Angular 是 Google 維護的**完整框架**：路由、表單、HTTP 客戶端、依賴注入、測試、CLI 全部內建。chinese_artwork_angular 使用 **Angular 21**，採用 standalone 元件、Signals 與 SSR。
 
 ## 和 Vue / React 的定位差異

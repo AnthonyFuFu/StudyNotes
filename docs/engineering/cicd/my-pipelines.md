@@ -1,5 +1,9 @@
 # 實戰：我的 CI/CD 與 K8s 部署
 
+!!! abstract "本章重點"
+
+    本章整理我在各專案中實際建立的流水線：GitHub Actions 服務容器整合測試、映像推送 GHCR、Electron 三平台打包，以及用 kubeadm 自建 Kubernetes 叢集部署微服務。
+
 前面章節介紹的是通用概念，這一章整理我在各專案中實際建立的流水線與部署方式。
 
 ## 各專案的 CI 一覽

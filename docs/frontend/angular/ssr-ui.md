@@ -1,5 +1,9 @@
 # 實戰：SSR、Hydration 與 UI
 
+!!! abstract "本章重點"
+
+    內容型網站需要 SEO 與快速首屏，Angular 可以讓每條路由各自選擇預渲染、伺服器渲染或客戶端渲染。本章說明 SSR、Hydration 與 Event Replay 的原理、SSR 的注意事項，以及 Angular Material + Tailwind 的分工。
+
 !!! abstract "專案：chinese_artwork_angular"
 
     中華書畫網站的 Angular 前端，Angular 21 + **SSR（Express）** + Angular Material + Tailwind CSS + Vitest，與 ASP.NET Core 版的 chineseArtwork 是同一個主題的兩種實作。

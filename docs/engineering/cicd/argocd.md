@@ -1,5 +1,9 @@
 # Argo CD 與 GitOps
 
+!!! abstract "本章重點"
+
+    GitOps 以 Git 作為部署的唯一真實來源，由叢集內的 Argo CD 持續比對並同步。本章說明 Push 與 Pull 模式的差異、Argo CD 架構與 Application 設定，以及 Git → Harbor → Argo CD 的完整流水線。
+
 ## GitOps 是什麼
 
 **GitOps**：以 **Git 作為部署的唯一真實來源（Single Source of Truth）**。K8s 上應該跑什麼，全部寫在 Git 裡；由叢集內的代理程式持續比對，自動把叢集調整成 Git 描述的樣子。

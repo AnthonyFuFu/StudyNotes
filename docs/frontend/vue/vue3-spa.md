@@ -1,5 +1,9 @@
 # 實戰：Vue 3 前後端分離
 
+!!! abstract "本章重點"
+
+    本章以 holiday_dessert_vue 說明 Vue 3 前後端分離的實作：巢狀版型與懶加載路由、跨網域與 Cookie 的處理、STOMP 即時客服、Vuex 與 Pinia 的比較，以及打包部署。
+
 !!! abstract "專案：holiday_dessert_vue"
 
     holidayDessert 前台的 Vue 3 單頁應用（SPA）版本：Vue CLI 5 + Vue Router 4 + Vuex 4 + Axios + Sass，開發伺服器跑在 `8081`，所有資料都透過 API 向 Spring Boot 後端（`8080`）取得。

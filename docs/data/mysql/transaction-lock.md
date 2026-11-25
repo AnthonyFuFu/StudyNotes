@@ -8,14 +8,12 @@
 
 **SQL 標準定義的四種隔離級別（由低到高）**
 
-``` text
-隔離級別              臟讀   不可重複讀   幻讀
-────────────────────────────────────────────────
-READ UNCOMMITTED      ✅     ✅          ✅
-READ COMMITTED        ❌     ✅          ✅
-REPEATABLE READ（預設）❌     ❌          ✅（InnoDB 用 Gap Lock 解決）
-SERIALIZABLE          ❌     ❌          ❌
-```
+| 隔離級別 | 髒讀 | 不可重複讀 | 幻讀 |
+|---------|:----:|:---------:|:----:|
+| READ UNCOMMITTED | ⚠️ 會發生 | ⚠️ 會發生 | ⚠️ 會發生 |
+| READ COMMITTED | ✅ 避免 | ⚠️ 會發生 | ⚠️ 會發生 |
+| **REPEATABLE READ**（InnoDB 預設） | ✅ 避免 | ✅ 避免 | ✅ 大致避免（MVCC + Gap Lock） |
+| SERIALIZABLE | ✅ 避免 | ✅ 避免 | ✅ 避免 |
 
 **問題定義**
 
@@ -91,7 +89,7 @@ flowchart LR
 
 ## 鎖機制
 
-### 表鎖 vs 行鎖：
+### 表鎖 vs 行鎖
 
 **表鎖（Table Lock）**
 
@@ -107,7 +105,7 @@ flowchart LR
 
 - ⚠️ 重要：InnoDB 行鎖是加在索引上的，不是行本身！
 
-### 三種行鎖：
+### 三種行鎖
 
 **Record Lock（記錄鎖）**
 

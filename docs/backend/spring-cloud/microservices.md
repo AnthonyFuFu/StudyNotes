@@ -36,17 +36,15 @@
 
 ## Spring Cloud 生態全覽
 
-``` text
-組件                    功能                    替代方案
-────────────────────────────────────────────────────────
-Nacos                  服務發現 + 配置中心      Eureka + Config
-OpenFeign              聲明式 HTTP 客戶端       RestTemplate
-Spring Cloud Gateway   API 閘道               Zuul
-Sentinel               限流 / 熔斷 / 降級      Hystrix / Resilience4j
-Sleuth + Zipkin        分散式鏈路追蹤           SkyWalking
-Spring Cloud Stream    消息驅動               直接用 Kafka/RabbitMQ
-Seata                  分散式事務              TCC / SAGA 手動實作
-```
+| 元件 | 功能 | 替代方案 |
+|------|------|---------|
+| Nacos | 服務發現 + 設定中心 | Eureka + Config Server |
+| OpenFeign | 聲明式 HTTP 客戶端 | RestTemplate / RestClient |
+| Spring Cloud Gateway | API 閘道 | Zuul（已停止維護） |
+| Sentinel | 限流 / 熔斷 / 降級 | Resilience4j（Hystrix 已停止維護） |
+| Micrometer Tracing + Zipkin | 分散式鏈路追蹤 | SkyWalking |
+| Spring Cloud Stream | 訊息驅動 | 直接使用 Kafka / RabbitMQ |
+| Seata | 分散式事務 | TCC / SAGA 手動實作 |
 
 ```xml
 <!-- pom.xml（Spring Cloud + Alibaba 依賴管理）-->

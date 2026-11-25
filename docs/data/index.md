@@ -22,7 +22,7 @@ icon: lucide/database
 
     資料結構的底層編碼、持久化與淘汰策略，以及分散式鎖、緩存三大問題、熱 Key / 大 Key 等實戰議題。
 
-    `8 章` · 資料結構底層 / 持久化 / 分散式鎖 / 緩存問題 / Cluster
+    `9 章` · 資料結構底層 / 持久化 / 分散式鎖 / 緩存問題 / Cluster
 
 -   __[Elasticsearch](elasticsearch/index.md)__
 

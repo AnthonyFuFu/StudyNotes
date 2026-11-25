@@ -44,25 +44,25 @@ flowchart LR
 
     ---
 
-    全球基礎設施 · IAM：誰可以對什麼做什麼 · VPC：自己的私有網路
+    所有 AWS 架構都建立在 Region / AZ、IAM 權限與 VPC 網路之上。
 
 -   __[02 · 運算與部署：EC2、ECS、EKS、Lambda](compute.md)__
 
     ---
 
-    運算服務怎麼選 · EC2 · 容器：ECR、ECS、EKS · Lambda：無伺服器 …
+    AWS 的運算服務從 EC2、ECS、EKS 到 Lambda，管得越少、彈性越低。
 
 -   __[03 · 儲存與資料庫：S3、RDS、ElastiCache](storage-database.md)__
 
     ---
 
-    S3：物件儲存 · 我的實作：Multipart Upload 邊讀邊傳 · RDS / Aurora：託管關聯式資料庫 · ElastiCache：託管 Redis …
+    本章介紹 S3 的特性與儲存類別，並以 holidayDessert 的 Multipart Upload 說明大檔案上傳的正確做法；接著說明 RDS / Aurora 的 Multi-AZ 與 Read Replica、ElastiCache 的叢集模式。
 
 -   __[04 · 維運、安全與成本](operations-security.md)__
 
     ---
 
-    可觀測性 · 祕密與加密 · 安全檢查清單 · 基礎設施即程式碼 …
+    雲端環境上線後，監控、祕密管理與成本控制同樣重要。
 
 </div>
 

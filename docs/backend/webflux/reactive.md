@@ -1,5 +1,9 @@
 # 反應式程式設計原理
 
+!!! abstract "本章重點"
+
+    WebFlux 用少量 Event Loop 執行緒處理大量等待 I/O 的連線。本章比較兩種並發模型，說明 Reactive Streams 與背壓、Mono / Flux 的常用運算子，以及「在 Event Loop 上阻塞」這個最大陷阱。
+
 Spring WebFlux 是 Spring 的**非阻塞、反應式** Web 框架，底層預設跑在 **Netty** 上，以 **Project Reactor** 為核心。它解決的問題是：**用少量執行緒處理大量「正在等待 I/O」的連線**。
 
 ## 兩種並發模型

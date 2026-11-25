@@ -17,7 +17,7 @@ block-beta
 
 `.class` 文件依序經過：載入 → **連接（驗證 → 準備 → 解析）** → 初始化 → 使用 → 卸載。
 
-### 每個階段詳解：
+### 每個階段詳解
 
 ```java
 public class Demo {
@@ -71,7 +71,7 @@ public class Demo {
 
 - ⑦ 卸載（Unloading）：類不再使用，GC 回收
 
-### 初始化的觸發條件（主動引用）：
+### 初始化的觸發條件（主動引用）
 
 ```java
 // ✅ 以下情況會觸發類初始化：
@@ -102,7 +102,7 @@ flowchart LR
 | **Application ClassLoader**（應用程序類加載器） | Java | classpath | 你寫的類 |
 | **Custom ClassLoader**（自定義類加載器） | Java | 自訂 | 自訂來源（加密、網路等） |
 
-### 雙親委派流程：
+### 雙親委派流程
 
 ``` mermaid
 sequenceDiagram
@@ -137,7 +137,7 @@ public class String {
 // 你的惡意 String 永遠不會被載入！✅
 ```
 
-### 自定義 ClassLoader：
+### 自定義 ClassLoader
 
 ```java
 public class CustomClassLoader extends ClassLoader {
@@ -177,7 +177,7 @@ public class CustomClassLoader extends ClassLoader {
 }
 ```
 
-### 打破雙親委派：
+### 打破雙親委派
 
 ```java
 // 打破方式：重寫 loadClass() 方法（不調用 super）

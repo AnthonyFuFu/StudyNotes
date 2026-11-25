@@ -4,7 +4,7 @@
 
     行為型模式關注「物件之間如何分工與溝通」。本章的 11 種模式都附上 UML 類別圖與 AnthonyFu-Learning 的範例程式，其中觀察者、策略、責任鏈、狀態是業務系統最常用的四種，另外並列了 Spring 實戰版本。
 
-## 觀察者模式（Observer）⭐ 事件驅動核心
+## 觀察者模式（Observer） — 事件驅動核心
 
 **目的**：定義一對多依賴，一個對象改變時，所有依賴者都自動收到通知
 
@@ -273,7 +273,7 @@ classDiagram
 
 **在 Spring 與實務中**：`ApplicationEventPublisher` + `@EventListener`（可搭配 `@Async`、`@TransactionalEventListener`）；跨服務時就是訊息佇列的發布 / 訂閱。
 
-## 策略模式（Strategy）⭐ 消滅 if-else
+## 策略模式（Strategy） — 消滅 if-else
 
 **目的**：定義一系列算法，封裝起來，使它們可以互相替換
 

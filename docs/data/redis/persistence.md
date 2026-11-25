@@ -86,7 +86,7 @@ AOF = 追加日誌
 - ❌ 文件比 RDB 大
 - ❌ 恢復速度比 RDB 慢
 
-## 混合持久化（推薦 ✅）
+## 混合持久化（推薦）
 
 Redis 4.0 引入，結合 RDB 和 AOF 的優點。開啟方式：`aof-use-rdb-preamble yes`。
 

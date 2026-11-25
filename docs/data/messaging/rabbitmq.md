@@ -1,5 +1,9 @@
 # RabbitMQ
 
+!!! abstract "本章重點"
+
+    RabbitMQ 的核心是 Exchange 路由：訊息先送到交換器，再依規則分派到佇列。本章說明四種 Exchange、可靠性機制（Publisher Confirms、手動 ack、死信佇列），並與 Kafka 做完整比較。
+
 RabbitMQ 是實作 **AMQP** 協定的訊息中介（Message Broker）。核心設計是：**Producer 不直接把訊息送到佇列，而是送到 Exchange，由 Exchange 依規則路由**。訊息被消費並確認後就會刪除。
 
 ## 架構

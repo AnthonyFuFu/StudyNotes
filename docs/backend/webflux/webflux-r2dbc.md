@@ -1,5 +1,9 @@
 # WebFlux、R2DBC 與 WebClient
 
+!!! abstract "本章重點"
+
+    本章示範 WebFlux 的兩種端點寫法、用 R2DBC 非阻塞存取 PostgreSQL、用 WebClient 呼叫外部 API 並重試，以及用 StepVerifier 測試反應式程式。
+
 ## 兩種撰寫端點的方式
 
 === "註解式 Controller"

@@ -36,13 +36,13 @@ flowchart LR
 
     ---
 
-    響應式系統對比 · Composition API
+    Vue 的核心是響應式系統：資料改變時畫面自動更新。
 
 -   __[02 · 實戰：Vue 3 前後端分離](vue3-spa.md)__
 
     ---
 
-    專案結構 · 路由：巢狀版型 + 懶加載 · API 呼叫與跨網域 · 即時客服：STOMP over WebSocket …
+    本章以 holiday_dessert_vue 說明 Vue 3 前後端分離的實作：巢狀版型與懶加載路由、跨網域與 Cookie 的處理、STOMP 即時客服、Vuex 與 Pinia 的比較，以及打包部署。
 
 </div>
 

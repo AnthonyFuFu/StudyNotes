@@ -1,5 +1,9 @@
 # 實戰：微服務專案與 K8s 部署
 
+!!! abstract "本章重點"
+
+    microservicecloud 從 Eureka 叢集、OpenFeign、Gateway、Resilience4j 一路做到 RabbitMQ、Zipkin 與 Prometheus，最後部署到 kubeadm 自建的三節點 K8s。本章整理整體架構、關鍵設定與踩過的坑。
+
 !!! abstract "專案：microservicecloud"
 
     Spring Boot 3 + Spring Cloud 的完整微服務練習：Eureka 叢集、OpenFeign、Gateway、Resilience4j、Config Server、RabbitMQ 事件驅動、Zipkin 鏈路追蹤、Prometheus + Grafana 監控；最後從 Docker Compose 一路部署到自己用 kubeadm 建的三節點 Kubernetes 叢集。

@@ -1,5 +1,9 @@
 # 儲存與資料庫：S3、RDS、ElastiCache
 
+!!! abstract "本章重點"
+
+    本章介紹 S3 的特性與儲存類別，並以 holidayDessert 的 Multipart Upload 說明大檔案上傳的正確做法；接著說明 RDS / Aurora 的 Multi-AZ 與 Read Replica、ElastiCache 的叢集模式。
+
 ## S3：物件儲存
 
 S3 不是檔案系統，而是 **Key → Object** 的扁平儲存。`uploads/2026/11/cake.jpg` 裡的 `/` 只是 Key 的一部分。

@@ -56,43 +56,43 @@ flowchart LR
 
     ---
 
-    單體 vs 微服務 · Spring Cloud 生態全覽
+    微服務把單體應用拆成可以獨立部署、獨立擴容的小服務，同時也帶來網路、一致性與維運上的複雜度。
 
 -   __[02 · Nacos](nacos.md)__
 
     ---
 
-    服務發現 · 配置中心
+    Nacos 同時提供服務註冊發現與設定中心兩項能力，是 Spring Cloud Alibaba 的核心元件。
 
 -   __[03 · OpenFeign](openfeign.md)__
 
     ---
 
-    基本使用 · 攔截器 / 超時 / 重試
+    OpenFeign 讓呼叫其他服務就像呼叫本地介面一樣簡單。
 
 -   __[04 · Spring Cloud Gateway](gateway.md)__
 
     ---
 
-    核心架構 · 灰度發布
+    API 閘道是所有外部請求的統一入口，負責路由、認證、限流與日誌。
 
 -   __[05 · Sentinel](sentinel.md)__
 
     ---
 
-    核心概念
+    下游服務變慢時，如果沒有保護機制，上游的執行緒會被耗盡而引發連鎖故障。
 
 -   __[06 · 元件選型：Spring Cloud 與 Alibaba 對照](ecosystem-comparison.md)__
 
     ---
 
-    元件對照 · 註冊中心 · 容錯 · 設定中心 · 怎麼選
+    Spring Cloud 的每個能力都有不同實作可選。
 
 -   __[07 · 實戰：微服務專案與 K8s 部署](practice.md)__
 
     ---
 
-    架構總覽 · Gateway 路由 · OpenFeign 降級 · RabbitMQ 事件 · 部署演進
+    microservicecloud 從 Eureka 叢集、OpenFeign、Gateway、Resilience4j 一路做到 RabbitMQ、Zipkin 與 Prometheus，最後部署到 kubeadm 自建的三節點 K8s。
 
 </div>
 

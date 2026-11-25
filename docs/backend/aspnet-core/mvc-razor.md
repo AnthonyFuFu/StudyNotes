@@ -1,5 +1,9 @@
 # MVC、Razor Pages 與 Areas
 
+!!! abstract "本章重點"
+
+    `.cshtml` 是 ASP.NET Core 的 Razor 視圖。本章比較 MVC 與 Razor Pages 兩種開發模式，整理 Razor 語法與 Tag Helper，並說明用 Areas 切分前後台、用 ViewComponent 做可重用區塊。
+
 你記得的 `.cshtml` 就是 **Razor 視圖**：ASP.NET Core 的伺服器端模板語法，用 `@` 在 HTML 中嵌入 C#。同一套 Razor 語法可以用在兩種開發模式：**MVC** 與 **Razor Pages**，chineseArtwork 兩種都用了。
 
 ## MVC 與 Razor Pages

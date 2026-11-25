@@ -1,5 +1,9 @@
 # 運算與部署：EC2、ECS、EKS、Lambda
 
+!!! abstract "本章重點"
+
+    AWS 的運算服務從 EC2、ECS、EKS 到 Lambda，管得越少、彈性越低。本章比較各服務的適用情境，說明負載平衡與自動擴展、ECS 與 EKS 的差異，以及常見的部署策略。
+
 ## 運算服務怎麼選
 
 ``` mermaid

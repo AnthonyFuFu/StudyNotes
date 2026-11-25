@@ -1,5 +1,9 @@
 # EF Core 與 Cookie 驗證
 
+!!! abstract "本章重點"
+
+    EF Core 是 .NET 的 ORM，地位相當於 JPA。本章比較 DB First 與 Code First、LINQ 查詢與變更追蹤，再說明 Cookie 驗證的流程、與 JWT 的取捨，以及 PBKDF2 密碼雜湊。
+
 ## Entity Framework Core
 
 EF Core 是 .NET 官方的 ORM，地位相當於 Java 的 JPA / Hibernate。查詢用 **LINQ** 撰寫，由 EF Core 翻譯成 SQL。

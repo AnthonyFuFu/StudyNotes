@@ -48,31 +48,31 @@ flowchart LR
 
     ---
 
-    REST 設計六大原則 · URI 設計規範 · HTTP 方法與冪等性 · HTTP Status Code 完整規範 · 統一響應格式 …
+    好的 API 讓前端、App、第三方都能直覺地使用。
 
 -   __[02 · gRPC](grpc.md)__
 
     ---
 
-    核心原理 · Protobuf 定義 · Spring Boot 整合 gRPC · gRPC vs REST 對比
+    gRPC 以 HTTP/2 + Protobuf 二進位傳輸，序列化更快、體積更小，並支援四種串流模式，是微服務內部通訊的常見選擇。
 
 -   __[03 · WebSocket](websocket.md)__
 
     ---
 
-    WebSocket 原理 · Spring Boot 整合
+    HTTP 只能由客戶端發起請求，需要伺服器主動推送時就要用 WebSocket。
 
 -   __[04 · GraphQL](graphql.md)__
 
     ---
 
-    核心概念 · Spring Boot 整合 GraphQL · GraphQL vs REST 比較
+    GraphQL 讓客戶端自己指定需要的欄位，一次請求取回多種資源，解決 REST 的 Over-fetching 與 Under-fetching。
 
 -   __[05 · 即時通訊與串流](realtime-streaming.md)__
 
     ---
 
-    推送技術比較 · WebSocket 握手 · STOMP 與原生 WebSocket · 影音串流
+    伺服器要主動把資料推給瀏覽器時，HTTP 一問一答就不夠用了。
 
 </div>
 

@@ -60,55 +60,55 @@ flowchart LR
 
     ---
 
-    六種狀態 · 中斷機制
+    理解執行緒的六種狀態與轉換條件，是閱讀執行緒傾印（thread dump）與排查死鎖的基礎。
 
 -   __[02 · synchronized 底層原理](synchronized.md)__
 
     ---
 
-    Monitor 物件鎖 · 鎖升級機制
+    synchronized 是 Java 最基本的同步機制。
 
 -   __[03 · volatile 原理](volatile.md)__
 
     ---
 
-    兩大保證 · 記憶體屏障
+    volatile 保證可見性與有序性，但不保證原子性。
 
 -   __[04 · AQS 底層原理](aqs.md)__
 
     ---
 
-    AQS 架構
+    AQS（AbstractQueuedSynchronizer）是 ReentrantLock、Semaphore、CountDownLatch 共同的底層框架。
 
 -   __[05 · 鎖進階](locks.md)__
 
     ---
 
-    ReentrantLock · ReadWriteLock · StampedLock
+    synchronized 之外，JUC 還提供更有彈性的鎖。
 
 -   __[06 · ThreadLocal](threadlocal.md)__
 
     ---
 
-    底層原理 · 記憶體洩漏問題
+    ThreadLocal 讓每條執行緒有自己獨立的變數副本，常用來存放使用者資訊、交易上下文。
 
 -   __[07 · 線程池](thread-pool.md)__
 
     ---
 
-    ThreadPoolExecutor 7 個參數 · 線程池監控
+    執行緒的建立與切換成本很高，執行緒池讓執行緒可以重複使用。
 
 -   __[08 · ConcurrentHashMap 底層原理](concurrenthashmap.md)__
 
     ---
 
-    JDK 7 vs JDK 8
+    ConcurrentHashMap 是高並發下最常用的 Map。
 
 -   __[09 · CompletableFuture 異步編排](completablefuture.md)__
 
     ---
 
-    核心 API
+    CompletableFuture 讓多個非同步任務可以串接、並行與合併，不必再寫巢狀的回呼。
 
 </div>
 

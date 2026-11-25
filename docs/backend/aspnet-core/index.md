@@ -40,19 +40,19 @@ flowchart LR
 
     ---
 
-    Program.cs：最小託管模型 · 中介軟體管線 · 依賴注入與生命週期 · 設定系統 …
+    ASP.NET Core 的骨架是 `Program.cs`：先註冊服務，再組裝中介軟體管線。
 
 -   __[02 · MVC、Razor Pages 與 Areas](mvc-razor.md)__
 
     ---
 
-    MVC 與 Razor Pages · Razor 語法速覽 · Areas：切分前台與後台 · ViewComponent：有邏輯的可重用區塊
+    `.cshtml` 是 ASP.NET Core 的 Razor 視圖。
 
 -   __[03 · EF Core 與 Cookie 驗證](efcore-auth.md)__
 
     ---
 
-    Entity Framework Core · Cookie 驗證 · 密碼雜湊：PBKDF2
+    EF Core 是 .NET 的 ORM，地位相當於 JPA。
 
 </div>
 

@@ -36,61 +36,34 @@ REST（Representational State Transfer）架構風格：
 
 **資源命名規則**
 
-``` text
-✅ 使用名詞（複數）
-   /users          用戶列表
-   /users/123      特定用戶
-   /orders         訂單列表
-   /orders/456     特定訂單
-```
+| 規則 | ✅ 建議 | ❌ 避免 |
+|------|--------|--------|
+| 使用名詞（複數） | `/users`、`/users/123`、`/orders/456` | `/getUsers`、`/createOrder` |
+| 用 HTTP 方法表達動作 | `GET /users`、`POST /orders`、`DELETE /users/123` | `/deleteUser`、`/updateOrder` |
+| 層次關係用路徑表示 | `/users/123/orders`、`/users/123/orders/456` | `/orders?userId=123` 表示從屬關係 |
+| 過濾、排序、分頁用查詢參數 | `GET /orders?status=PAID&sort=created_at&page=1&size=20` | `/orders/paid/page/1` |
+| 小寫加連字號 | `/user-orders` | `/UserOrders`、`/user_orders` |
 
-``` text
-✅ 層次關係用路徑表示
-   /users/123/orders        用戶 123 的所有訂單
-   /users/123/orders/456    用戶 123 的訂單 456
-```
+**特殊操作（非 CRUD）**：無法對應到 CRUD 的動作，用「資源 + 動作」的子路徑搭配 `POST`。
 
-- ✅ 過濾、排序、分頁用查詢參數
-    - GET /orders?status=PAID&sort=created_at&order=desc&page=1&size=20
-
-- ✅ 搜索
-    - GET /products/search?keyword=iPhone&category=手機
-
-``` text
-❌ 不要用動詞
-   /getUsers     ❌  → GET /users        ✅
-   /createOrder  ❌  → POST /orders       ✅
-   /deleteUser   ❌  → DELETE /users/123  ✅
-   /updateOrder  ❌  → PUT /orders/456    ✅
-```
-
-``` text
-❌ 不要用大寫和底線
-   /UserOrders   ❌  → /user-orders       ✅
-   /user_orders  ❌  → /user-orders       ✅
-```
-
-**特殊操作（非 CRUD）**
-
-``` text
-POST /orders/456/cancel    取消訂單（動作）
-POST /orders/456/pay       付款
-POST /users/123/activate   啟用帳號
-```
+| 請求 | 意義 |
+|------|------|
+| `POST /orders/456/cancel` | 取消訂單 |
+| `POST /orders/456/pay` | 付款 |
+| `POST /users/123/activate` | 啟用帳號 |
+| `GET /products/search?keyword=iPhone` | 搜尋 |
 
 ## HTTP 方法與冪等性
 
-``` text
-HTTP 方法     語義          安全性  冪等性
-──────────────────────────────────────────────
-GET          查詢           ✅      ✅
-HEAD         查詢（只要頭）  ✅      ✅
-OPTIONS      查詢支援的方法  ✅      ✅
-POST         新增/提交      ❌      ❌
-PUT          完整更新       ❌      ✅
-PATCH        部分更新       ❌      ❌
-DELETE       刪除           ❌      ✅
-```
+| HTTP 方法 | 語義 | 安全性 | 冪等性 |
+|-----------|------|:------:|:------:|
+| `GET` | 查詢 | ✅ | ✅ |
+| `HEAD` | 查詢（只要 Header） | ✅ | ✅ |
+| `OPTIONS` | 查詢支援的方法 | ✅ | ✅ |
+| `POST` | 新增 / 提交 | ❌ | ❌ |
+| `PUT` | 完整更新 | ❌ | ✅ |
+| `PATCH` | 部分更新 | ❌ | ❌ |
+| `DELETE` | 刪除 | ❌ | ✅ |
 
 | 特性 | 意義 |
 |------|------|
@@ -122,46 +95,29 @@ Idempotency-Key: uuid-abc-123
 
 ## HTTP Status Code 完整規範
 
-``` text
-1xx - 資訊性
-  100 Continue         → 繼續發送請求體
-```
-
-``` text
-2xx - 成功
-  200 OK               → 查詢成功（GET / PUT / PATCH）
-  201 Created          → 建立成功（POST），響應頭帶 Location
-  202 Accepted         → 已接受，非同步處理（如：提交任務）
-  204 No Content       → 成功但無返回內容（DELETE）
-```
-
-``` text
-3xx - 重定向
-  301 Moved Permanently → 永久重定向（更新書籤）
-  302 Found            → 臨時重定向
-  304 Not Modified     → 緩存未過期，使用本地緩存
-```
-
-``` text
-4xx - 客戶端錯誤
-  400 Bad Request      → 請求格式錯誤、參數非法
-  401 Unauthorized     → 未認證（沒有 Token）
-  403 Forbidden        → 已認證但無權限（有 Token 但角色不對）
-  404 Not Found        → 資源不存在
-  405 Method Not Allowed → HTTP 方法不支援
-  409 Conflict         → 資源衝突（如：用戶名已存在）
-  410 Gone             → 資源已永久刪除（和 404 的區別）
-  422 Unprocessable Entity → 格式正確但業務驗證失敗
-  429 Too Many Requests → 超過限流閾值
-```
-
-``` text
-5xx - 服務器錯誤
-  500 Internal Server Error → 服務器未預期的錯誤
-  502 Bad Gateway           → 上游服務返回無效響應
-  503 Service Unavailable   → 服務器暫時不可用（維護/過載）
-  504 Gateway Timeout       → 上游服務超時
-```
+| 狀態碼 | 意義 | 使用時機 |
+|--------|------|---------|
+| `100 Continue` | 繼續 | 客戶端可以繼續送出請求體 |
+| `200 OK` | 成功 | 查詢成功（GET / PUT / PATCH） |
+| `201 Created` | 已建立 | 建立成功（POST），回應帶 `Location` Header |
+| `202 Accepted` | 已接受 | 非同步處理，例如提交背景任務 |
+| `204 No Content` | 無內容 | 成功但不回傳內容（DELETE） |
+| `301 Moved Permanently` | 永久重定向 | 網址永久變更 |
+| `302 Found` | 臨時重定向 | 暫時導向其他網址 |
+| `304 Not Modified` | 未修改 | 快取仍有效，使用本地快取 |
+| `400 Bad Request` | 請求錯誤 | 格式錯誤、參數非法 |
+| `401 Unauthorized` | 未認證 | 沒有 Token 或 Token 無效 |
+| `403 Forbidden` | 無權限 | 已認證，但角色沒有權限 |
+| `404 Not Found` | 找不到 | 資源不存在 |
+| `405 Method Not Allowed` | 方法不支援 | 例如對唯讀資源送 DELETE |
+| `409 Conflict` | 衝突 | 資源已存在（例如用戶名重複） |
+| `410 Gone` | 已刪除 | 資源已永久刪除（與 404 不同：確定曾經存在） |
+| `422 Unprocessable Entity` | 無法處理 | 格式正確，但業務驗證失敗 |
+| `429 Too Many Requests` | 請求過多 | 超過限流閾值，搭配 `Retry-After` |
+| `500 Internal Server Error` | 伺服器錯誤 | 未預期的例外 |
+| `502 Bad Gateway` | 閘道錯誤 | 上游服務回傳無效回應 |
+| `503 Service Unavailable` | 服務不可用 | 維護中或過載 |
+| `504 Gateway Timeout` | 閘道逾時 | 上游服務逾時 |
 
 ```java
 // Spring Boot 正確使用 Status Code

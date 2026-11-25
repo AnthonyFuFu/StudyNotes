@@ -53,6 +53,7 @@ nav = [
       { "Web MVC 請求處理流程" = "backend/spring-boot/web-mvc.md" },
       { "資料存取與交易" = "backend/spring-boot/data-access.md" },
       { "實戰：高併發搶票系統" = "backend/spring-boot/practice-seckill.md" },
+      { "實戰：AI、OCR 與周邊整合" = "backend/spring-boot/practice-integrations.md" },
     ] },
     { "Spring WebFlux" = [
       "backend/webflux/index.md",
@@ -130,6 +131,7 @@ nav = [
       { "記憶體淘汰策略" = "data/redis/eviction.md" },
       { "分散式鎖" = "data/redis/distributed-lock.md" },
       { "緩存三大問題" = "data/redis/cache-problems.md" },
+      { "多級快取與資料一致性" = "data/redis/multilevel-cache.md" },
       { "Redis Cluster 架構" = "data/redis/cluster.md" },
       { "效能優化" = "data/redis/performance.md" },
       { "熱 Key / 大 Key 處理" = "data/redis/hot-big-key.md" },
@@ -158,6 +160,7 @@ nav = [
       { "高可用設計" = "architecture/system-design/high-availability.md" },
       { "高效能設計" = "architecture/system-design/high-performance.md" },
       { "架構設計" = "architecture/system-design/architecture.md" },
+      { "分層架構與 DDD" = "architecture/system-design/ddd-architecture.md" },
       { "系統設計面試答題框架" = "architecture/system-design/interview-framework.md" },
     ] },
     { "設計模式" = [
@@ -186,6 +189,7 @@ nav = [
       { "HTTPS 與 TLS" = "network-security/network/https-tls.md" },
       { "DNS 解析流程" = "network-security/network/dns.md" },
       { "CDN 原理" = "network-security/network/cdn.md" },
+      { "Nginx 反向代理與負載均衡" = "network-security/network/nginx.md" },
       { "面試題速查" = "network-security/network/interview.md" },
     ] },
     { "資安" = [
@@ -208,10 +212,12 @@ nav = [
       { "Spring Boot Test" = "engineering/testing/spring-boot-test.md" },
       { "Testcontainers" = "engineering/testing/testcontainers.md" },
       { "TDD" = "engineering/testing/tdd.md" },
+      { "效能測試與壓測" = "engineering/testing/performance-testing.md" },
     ] },
     { "CI/CD 與 DevOps" = [
       "engineering/cicd/index.md",
       { "DevOps 核心概念" = "engineering/cicd/devops-concepts.md" },
+      { "Git 協作流程" = "engineering/cicd/git-workflow.md" },
       { "Docker 深入" = "engineering/cicd/docker.md" },
       { "Kubernetes 深入" = "engineering/cicd/kubernetes.md" },
       { "Jenkins 與 GitHub Actions" = "engineering/cicd/jenkins-github-actions.md" },
@@ -235,6 +241,7 @@ nav = [
       { "ELK Stack 深入" = "engineering/monitoring/elk.md" },
       { "分散式鏈路追蹤" = "engineering/monitoring/tracing.md" },
       { "實戰：可觀測性平台" = "engineering/monitoring/platform.md" },
+      { "線上問題排查 SOP" = "engineering/monitoring/troubleshooting.md" },
     ] },
   ] },
   { "關於我" = "about.md" },

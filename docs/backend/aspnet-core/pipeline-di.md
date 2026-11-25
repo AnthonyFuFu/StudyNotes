@@ -1,5 +1,9 @@
 # 請求管線、DI 與設定
 
+!!! abstract "本章重點"
+
+    ASP.NET Core 的骨架是 `Program.cs`：先註冊服務，再組裝中介軟體管線。本章說明管線的順序為什麼重要、Singleton / Scoped / Transient 三種生命週期與 Captive Dependency 陷阱，以及設定系統與 async / await。
+
 ASP.NET Core 是微軟的跨平台 Web 框架（.NET 8 為 LTS），預設伺服器是 **Kestrel**。如果熟悉 Spring Boot，可以把它想成「微軟版的 Spring Boot」：一樣有 DI 容器、中介軟體管線、MVC、設定系統。
 
 ## Program.cs：最小託管模型

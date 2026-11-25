@@ -1,5 +1,9 @@
 # 實戰：高併發搶票系統
 
+!!! abstract "本章重點"
+
+    瞬間數千人搶同一批票，直接扣資料庫庫存會鎖競爭、連線耗盡甚至超賣。本章拆解 holidayDessert 的四層防護：Semaphore 快速失敗、本地計數器、Redis Lua 原子扣票、Kafka 非同步落地，並討論每一層的設計取捨。
+
 !!! abstract "專案：holidayDessert"
 
     Spring Boot 3.5 + MySQL + Redis + Kafka。模擬演唱會開賣瞬間的高併發搶票：先把票務資料**預熱**到 Redis，搶票時只操作 Redis，訂單再**非同步**寫回資料庫。後台內建壓力測試工具，可模擬 2,000 名會員同時搶票並回報 TPS。

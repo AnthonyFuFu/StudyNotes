@@ -6,7 +6,7 @@ icon: lucide/container
 
 DevOps 核心概念、Docker 與 Kubernetes 深入、Jenkins / GitHub Actions 流水線、Helm 部署，再到企業常見的 **Harbor 私有映像倉庫**與 **Argo CD GitOps**，最後整理我在各專案中實際建立的流水線。
 
-**核心技術**：Docker / Kubernetes / Jenkins / GitHub Actions / Helm / Harbor / Argo CD / Argo Rollouts / GHCR / kubeadm
+**核心技術**：Docker / Kubernetes / Jenkins / GitHub Actions / Helm / Harbor / Argo CD / Argo Rollouts / GHCR / kubeadm / Git Flow / Conventional Commits
 
 ## 學習地圖
 
@@ -18,38 +18,42 @@ flowchart LR
     R --> c0
     p0("・什麼是 DevOps？<br>・CI/CD 流水線<br>・DevOps 工具鏈全覽")
     c0 --- p0
-    c1["02 · Docker 深入"]
+    c1["02 · Git 協作流程"]
     R --> c1
-    p1("・Docker 核心原理<br>・Dockerfile 最佳實踐<br>・Docker Compose<br>・Docker 網路")
+    p1("・三種分支策略<br>・Merge 與 Rebase<br>・Conventional Commits 與語意化版本<br>・Code Review 與保護分支<br>・常用但容易忘記的指令")
     c1 --- p1
-    c2["03 · Kubernetes 深入"]
+    c2["03 · Docker 深入"]
     R --> c2
-    p2("・K8s 整體架構<br>・核心資源對象<br>・滾動更新與回滾<br>・StatefulSet")
+    p2("・Docker 核心原理<br>・Dockerfile 最佳實踐<br>・Docker Compose<br>・Docker 網路")
     c2 --- p2
-    c3["04 · Jenkins + GitHub Actions"]
+    c3["04 · Kubernetes 深入"]
     R --> c3
-    p3("・Jenkins Pipeline<br>・GitHub Actions Workflow")
+    p3("・K8s 整體架構<br>・核心資源對象<br>・滾動更新與回滾<br>・StatefulSet")
     c3 --- p3
-    c4["05 · 實戰：Spring Boot 完整部署流程"]
+    c4["05 · Jenkins + GitHub Actions"]
     R --> c4
-    p4("・Helm Chart<br>・完整 CI/CD 流程總覽<br>・常用 kubectl 指令速查")
+    p4("・Jenkins Pipeline<br>・GitHub Actions Workflow")
     c4 --- p4
-    c5["06 · Harbor 私有映像倉庫"]
+    c5["06 · 實戰：Spring Boot 完整部署流程"]
     R --> c5
-    p5("・為什麼需要私有倉庫<br>・架構<br>・核心功能<br>・與 CI / K8s 整合<br>・Harbor 與其他倉庫")
+    p5("・Helm Chart<br>・完整 CI/CD 流程總覽<br>・常用 kubectl 指令速查")
     c5 --- p5
-    c6["07 · Argo CD 與 GitOps"]
+    c6["07 · Harbor 私有映像倉庫"]
     R --> c6
-    p6("・GitOps 是什麼<br>・Argo CD 架構<br>・Application<br>・完整流水線：Git → Harbor → Argo CD<br>・回滾與漂移")
+    p6("・為什麼需要私有倉庫<br>・架構<br>・核心功能<br>・與 CI / K8s 整合<br>・Harbor 與其他倉庫")
     c6 --- p6
-    c7["08 · 實戰：我的 CI/CD 與 K8s 部署"]
+    c7["08 · Argo CD 與 GitOps"]
     R --> c7
-    p7("・各專案的 CI 一覽<br>・holidayDessert：用服務容器跑整合測試<br>・映像與部署<br>・microservicecloud：自建 Kubernetes 叢集<br>・程式碼品質")
+    p7("・GitOps 是什麼<br>・Argo CD 架構<br>・Application<br>・完整流水線：Git → Harbor → Argo CD<br>・回滾與漂移")
     c7 --- p7
+    c8["09 · 實戰：我的 CI/CD 與 K8s 部署"]
+    R --> c8
+    p8("・各專案的 CI 一覽<br>・holidayDessert：用服務容器跑整合測試<br>・映像與部署<br>・microservicecloud：自建 Kubernetes 叢集<br>・程式碼品質")
+    c8 --- p8
     classDef chapter stroke-width:2px
     classDef points fill:transparent,text-align:left
-    class c0,c1,c2,c3,c4,c5,c6,c7 chapter
-    class p0,p1,p2,p3,p4,p5,p6,p7 points
+    class c0,c1,c2,c3,c4,c5,c6,c7,c8 chapter
+    class p0,p1,p2,p3,p4,p5,p6,p7,p8 points
 ```
 
 ## 章節導覽
@@ -60,49 +64,55 @@ flowchart LR
 
     ---
 
-    什麼是 DevOps？ · CI/CD 流水線 · DevOps 工具鏈全覽
+    DevOps 的目標是讓開發與維運協作，更快、更穩定地交付軟體。
 
--   __[02 · Docker 深入](docker.md)__
-
-    ---
-
-    Docker 核心原理 · Dockerfile 最佳實踐 · Docker Compose · Docker 網路
-
--   __[03 · Kubernetes 深入](kubernetes.md)__
+-   __[02 · Git 協作流程](git-workflow.md)__
 
     ---
 
-    K8s 整體架構 · 核心資源對象 · 滾動更新與回滾 · StatefulSet
+    CI/CD 的起點是 Git。
 
--   __[04 · Jenkins + GitHub Actions](jenkins-github-actions.md)__
-
-    ---
-
-    Jenkins Pipeline · GitHub Actions Workflow
-
--   __[05 · 實戰：Spring Boot 完整部署流程](deployment.md)__
+-   __[03 · Docker 深入](docker.md)__
 
     ---
 
-    Helm Chart · 完整 CI/CD 流程總覽 · 常用 kubectl 指令速查
+    容器讓「在我電腦上可以跑」的環境可以完整搬到任何地方。
 
--   __[06 · Harbor 私有映像倉庫](harbor.md)__
-
-    ---
-
-    為什麼需要私有倉庫 · 架構 · 核心功能 · 與 CI / K8s 整合 …
-
--   __[07 · Argo CD 與 GitOps](argocd.md)__
+-   __[04 · Kubernetes 深入](kubernetes.md)__
 
     ---
 
-    GitOps 是什麼 · Argo CD 架構 · Application · 完整流水線：Git → Harbor → Argo CD …
+    Kubernetes 負責在多台機器上排程容器、自動恢復與擴縮容。
 
--   __[08 · 實戰：我的 CI/CD 與 K8s 部署](my-pipelines.md)__
+-   __[05 · Jenkins + GitHub Actions](jenkins-github-actions.md)__
 
     ---
 
-    各專案的 CI 一覽 · holidayDessert：用服務容器跑整合測試 · 映像與部署 · microservicecloud：自建 Kubernetes 叢集 …
+    CI 工具負責在每次提交時自動建置、測試與打包。
+
+-   __[06 · 實戰：Spring Boot 完整部署流程](deployment.md)__
+
+    ---
+
+    本章把前面的 Docker、Kubernetes、CI 串起來，用 Helm Chart 管理多環境的部署設定，並附上完整的 CI/CD 流程總覽與常用的 kubectl 指令速查。
+
+-   __[07 · Harbor 私有映像倉庫](harbor.md)__
+
+    ---
+
+    Harbor 是企業級的私有映像倉庫，提供專案權限、漏洞掃描、映像簽章與跨機房同步。
+
+-   __[08 · Argo CD 與 GitOps](argocd.md)__
+
+    ---
+
+    GitOps 以 Git 作為部署的唯一真實來源，由叢集內的 Argo CD 持續比對並同步。
+
+-   __[09 · 實戰：我的 CI/CD 與 K8s 部署](my-pipelines.md)__
+
+    ---
+
+    本章整理我在各專案中實際建立的流水線：GitHub Actions 服務容器整合測試、映像推送 GHCR、Electron 三平台打包，以及用 kubeadm 自建 Kubernetes 叢集部署微服務。
 
 </div>
 

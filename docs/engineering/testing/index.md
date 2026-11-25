@@ -6,7 +6,7 @@ icon: lucide/flask-conical
 
 測試金字塔與各層測試工具，從 JUnit 5、Mockito 到 Spring Boot Test、Testcontainers 與 TDD 實戰。
 
-**核心技術**：JUnit 5 / Mockito / Testcontainers / TDD
+**核心技術**：JUnit 5 / Mockito / Testcontainers / TDD / k6 / JMeter
 
 ## 學習地圖
 
@@ -16,32 +16,36 @@ flowchart LR
     R(["測試"])
     c0["01 · 測試基礎概念"]
     R --> c0
-    p0("・測試金字塔<br>・測試分類<br>・好測試的標準（FIRST 原則）")
+    p0("・測試金字塔<br>・FIRST 原則")
     c0 --- p0
     c1["02 · JUnit 5 深入"]
     R --> c1
-    p1("・核心注解<br>・參數化測試<br>・條件測試<br>・測試生命週期")
+    p1("・依賴設定<br>・JUnit 5 核心注解<br>・AssertJ 斷言<br>・參數化測試<br>・條件測試與巢狀測試")
     c1 --- p1
     c2["03 · Mockito 深入"]
     R --> c2
-    p2("・Mock / Stub / Spy<br>・常用 API<br>・驗證行為<br>・ArgumentCaptor")
+    p2("・Mock / Stub / Spy 的區別<br>・Mockito 完整 API<br>・ArgumentCaptor<br>・Spy（間諜）使用")
     c2 --- p2
     c3["04 · Spring Boot Test"]
     R --> c3
-    p3("・@SpringBootTest（整合測試）<br>・@WebMvcTest（Controller 層測試）<br>・@DataJpaTest（Repository 層測試）<br>・@MockBean / @SpyBean")
+    p3("・測試切片<br>・@WebMvcTest<br>・@DataJpaTest<br>・@SpringBootTest")
     c3 --- p3
-    c4["05 · Testcontainers（真實環境整合測試）"]
+    c4["05 · Testcontainers"]
     R --> c4
-    p4("・核心原理<br>・MySQL / Redis / Kafka 整合<br>・與 Spring Boot 整合")
+    p4("・核心原理<br>・整合 MySQL + Redis<br>・Kafka 整合測試<br>・Flyway 與測試資料管理")
     c4 --- p4
-    c5["06 · TDD（測試驅動開發）"]
+    c5["06 · TDD"]
     R --> c5
-    p5("・Red-Green-Refactor 循環<br>・TDD 實戰範例<br>・測試覆蓋率")
+    p5("・Red-Green-Refactor 循環<br>・TDD 完整實戰<br>・測試覆蓋率<br>・測試最佳實踐")
     c5 --- p5
+    c6["07 · 效能測試與壓測"]
+    R --> c6
+    p6("・四種效能測試<br>・要看哪些指標<br>・工具比較<br>・我的實作：搶票壓測工具<br>・壓測的注意事項")
+    c6 --- p6
     classDef chapter stroke-width:2px
     classDef points fill:transparent,text-align:left
-    class c0,c1,c2,c3,c4,c5 chapter
-    class p0,p1,p2,p3,p4,p5 points
+    class c0,c1,c2,c3,c4,c5,c6 chapter
+    class p0,p1,p2,p3,p4,p5,p6 points
 ```
 
 ## 章節導覽
@@ -52,37 +56,43 @@ flowchart LR
 
     ---
 
-    測試金字塔 · FIRST 原則
+    測試的目的是讓你敢重構、敢上線。
 
 -   __[02 · JUnit 5 深入](junit5.md)__
 
     ---
 
-    依賴設定 · JUnit 5 核心注解 · AssertJ 斷言 · 參數化測試 · 條件測試與巢狀測試
+    JUnit 5 是 Java 測試的基礎框架。
 
 -   __[03 · Mockito 深入](mockito.md)__
 
     ---
 
-    Mock / Stub / Spy 的區別 · Mockito 完整 API · ArgumentCaptor · Spy（間諜）使用
+    單元測試要隔離外部依賴，Mockito 讓你用假物件取代資料庫、外部 API。
 
 -   __[04 · Spring Boot Test](spring-boot-test.md)__
 
     ---
 
-    測試切片 · @WebMvcTest · @DataJpaTest · @SpringBootTest
+    啟動整個 Spring 容器的測試很慢，測試切片只載入需要的部分。
 
 -   __[05 · Testcontainers](testcontainers.md)__
 
     ---
 
-    核心原理 · 整合 MySQL + Redis · Kafka 整合測試 · Flyway 與測試資料管理
+    用 H2 或 Mock 測試，常常跟正式環境的行為不一致。
 
 -   __[06 · TDD](tdd.md)__
 
     ---
 
-    Red-Green-Refactor 循環 · TDD 完整實戰 · 測試覆蓋率 · 測試最佳實踐
+    TDD 先寫失敗的測試，再寫剛好讓它通過的程式，最後重構。
+
+-   __[07 · 效能測試與壓測](performance-testing.md)__
+
+    ---
+
+    功能測試確認「對不對」，效能測試確認「撐不撐得住」。
 
 </div>
 

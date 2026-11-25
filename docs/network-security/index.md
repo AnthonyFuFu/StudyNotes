@@ -14,7 +14,7 @@ icon: lucide/shield
 
     TCP/IP 模型、TCP 握手與可靠傳輸、HTTP 各版本演進、TLS 加密、DNS 與 CDN 的運作方式。
 
-    `7 章` · TCP / HTTP / HTTPS / DNS / CDN
+    `8 章` · TCP / HTTP / HTTPS / DNS / CDN
 
 -   __[資安](security/index.md)__
 

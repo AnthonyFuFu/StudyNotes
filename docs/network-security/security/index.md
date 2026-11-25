@@ -52,37 +52,37 @@ flowchart LR
 
     ---
 
-    認證（Authentication）vs 授權 · 加密基礎 · HTTPS / TLS 握手原理
+    資安從兩個基本問題開始：你是誰（認證）、你能做什麼（授權）。
 
 -   __[02 · Spring Security 核心原理](spring-security.md)__
 
     ---
 
-    過濾器鏈架構 · 認證流程深度解析 · SecurityContext 與自定義注解 · 授權流程
+    Spring Security 的核心是一條過濾器鏈。
 
 -   __[03 · JWT 深入原理與實作](jwt.md)__
 
     ---
 
-    JWT 結構詳解 · JWT 完整實作 · JWT 安全問題與防禦
+    JWT 讓伺服器不需要保存 Session 也能驗證使用者。
 
 -   __[04 · OAuth2 完整教學](oauth2.md)__
 
     ---
 
-    OAuth2 核心概念 · 四種授權模式 · PKCE（Proof Key for Code Exchange）⭐ 現代標準 · Spring Boot 整合 OAuth2 第三方登入
+    OAuth2 是「授權」協定，讓使用者不必交出密碼就能授權第三方存取資料。
 
 -   __[05 · SSO 單點登入](sso.md)__
 
     ---
 
-    SSO 架構設計 · Spring Authorization Server 實作
+    SSO 讓使用者登入一次就能使用多個系統。
 
 -   __[06 · 常見攻擊防禦](attack-defense.md)__
 
     ---
 
-    SQL 注入 · XSS · CSRF · 其他重要攻擊防禦
+    大部分的資安事件都來自少數幾種常見攻擊。
 
 </div>
 

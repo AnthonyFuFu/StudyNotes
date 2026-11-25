@@ -40,19 +40,19 @@ flowchart LR
 
     ---
 
-    兩種並發模型 · Reactive Streams 規範 · Mono 與 Flux · 最大陷阱：在 Event Loop 上阻塞 …
+    WebFlux 用少量 Event Loop 執行緒處理大量等待 I/O 的連線。
 
 -   __[02 · WebFlux、R2DBC 與 WebClient](webflux-r2dbc.md)__
 
     ---
 
-    兩種撰寫端點的方式 · R2DBC：反應式關聯式資料庫 · WebClient：非阻塞 HTTP 客戶端 · 測試：StepVerifier …
+    本章示範 WebFlux 的兩種端點寫法、用 R2DBC 非阻塞存取 PostgreSQL、用 WebClient 呼叫外部 API 並重試，以及用 StepVerifier 測試反應式程式。
 
 -   __[03 · 實戰：直播與影片串流](practice-streaming.md)__
 
     ---
 
-    直播串流架構 · 直播聊天室：Sinks 廣播 · 影片點播：HTTP Range 請求 · 行情資料：外部 API 整合
+    直播、聊天室與影片點播都是長時間佔用連線的場景，正好是 WebFlux 擅長的地方。
 
 </div>
 

@@ -20,7 +20,7 @@
 
 ## 四種授權模式
 
-### 模式一：授權碼模式（Authorization Code）⭐ 最安全
+### 模式一：授權碼模式（Authorization Code） — 最安全
 
 ``` mermaid
 sequenceDiagram
@@ -60,7 +60,7 @@ sequenceDiagram
     A->>B: 帶 Token 調用
 ```
 
-### 模式三：隱式模式（Implicit）⚠️ 已不推薦
+### 模式三：隱式模式（Implicit）（已不推薦）
 
 直接返回 Access Token（不經過 Code 交換）
 
@@ -68,7 +68,7 @@ sequenceDiagram
 
 → 建議改用 Authorization Code + PKCE
 
-### 模式四：密碼模式（Resource Owner Password）⚠️ 不推薦
+### 模式四：密碼模式（Resource Owner Password）（不推薦）
 
 用戶直接把帳密給 Client，Client 再去換 Token
 
@@ -76,7 +76,7 @@ sequenceDiagram
 
 → OAuth2.1 已移除此模式
 
-## PKCE（Proof Key for Code Exchange）⭐ 現代標準
+## PKCE（Proof Key for Code Exchange） — 現代標準
 
 問題：純前端 SPA 沒有 client_secret，Authorization Code 可能被截獲
 

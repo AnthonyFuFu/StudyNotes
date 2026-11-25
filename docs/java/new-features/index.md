@@ -44,37 +44,37 @@ flowchart LR
 
     ---
 
-    函數式接口 · Stream API 進階用法 · Optional
+    Java 8 引入的 Lambda、Stream 與 Optional 至今仍是日常開發的基礎。
 
 -   __[02 · Java 9 ~ 16 重要特性](java9-16.md)__
 
     ---
 
-    var - 局部類型推斷 · Text Block - 文字塊 · Switch 表達式 · 集合工廠方法
+    Java 9 到 16 之間累積了許多實用的小改進。
 
 -   __[03 · Java 17 LTS 重點](java17.md)__
 
     ---
 
-    Record Classes - 記錄類 · Sealed Classes - 封閉類 · Pattern Matching for instanceof
+    Java 17 是繼 Java 11 之後的 LTS 版本。
 
 -   __[04 · Java 21 LTS 重點](java21.md)__
 
     ---
 
-    Virtual Threads - 虛擬線程 · Pattern Matching for Switch · Sequenced Collections · Structured Concurrency - 結構化並發 · ScopedValue - 作用域值
+    Java 21 LTS 最重要的特性是虛擬執行緒，讓同步寫法也能撐住大量並發。
 
 -   __[05 · 版本對比速查表](version-comparison.md)__
 
     ---
 
-    版本對比速查表
+    一張表整理 Java 8 到 21 各版本的重點特性與 LTS 版本，方便快速查詢與決定升級路線。
 
 -   __[06 · 實戰整合範例](practice.md)__
 
     ---
 
-    實戰整合範例
+    本章把 Record、Sealed Class、模式匹配與虛擬執行緒組合在同一個情境中，示範新特性在實際專案裡如何互相搭配。
 
 </div>
 

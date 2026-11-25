@@ -36,13 +36,13 @@ flowchart LR
 
     ---
 
-    渲染流程 · 常用語法 · 片段與版型 · 與 Spring Security 整合
+    本章說明 Thymeleaf 的渲染流程、常用語法與 Razor 的對照、片段與版型、與 Spring Security 的整合，以及伺服器端模板的優缺點。
 
 -   __[02 · 漸進增強：在伺服器頁面上加互動](progressive-enhancement.md)__
 
     ---
 
-    一個頁面裡的分工 · jQuery：命令式更新 · Vue 2 從 CDN 引入：宣告式更新 · 從混合架構走向前後端分離
+    本章說明一個頁面裡各項技術的分工、jQuery 命令式與 Vue 宣告式更新的差別，最後比較混合架構與 Vue 3 SPA 的取捨。
 
 </div>
 

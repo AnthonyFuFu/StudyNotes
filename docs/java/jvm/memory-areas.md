@@ -44,7 +44,7 @@ block-beta
     f1["棧幀 1：method_a() ← 棧底"]
 ```
 
-### 棧幀內部詳解：
+### 棧幀內部詳解
 
 ```java
 public int calculate(int a, int b) {
@@ -62,7 +62,7 @@ public int calculate(int a, int b) {
 | **動態連結**<br>Dynamic Linking | 指向運行時常量池中該方法的引用 |
 | **方法返回地址**<br>Return Address | 記錄調用者的 PC 值，方法結束後回到哪裡 |
 
-### StackOverflowError vs OOM：
+### StackOverflowError vs OOM
 
 ```java
 // StackOverflowError：棧深度超過限制
@@ -81,7 +81,7 @@ for (int i = 0; i < 100000; i++) {
 // -Xss512k  每個線程棧大小為 512KB（預設 512k~1M）
 ```
 
-## 堆（Heap）⭐ 最重要
+## 堆（Heap）
 
 - ✅ 線程共享（所有線程都用同一個堆）
 - ✅ JVM 中最大的記憶體區域
@@ -109,7 +109,7 @@ block-beta
 | `-Xmn` | 新生代大小 |
 | `-XX:SurvivorRatio=8` | Eden : S0 : S1 = 8 : 1 : 1 |
 
-### 對象在堆中的生命週期：
+### 對象在堆中的生命週期
 
 新對象建立
 
@@ -194,7 +194,7 @@ public void demo() {
 | `-XX:MetaspaceSize=256m` | 初始大小 |
 | `-XX:MaxMetaspaceSize=512m` | 最大大小 |
 
-### 字串常量池：
+### 字串常量池
 
 ```java
 // 字串常量池（String Pool）在 Java 8+ 移到了堆中！

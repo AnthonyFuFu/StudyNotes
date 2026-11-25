@@ -136,7 +136,7 @@ GET /products/_search
 // ⚠️ wildcard 效能差，避免在高基數欄位上使用
 ```
 
-## 複合查詢（Bool Query）⭐ 最重要
+## 複合查詢（Bool Query）
 
 ```json
 GET /products/_search

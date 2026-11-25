@@ -6,7 +6,7 @@ icon: lucide/activity
 
 Metrics、Logs、Traces 三大支柱，以及 Prometheus、Grafana、ELK、鏈路追蹤如何組成完整的可觀測性平台。
 
-**核心技術**：Prometheus / Grafana / ELK / SkyWalking / SLO
+**核心技術**：Prometheus / Grafana / ELK / SkyWalking / SLO / Arthas / 線上排查
 
 ## 學習地圖
 
@@ -16,15 +16,15 @@ flowchart LR
     R(["監控與可觀測性"])
     c0["01 · 可觀測性三大支柱"]
     R --> c0
-    p0("・Metrics（指標）<br>・Logs（日誌）<br>・Traces（鏈路追蹤）")
+    p0("・什麼是可觀測性？<br>・黃金指標")
     c0 --- p0
     c1["02 · Prometheus 深入"]
     R --> c1
-    p1("・架構原理<br>・資料模型與 PromQL<br>・Spring Boot 整合<br>・告警規則（AlertManager）")
+    p1("・架構原理<br>・資料模型與指標類型<br>・PromQL 查詢語言<br>・Spring Boot 整合 Prometheus<br>・AlertManager 告警規則")
     c1 --- p1
     c2["03 · Grafana 深入"]
     R --> c2
-    p2("・儀表板設計原則<br>・關鍵面板配置<br>・變數（Variables）")
+    p2("・儀表板設計原則<br>・關鍵面板 PromQL 配置<br>・Grafana 變數")
     c2 --- p2
     c3["04 · ELK Stack 深入"]
     R --> c3
@@ -32,16 +32,20 @@ flowchart LR
     c3 --- p3
     c4["05 · 分散式鏈路追蹤"]
     R --> c4
-    p4("・SkyWalking 架構<br>・Spring Boot 整合<br>・鏈路分析實戰")
+    p4("・SkyWalking 架構<br>・Spring Boot 整合<br>・鏈路追蹤實戰分析")
     c4 --- p4
     c5["06 · 實戰：完整可觀測性平台"]
     R --> c5
-    p5("・整合架構設計<br>・Docker Compose 部署<br>・生產告警體系")
+    p5("・整合架構設計<br>・Docker Compose 部署完整監控棧<br>・生產告警體系設計<br>・SLI / SLO 設計")
     c5 --- p5
+    c6["07 · 線上問題排查 SOP"]
+    R --> c6
+    p6("・排查原則<br>・由外而內定位<br>・常見情境<br>・Arthas：不重啟就能看線上程式<br>・Kubernetes 環境")
+    c6 --- p6
     classDef chapter stroke-width:2px
     classDef points fill:transparent,text-align:left
-    class c0,c1,c2,c3,c4,c5 chapter
-    class p0,p1,p2,p3,p4,p5 points
+    class c0,c1,c2,c3,c4,c5,c6 chapter
+    class p0,p1,p2,p3,p4,p5,p6 points
 ```
 
 ## 章節導覽
@@ -52,37 +56,43 @@ flowchart LR
 
     ---
 
-    什麼是可觀測性？ · 黃金指標
+    監控回答「哪裡壞了」，可觀測性回答「為什麼壞了」。
 
 -   __[02 · Prometheus 深入](prometheus.md)__
 
     ---
 
-    架構原理 · 資料模型與指標類型 · PromQL 查詢語言 · Spring Boot 整合 Prometheus · AlertManager 告警規則
+    Prometheus 以拉取模式收集指標，是雲原生監控的事實標準。
 
 -   __[03 · Grafana 深入](grafana.md)__
 
     ---
 
-    儀表板設計原則 · 關鍵面板 PromQL 配置 · Grafana 變數
+    好的儀表板要讓人在幾秒內判斷系統是否正常。
 
 -   __[04 · ELK Stack 深入](elk.md)__
 
     ---
 
-    ELK 架構 · Spring Boot 結構化日誌 · Filebeat 配置 · Logstash Pipeline · Kibana 使用技巧
+    日誌是排查問題最直接的線索，但散落在每台機器上就很難查。
 
 -   __[05 · 分散式鏈路追蹤](tracing.md)__
 
     ---
 
-    SkyWalking 架構 · Spring Boot 整合 · 鏈路追蹤實戰分析
+    一個請求在微服務之間經過多個服務時，鏈路追蹤能指出時間花在哪一段。
 
--   __[06 · 實戰：可觀測性平台](platform.md)__
+-   __[06 · 實戰：完整可觀測性平台](platform.md)__
 
     ---
 
-    整合架構設計 · Docker Compose 部署完整監控棧 · 生產告警體系設計 · SLI / SLO 設計
+    本章把 Metrics、Logs、Traces 三者整合成一套完整的可觀測性平台，示範以 Docker Compose 部署整個監控棧，並說明生產環境的告警分級與 SLI / SLO 的設計方式。
+
+-   __[07 · 線上問題排查 SOP](troubleshooting.md)__
+
+    ---
+
+    告警響了之後，排查要有固定的順序，而不是到處亂看。
 
 </div>
 

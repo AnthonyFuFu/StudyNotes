@@ -48,31 +48,31 @@ flowchart LR
 
     ---
 
-    倒排索引（Inverted Index）⭐ 最重要 · 分散式架構 · 文件寫入流程
+    Elasticsearch 能在毫秒內完成全文搜尋，關鍵在於倒排索引。
 
 -   __[02 · 資料模型](data-model.md)__
 
     ---
 
-    Mapping · 分析器
+    Mapping 決定了欄位如何被索引與查詢，設計錯了往往只能重建索引。
 
 -   __[03 · DSL 查詢語法](dsl-query.md)__
 
     ---
 
-    全文查詢 · 精確查詢 · 複合查詢（Bool Query）⭐ 最重要 · 聚合查詢 · 巢狀查詢
+    Elasticsearch 的查詢以 JSON 形式的 DSL 撰寫。
 
 -   __[04 · Spring Boot 整合](spring-boot.md)__
 
     ---
 
-    Spring Data Elasticsearch 整合 · DB 與 ES 數據同步方案
+    本章示範用 Spring Data Elasticsearch 操作索引與查詢，並比較同步雙寫、MQ 非同步、Canal 監聽 Binlog 等資料庫與 ES 的資料同步方案。
 
 -   __[05 · 生產實戰](production.md)__
 
     ---
 
-    索引設計最佳實踐 · 效能調優 · ELK Stack 日誌系統建置
+    把 Elasticsearch 用在正式環境，要面對分片規劃、寫入效能與記憶體設定等問題。
 
 </div>
 

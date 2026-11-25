@@ -1,5 +1,9 @@
 # 即時通訊與串流
 
+!!! abstract "本章重點"
+
+    伺服器要主動把資料推給瀏覽器時，HTTP 一問一答就不夠用了。本章比較輪詢、SSE、WebSocket、HLS、WebRTC 的適用場景，對照 STOMP 與原生 WebSocket 兩種實作，並說明 HTTP Range 與 HLS 影音串流的原理。
+
 伺服器要「主動」把資料推給瀏覽器時，HTTP 一問一答的模式就不夠用了。我在不同專案用過三種做法：**STOMP over WebSocket**（holidayDessert 客服）、**原生 WebSocket + Reactor**（stock-observation 直播聊天室）、**HLS / HTTP Range**（直播與影片串流）。
 
 ## 推送技術比較

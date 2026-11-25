@@ -1,5 +1,9 @@
 # Web MVC 請求處理流程
 
+!!! abstract "本章重點"
+
+    一個 HTTP 請求進到 Spring MVC 後，會依序經過 Filter、DispatcherServlet、HandlerMapping、Interceptor 與 HandlerAdapter。本章說明每個元件的角色、Filter / Interceptor / AOP 的分工，以及 Thread-per-Request 模型的極限。
+
 Spring MVC 建立在 **Servlet API** 上，採用 **Thread-per-Request** 模型：每個 HTTP 請求從 Tomcat 執行緒池拿一條執行緒，從頭跑到尾。
 
 ## 一個請求經過哪些元件

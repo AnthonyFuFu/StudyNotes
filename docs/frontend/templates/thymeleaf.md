@@ -1,5 +1,9 @@
 # Thymeleaf
 
+!!! abstract "本章重點"
+
+    本章說明 Thymeleaf 的渲染流程、常用語法與 Razor 的對照、片段與版型、與 Spring Security 的整合，以及伺服器端模板的優缺點。
+
 Thymeleaf 是 Spring Boot 最常搭配的伺服器端模板引擎。最大特色是**自然模板（Natural Template）**：模板本身就是合法的 HTML，用瀏覽器直接打開也能看到版面，屬性 `th:*` 只在伺服器渲染時生效。
 
 ## 渲染流程

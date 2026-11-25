@@ -48,15 +48,13 @@
 
 ## HTTP 狀態碼快速記憶
 
-``` text
-1xx  資訊性     100 Continue
-2xx  成功       200 OK / 201 Created / 204 No Content
-3xx  重定向     301 永久 / 302 臨時 / 304 Not Modified
-4xx  客戶端錯誤  400 Bad Request / 401 未認證 / 403 無權限
-                404 Not Found / 429 Too Many Requests
-5xx  服務器錯誤  500 Internal Error / 502 Bad Gateway
-                503 Service Unavailable / 504 Gateway Timeout
-```
+| 類別 | 意義 | 常見狀態碼 |
+|------|------|-----------|
+| **1xx** | 資訊性 | `100 Continue` |
+| **2xx** | 成功 | `200 OK`、`201 Created`、`204 No Content` |
+| **3xx** | 重定向 | `301` 永久、`302` 臨時、`304 Not Modified` |
+| **4xx** | 客戶端錯誤 | `400 Bad Request`、`401` 未認證、`403` 無權限、`404 Not Found`、`429 Too Many Requests` |
+| **5xx** | 伺服器錯誤 | `500 Internal Error`、`502 Bad Gateway`、`503 Service Unavailable`、`504 Gateway Timeout` |
 
 ## HTTP 常用 Header
 

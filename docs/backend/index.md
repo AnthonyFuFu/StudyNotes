@@ -14,7 +14,7 @@ icon: lucide/server
 
     Java 後端最主流的框架。這個主題從 IoC、自動配置、AOP 代理講到請求處理流程與交易，最後以 holidayDessert 的高併發搶票系統做完整實戰。
 
-    `4 章` · IoC / 自動配置 / AOP / DispatcherServlet / JPA / @Transactional / Redis Lua
+    `5 章` · IoC / 自動配置 / AOP / DispatcherServlet / JPA / @Transactional / Redis Lua
 
 -   __[Spring WebFlux](webflux/index.md)__
 

@@ -1,5 +1,9 @@
 # Kafka
 
+!!! abstract "本章重點"
+
+    Kafka 本質上是分散式的追加日誌，訊息消費後仍會保留、可以重播。本章說明 Topic、Partition、Consumer Group 的關係，Kafka 高吞吐量的原因，並以 holidayDessert 的搶票訂單說明實作與毒藥訊息的處理。
+
 Kafka 本質上是一個**分散式、只能追加寫入的日誌（Commit Log）**。訊息被消費後**不會刪除**，而是依保留時間（預設 7 天）清理，所以可以重播。
 
 ## 架構

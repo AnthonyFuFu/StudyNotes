@@ -1,5 +1,9 @@
 # 元件選型：Spring Cloud 與 Alibaba 生態對照
 
+!!! abstract "本章重點"
+
+    Spring Cloud 的每個能力都有不同實作可選。本章對照官方 / Netflix 系（Eureka、Resilience4j、Config Server）與 Alibaba 系（Nacos、Sentinel）的差異，並給出選型建議。
+
 Spring Cloud 是一套**規範與抽象**，每個能力都有不同的實作可以選。前面章節介紹的是 Spring Cloud Alibaba（Nacos、Sentinel），我在 microservicecloud 實作的則是 Spring Cloud 官方 / Netflix 系（Eureka、Resilience4j、Config Server）。
 
 ## 元件對照

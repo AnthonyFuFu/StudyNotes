@@ -29,7 +29,7 @@
 
 現在是 91s，窗口是 [31s \~ 91s]  ← 窗口滑動
 
-### 算法三：令牌桶（Token Bucket）✅ 推薦
+### 算法三：令牌桶（Token Bucket）（推薦）
 
 ``` mermaid
 flowchart LR
@@ -52,7 +52,7 @@ flowchart LR
 - **優點**：輸出速率穩定
 - **缺點**：無法應對突發流量
 
-### Java 實作（Guava RateLimiter）：
+### Java 實作（Guava RateLimiter）
 
 ```java
 import com.google.common.util.concurrent.RateLimiter;
@@ -73,7 +73,7 @@ public class OrderController {
 }
 ```
 
-### Redis + Lua 分散式限流：
+### Redis + Lua 分散式限流
 
 ```java
 public boolean isAllowed(String userId, int maxRequest, int windowSeconds) {
@@ -128,7 +128,7 @@ stateDiagram-v2
 | **Open（斷開）** | 熔斷狀態，直接返回錯誤，不請求下游 |
 | **Half-Open（半開）** | 允許少量請求測試，成功則恢復 Closed |
 
-### Resilience4j 實作：
+### Resilience4j 實作
 
 ```yaml
 # application.yml
@@ -160,15 +160,13 @@ public class OrderService {
 
 ## 降級（Fallback）策略
 
-``` text
-降級策略                    使用場景
-─────────────────────────────────────────
-返回預設值         →  搜索結果顯示熱門商品
-讀取緩存           →  商品詳情從 Redis 讀取
-異步處理           →  下單失敗放入 MQ 重試
-返回靜態頁面       →  活動頁掛了返回靜態版本
-直接返回錯誤       →  非核心功能直接告知不可用
-```
+| 降級策略 | 使用場景 |
+|---------|---------|
+| 返回預設值 | 推薦服務掛了，搜尋結果改顯示熱門商品 |
+| 讀取快取 | 商品詳情直接從 Redis 讀取，不查資料庫 |
+| 非同步處理 | 下單失敗先放入 MQ，稍後重試 |
+| 返回靜態頁面 | 活動頁掛了，改回傳預先產生的靜態版本 |
+| 直接返回錯誤 | 非核心功能直接告知暫時不可用 |
 
 !!! example "我的實作：holidayDessert 的四層流控"
 

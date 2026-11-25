@@ -1,5 +1,9 @@
 # 實戰：直播與影片串流
 
+!!! abstract "本章重點"
+
+    直播、聊天室與影片點播都是長時間佔用連線的場景，正好是 WebFlux 擅長的地方。本章拆解 stock-observation 的 HLS 代理、Reactor Sinks 聊天室廣播，以及 HTTP Range 影片串流。
+
 !!! abstract "專案：stock-observation"
 
     Spring Boot 4 + WebFlux + R2DBC（PostgreSQL / H2）。同時涵蓋三個領域：台股 / 美股行情資料、**直播串流**（MediaMTX + WebSocket 聊天室）、**影片點播**（HTTP Range 串流）。這三個都是「長時間佔用連線」的場景，正是 WebFlux 擅長的地方。

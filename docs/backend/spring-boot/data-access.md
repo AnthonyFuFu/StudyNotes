@@ -1,5 +1,9 @@
 # 資料存取與交易
 
+!!! abstract "本章重點"
+
+    本章比較 JPA、JdbcTemplate、MyBatis 三種資料存取方式與 HikariCP 連線池設定，深入 `@Transactional` 的代理原理、傳播行為與常見的失效原因，最後說明用條件式 UPDATE 防止超賣。
+
 Spring Boot 存取關聯式資料庫有好幾種方式，各有適用場景。holidayDessert 同時用了 **Spring Data JPA** 和 **JdbcTemplate**。
 
 ## 三種資料存取方式

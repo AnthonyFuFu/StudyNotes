@@ -1,5 +1,9 @@
 # 程序架構與安全
 
+!!! abstract "本章重點"
+
+    Electron 由 Main、Renderer、Preload 三種程序組成，安全設定一旦錯誤，網頁漏洞就會變成整台電腦的漏洞。本章說明三種程序的分工、必要的安全設定，以及用共用介面實作型別安全的 IPC。
+
 Electron = **Chromium（畫面）+ Node.js（系統能力）**，讓網頁技術做出跨平台桌面程式。VS Code、Slack、Discord 都是 Electron 寫的。
 
 ## 三種程序

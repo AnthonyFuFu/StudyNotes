@@ -1,5 +1,9 @@
 # 基礎架構：區域、IAM 與 VPC
 
+!!! abstract "本章重點"
+
+    所有 AWS 架構都建立在 Region / AZ、IAM 權限與 VPC 網路之上。本章說明責任共擔模型、IAM 的最小權限與「不要把 Access Key 寫進程式」，以及三層式 VPC 與 Security Group 的設計。
+
 ## 全球基礎設施
 
 ``` mermaid

@@ -44,25 +44,25 @@ flowchart LR
 
     ---
 
-    關鍵渲染路徑 · 重排（Reflow）vs 重繪 · 事件循環
+    了解瀏覽器怎麼把 HTML 變成畫面，才知道效能問題出在哪裡。
 
 -   __[02 · JavaScript 核心原理](javascript.md)__
 
     ---
 
-    原型鏈 · 閉包 · 非同步：Promise / async-await
+    原型鏈、閉包與非同步是 JavaScript 最核心、也最常被問到的三個概念。
 
 -   __[03 · TypeScript 深度](typescript.md)__
 
     ---
 
-    類型系統 · 泛型 · 實用工具類型
+    TypeScript 在編譯期就能找出型別錯誤，讓大型前端專案更好維護。
 
 -   __[04 · 前端效能優化](performance.md)__
 
     ---
 
-    載入效能 · 渲染效能 · 網路效能
+    前端效能分成「載入得快」與「操作得順」兩部分。
 
 </div>
 

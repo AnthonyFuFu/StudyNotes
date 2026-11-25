@@ -36,13 +36,13 @@ flowchart LR
 
     ---
 
-    Virtual DOM 與 Diff 算法 · Fiber 架構 · Hooks 深度 · 狀態管理
+    本章從 Virtual DOM 與 Diff 演算法開始，說明 React 16 引入 Fiber 架構的原因，再深入 Hooks 的運作規則與常見陷阱，最後比較各種狀態管理方案。
 
 -   __[02 · 實戰：React 19 + TypeScript](react-typescript.md)__
 
     ---
 
-    技術選擇 · 自訂 Hook：把「讀取資料」抽出來 · React 19 的新東西 · 測試
+    本章以 fu-clan-management-system 說明 React 19 + TypeScript 的實戰寫法：技術選擇的理由、用自訂 Hook 處理讀取狀態與競態條件、React 19 的新功能，以及 Testing Library 的測試原則。
 
 </div>
 

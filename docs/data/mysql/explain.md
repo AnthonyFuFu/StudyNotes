@@ -23,7 +23,7 @@ LIMIT 10;
 | 1 | SIMPLE | u | `ref` | status_idx | status_idx | 62 | 500 | 100% | Using where |
 | 1 | SIMPLE | o | `ref` | user_id_idx | user_id_idx | 8 | 10 | 33% | Using index condition |
 
-### type 欄位（效能由好到差）：
+### type 欄位（效能由好到差）
 
 system  > const > eq_ref > ref > range > index > ALL
 
@@ -54,7 +54,7 @@ ALL：   全表掃描 ← 最差！必須優化！
 
 - 沒有使用任何索引
 
-### Extra 欄位常見值：
+### Extra 欄位常見值
 
 | Extra 值 | 意義 |
 |------|------|

@@ -30,7 +30,7 @@
         R -->|"= 1"| T1[("order_1<br>id 1, 3, 5 …")]
     ```
 
-### 常見分片策略：
+### 常見分片策略
 
 Hash 取模：  userId % 4 → 均勻分布，但擴容難
 
@@ -38,7 +38,7 @@ Range 範圍：  id 1\~100萬 → shard0，101\~200萬 → shard1
 
 一致性 Hash：  擴容方便，但實作複雜
 
-### ShardingSphere 配置範例：
+### ShardingSphere 配置範例
 
 ```yaml
 spring:

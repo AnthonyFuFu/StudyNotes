@@ -45,7 +45,7 @@ flowchart TB
 - ✅ **A、B、C、D**：從 GC Root 可達 → 存活
 - ❌ **E、F**：互相引用但沒有 GC Root 到達 → 不可達，可以回收
 
-### 四種引用類型：
+### 四種引用類型
 
 ```java
 // 1. 強引用（Strong Reference）- 最常見
@@ -246,7 +246,7 @@ block-beta
 
 **JVM 參數**：`-XX:+UseConcMarkSweepGC`（Java 14 已移除）
 
-### 收集器五：G1 GC（Garbage First）⭐ Java 9+ 預設
+### 收集器五：G1 GC（Garbage First） — Java 9+ 預設
 
 **核心思想**：不再固定劃分新生代 / 老年代區域，而是把整個堆切成多個大小相等的 Region。
 

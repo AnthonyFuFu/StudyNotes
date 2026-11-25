@@ -217,7 +217,7 @@ Long uv = redisTemplate.opsForHyperLogLog().size("page:home:uv");
 // HyperLogLog：記憶體固定 12KB，誤差 < 0.81%（不需要精確時使用）
 ```
 
-## ZSet（有序集合）⭐ 最重要
+## ZSet（有序集合）
 
 **底層編碼**
 

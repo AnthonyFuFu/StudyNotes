@@ -36,13 +36,13 @@ flowchart LR
 
     ---
 
-    和 Vue / React 的定位差異 · Standalone 元件 · 依賴注入 · RxJS：處理非同步串流 …
+    Angular 是內建 DI、路由、表單與 HTTP 的完整框架，它的 Service + DI 思維與 Spring 非常接近。
 
 -   __[02 · 實戰：SSR、Hydration 與 UI](ssr-ui.md)__
 
     ---
 
-    為什麼要 SSR · 三種渲染模式並用 · Hydration 與 Event Replay · 伺服器：Express …
+    內容型網站需要 SEO 與快速首屏，Angular 可以讓每條路由各自選擇預渲染、伺服器渲染或客戶端渲染。
 
 </div>
 

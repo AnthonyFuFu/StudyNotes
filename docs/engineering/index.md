@@ -14,7 +14,7 @@ icon: lucide/wrench
 
     測試金字塔與各層測試工具，從 JUnit 5、Mockito 到 Spring Boot Test、Testcontainers 與 TDD 實戰。
 
-    `6 章` · JUnit 5 / Mockito / Testcontainers / TDD
+    `7 章` · JUnit 5 / Mockito / Testcontainers / TDD
 
 -   __[CI/CD 與 DevOps](cicd/index.md)__
 
@@ -22,7 +22,7 @@ icon: lucide/wrench
 
     DevOps 核心概念、Docker 與 Kubernetes 深入、Jenkins / GitHub Actions 流水線、Helm 部署，再到企業常見的 **Harbor 私有映像倉庫**與 **Argo CD GitOps**，最後整理我在各專案中實際建立的流水線。
 
-    `8 章` · Docker / Kubernetes / Jenkins / GitHub Actions / Helm / Harbor / Argo CD / Argo Rollouts / GHCR / kubeadm
+    `9 章` · Docker / Kubernetes / Jenkins / GitHub Actions / Helm / Harbor / Argo CD / Argo Rollouts / GHCR / kubeadm
 
 -   __[AWS 雲端服務](aws/index.md)__
 
@@ -38,7 +38,7 @@ icon: lucide/wrench
 
     Metrics、Logs、Traces 三大支柱，以及 Prometheus、Grafana、ELK、鏈路追蹤如何組成完整的可觀測性平台。
 
-    `6 章` · Prometheus / Grafana / ELK / SkyWalking / SLO
+    `7 章` · Prometheus / Grafana / ELK / SkyWalking / SLO
 
 </div>
 
