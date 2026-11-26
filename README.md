@@ -1,20 +1,63 @@
-# Study Notes
+<div align="center">
 
-全端工程師的深度學習筆記網站，以 [zensical](https://zensical.org/) 建立，內容以 Markdown 撰寫。
+# 📚 Study Notes
 
-筆記系統性整理核心知識體系，並搭配實際專案的實作，共 **7 大分類、26 個主題、133 個章節**：
+**全端工程師的深度學習筆記網站：從原理、優缺點到真實專案的實作**
+
+[![Deploy](https://github.com/AnthonyFuFu/StudyNotes/actions/workflows/CI.yml/badge.svg)](https://github.com/AnthonyFuFu/StudyNotes/actions/workflows/CI.yml)
+[![zensical](https://img.shields.io/badge/zensical-Material_風格-526CFE?logo=materialformkdocs&logoColor=white)](https://zensical.org/)
+[![Markdown](https://img.shields.io/badge/Markdown-000000?logo=markdown&logoColor=white)](https://daringfireball.net/projects/markdown/)
+[![Mermaid](https://img.shields.io/badge/Mermaid-207_張圖表-FF3670?logo=mermaid&logoColor=white)](https://mermaid.js.org/)
+[![Python](https://img.shields.io/badge/Python-3.11+-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![Docker](https://img.shields.io/badge/Docker-Nginx_非_root-2496ED?logo=docker&logoColor=white)](Dockerfile)
+
+🌐 線上閱讀：[**anthonyfufu.github.io/StudyNotes**](https://anthonyfufu.github.io/StudyNotes/)
+
+[內容總覽](#-內容總覽) ・
+[網站特色](#-網站特色) ・
+[快速開始](#快速開始) ・
+[專案結構](#專案結構) ・
+[書寫規則](#書寫規則) ・
+[建置與部署](#建置與部署)
+
+</div>
+
+---
+
+## 🗂️ 內容總覽
+
+筆記系統性整理核心知識體系，共 **7 大分類、26 個主題、133 個章節**：
 
 | 分類 | 主題 |
 |------|------|
-| Java 核心 | Java 新特性 / JVM 深度原理 / Java 並發 |
-| 後端框架 | Spring Boot（MVC）/ Spring WebFlux / Spring Cloud 微服務 / ASP.NET Core |
-| 前端與桌面 | 前端基礎原理 / 伺服器端模板（Thymeleaf、Razor）/ Vue / React / Angular / Electron 桌面應用 |
-| 資料與訊息 | MySQL 深度優化 / Redis 深度 / Elasticsearch / 訊息佇列（Kafka、RabbitMQ） |
-| 架構設計 | 系統設計 / 設計模式 / API 設計與通訊協議 |
-| 網路與資安 | 網路基礎 / 資安 |
-| 工程實踐 | 測試 / CI/CD 與 DevOps（含 Harbor、Argo CD）/ AWS 雲端服務 / 監控與可觀測性 |
+| ☕ **Java 核心** | Java 新特性 ・ JVM 深度原理 ・ Java 並發 |
+| 🧩 **後端框架** | Spring Boot（MVC）・ Spring WebFlux ・ Spring Cloud 微服務 ・ ASP.NET Core |
+| 🎨 **前端與桌面** | 前端基礎原理 ・ 伺服器端模板（Thymeleaf、Razor）・ Vue ・ React ・ Angular ・ Electron |
+| 🗄️ **資料與訊息** | MySQL 深度優化 ・ Redis 深度 ・ Elasticsearch ・ 訊息佇列（Kafka、RabbitMQ） |
+| 🏗️ **架構設計** | 系統設計 ・ 設計模式 ・ API 設計與通訊協議 |
+| 🔐 **網路與資安** | 網路基礎（含 Nginx）・ 資安 |
+| ⚙️ **工程實踐** | 測試 ・ CI/CD 與 DevOps（含 Harbor、Argo CD）・ AWS 雲端服務 ・ 監控與可觀測性 |
 
-框架類主題都依照「原理 → 優缺點 → 我的實作」撰寫，實作內容來自以下專案：holidayDessert、holiday_dessert_vue、stock-observation、microservicecloud、chineseArtwork、chinese_artwork_angular、fu-clan-management-system。
+框架類主題都依照「**原理 → 優缺點 → 我的實作**」撰寫，實作內容來自以下專案：
+
+[holidayDessert](https://github.com/AnthonyFuFu/holidayDessert) ・
+[holiday_dessert_vue](https://github.com/AnthonyFuFu/holiday_dessert_vue) ・
+[stock-observation](https://github.com/AnthonyFuFu/stock-observation) ・
+[microservicecloud](https://github.com/AnthonyFuFu/microservicecloud) ・
+[chineseArtwork](https://github.com/AnthonyFuFu/chineseArtwork) ・
+[chinese_artwork_angular](https://github.com/AnthonyFuFu/chinese_artwork_angular) ・
+[fu-clan-management-system](https://github.com/AnthonyFuFu/fu-clan-management-system)
+
+## ✨ 網站特色
+
+| | 特色 | 說明 |
+|:---:|---|---|
+| 🧭 | **三層導覽** | 上方分類頁籤、左側只展開目前主題、右側章節目錄跟隨捲動 |
+| 📝 | **一致的章節格式** | 每章開頭都有「本章重點」，主題首頁以卡片列出各章摘要 |
+| 📊 | **Mermaid 圖表** | 流程、時序、類別圖全部以 Mermaid 繪製，支援深色模式 |
+| 🔎 | **中文搜尋** | 搜尋分詞加入中文標點，中文關鍵字也能精準命中 |
+| 🌗 | **深淺色主題** | 依系統設定自動切換，也可手動切換 |
+| 🐳 | **容器化** | Nginx 以非 root 使用者執行，可直接部署 |
 
 ## 快速開始
 
